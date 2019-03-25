@@ -2,7 +2,7 @@
 
 The otpr R package provides a simple R wrapper for the Open Trip Planner (OTP) API.
 
-## Installation - Open Trip Planner
+## Installation - OpenTripPlanner
 
 To use otpr you will need a running instance of OTP. An tutorial complete with sample data is available at https://github.com/marcusyoung/otp-tutorial. 
 
