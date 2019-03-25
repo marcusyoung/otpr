@@ -1,6 +1,6 @@
 # otpr
 
-The otpr R package provides a simple R wrapper for the OpenTripPlanner (OTP) API.
+otpr is an R package that provides a simple wrapper for the OpenTripPlanner (OTP) API.
 
 ## Installation - OpenTripPlanner
 
