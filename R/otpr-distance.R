@@ -75,7 +75,8 @@ otpr_distance <-
       # set error.id to OK
       error.id <- "OK"
       if (mode == "CAR") {
-        # for car the distance is only recorded in the legs objects. Only one leg should be returned if mode is car and we pick that -  probably need error check for this
+        # for car the distance is only recorded in the legs objects. Only one leg
+        # should be returned if mode is car and we pick that
         response <-
           list(
             "errorId" = error.id,
