@@ -1,4 +1,4 @@
 library(testthat)
-library(opentripplanner)
+library(otpr)
 
-test_check("opentripplanner")
+test_check("otpr")

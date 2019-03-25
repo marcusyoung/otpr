@@ -12,6 +12,8 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     checkmate,
-    httr
-RoxygenNote: 6.0.1
+    httr,
+    curl,
+    jsonlite
+RoxygenNote: 6.1.1
 Suggests: testthat
