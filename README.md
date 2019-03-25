@@ -1,6 +1,6 @@
 # otpr
 
-The goal of the otpr package is to provide a simple R wrapper for the Open Trip Planner (OTP) API.
+The otpr package provides a simple R wrapper for the Open Trip Planner (OTP) API.
 
 ## Installation - Open Trip Planner
 
