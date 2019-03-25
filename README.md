@@ -1,6 +1,6 @@
 # otpr
 
-The otpr package provides a simple R wrapper for the Open Trip Planner (OTP) API.
+The otpr R package provides a simple R wrapper for the Open Trip Planner (OTP) API.
 
 ## Installation - Open Trip Planner
 
@@ -14,3 +14,7 @@ Install the package with **devtools** as follows:
 # install.packages("devtools")
 devtools::install_github("marcusyoung/otpr")
 ```
+
+## Status
+
+Currently under development
