@@ -10,7 +10,7 @@
 #' @param ssl Logical, indicates whether to use https. Optional, default is FALSE.
 #' @param check Logical. If TRUE connection object is only returned if OTP
 #'     instance and router are confirmed reachable. Optional, default is TRUE.
-#' @return Returns an S3 object of class otpconnect. If \code{check} is TRUE
+#' @return Returns S3 object of class otpconnect. If \code{check} is TRUE
 #'     and the router is not reachable the object is not returned.
 #' @examples
 #' otpcon <- otp_connect()
