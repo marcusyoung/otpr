@@ -1,4 +1,4 @@
-#' Finds the distance in km between supplied origin and destination
+#' Finds the distance in metres between supplied origin and destination
 #'
 #' Finds the distance in metres between supplied origin and destination. Only makes
 #' sense for walk, cycle or car modes (not transit)
@@ -25,17 +25,29 @@ otpr_distance <-
 
     mode <- toupper(mode)
 
+
     coll <- checkmate::makeAssertCollection()
-    checkmate::assert_class(otpcon, "otpconnect")
-    checkmate::assert_numeric(fromPlace,
-                              lower =  -180,
-                              upper = 180,
-                              len = 2)
-    checkmate::assert_numeric(toPlace,
-                              lower =  -180,
-                              upper = 180,
-                              len = 2)
-    checkmate::assert_choice(mode, choices = c("WALK", "BICYCLE", "CAR"), null.ok = F)
+    checkmate::assert_class(otpcon, "otpconnect", add = coll)
+    checkmate::assert_numeric(
+      fromPlace,
+      lower =  -180,
+      upper = 180,
+      len = 2,
+      add = coll
+    )
+    checkmate::assert_numeric(
+      toPlace,
+      lower =  -180,
+      upper = 180,
+      len = 2,
+      add = coll
+    )
+    checkmate::assert_choice(
+      mode,
+      choices = c("WALK", "BICYCLE", "CAR"),
+      null.ok = F,
+      add = coll
+    )
     checkmate::reportAssertions(coll)
 
     fromPlace <- paste(fromPlace, collapse = ",")
