@@ -13,8 +13,6 @@
 #' error then a list containing \code{errorId} with the OTP error code and \code{errorMessage}
 #' with the error message returned by OTP.
 #' @export
-
-
 otpr_distance <-
   function(otpcon = NULL,
            fromPlace = NULL,
