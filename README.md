@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/marcusyoung/otpr.svg?branch=master)](https://travis-ci.org/marcusyoung/otpr)
+
 # otpr
 
 otpr is an R package that provides a simple wrapper for the OpenTripPlanner (OTP) API.
