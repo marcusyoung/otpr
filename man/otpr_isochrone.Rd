@@ -4,7 +4,7 @@
 \alias{otpr_isochrone}
 \title{Returns one or more travel time isochrones in GeoJSON format}
 \usage{
-otpr_isochrone(otpcon, location, direction = "from", mode = "TRANSIT",
+otpr_isochrone(otpcon, location, fromLocation = TRUE, mode = "TRANSIT",
   date, time, cutoffs, batch = TRUE, arriveBy = FALSE,
   maxWalkDistance = 800, walkReluctance = 2, transferPenalty = 0,
   minTransferTime = 0)
@@ -14,8 +14,8 @@ otpr_isochrone(otpcon, location, direction = "from", mode = "TRANSIT",
 
 \item{location}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
 
-\item{direction}{Character, either "to" or "from". If "from" (default) the isochrone
-will be generated \emph{from} the \code{location}. If "to" the isochrone will be generated
+\item{fromLocation}{Logical. If TRUE (default) the isochrone
+will be generated \emph{from} the \code{location}. If FALSE the isochrone will be generated
 \emph{to} the \code{location}.}
 
 \item{mode}{Character, mode of travel. Valid values are: WALK, TRANSIT, BUS, or RAIL.
@@ -33,7 +33,7 @@ is current system time.}
 example: 'c(900, 1800. 2700)'
 would request 15, 30 and 60 minute isochrones. Can be a single value.}
 
-\item{batch}{Logical.}
+\item{batch}{Logical. If true, goal direction is turned off and a full path tree is built}
 
 \item{arriveBy}{Logical. Whether the specified date and time is for
 departure (FALSE) or arrival (TRUE). Default is FALSE.}
@@ -45,8 +45,8 @@ willing to walk. Default = 800.}
 to being in transit for equal lengths of time. Default = 2.}
 
 \item{transferPenalty}{Integer. An additional penalty added to boardings after
-the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high
-value to discourage transfers. Default is 0.}
+the first. The value is in OTP's internal weight units, which are roughly equivalent
+to seconds. Set this to a high value to discourage transfers. Default is 0.}
 
 \item{minTransferTime}{Integer. The minimum time, in seconds, between successive
 trips on different vehicles. This is designed to allow for imperfect schedule
@@ -70,5 +70,8 @@ walk and/or transit modes - a limitation of OTP. Isochrones can be generated eit
 \examples{
 \dontrun{
 otpr_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
+
+otpr_isochrone(otpcon, location = c(53.48805, -2.24258), fromLocation = FALSE,
+cutoffs = c(900, 1800, 2700), mode = "BUS")
 }
 }

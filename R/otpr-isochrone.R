@@ -27,8 +27,8 @@
 #' @param walkReluctance Integer. A multiplier for how bad walking is, compared
 #' to being in transit for equal lengths of time. Default = 2.
 #' @param transferPenalty Integer. An additional penalty added to boardings after
-#' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high
-#' value to discourage transfers. Default is 0.
+#' the first. The value is in OTP's internal weight units, which are roughly equivalent
+#' to seconds. Set this to a high value to discourage transfers. Default is 0.
 #' @param minTransferTime Integer. The minimum time, in seconds, between successive
 #' trips on different vehicles. This is designed to allow for imperfect schedule
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
@@ -43,7 +43,8 @@
 #' @examples \dontrun{
 #' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
 #'
-#' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), fromLocation = FALSE, cutoffs = c(900, 1800, 2700), mode = "BUS")
+#' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), fromLocation = FALSE,
+#' cutoffs = c(900, 1800, 2700), mode = "BUS")
 #'}
 #' @export
 otpr_isochrone <-
