@@ -2,3 +2,4 @@
 
 export(otp_connect)
 export(otpr_distance)
+export(otpr_time)

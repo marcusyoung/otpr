@@ -6,7 +6,7 @@
 #' @param otpcon An OTP connection object produced by \code{otp_connect()}.
 #' @param fromPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
 #' @param toPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.36484, -2.27108)`
-#' @param mode Character, mode of travel. Valid values are WALK, BICYCLE, or CAR. Default is CAR.
+#' @param mode Character vector, single mode of travel. Valid values are WALK, BICYCLE, or CAR. Default is CAR.
 
 #' @return If OTP has not returned an error then a list containing \code{errorId}
 #' with the value "OK" and the \code{distance} in metres. If OTP has returned an
@@ -50,6 +50,7 @@ otpr_distance <-
 
     fromPlace <- paste(fromPlace, collapse = ",")
     toPlace <- paste(toPlace, collapse = ",")
+    mode <- paste(mode, collapse = ",")
 
 
     # Construct URL

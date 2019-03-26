@@ -2,7 +2,7 @@
 % Please edit documentation in R/otpr-distance.R
 \name{otpr_distance}
 \alias{otpr_distance}
-\title{Finds the distance in km between supplied origin and destination}
+\title{Finds the distance in metres between supplied origin and destination}
 \usage{
 otpr_distance(otpcon = NULL, fromPlace = NULL, toPlace = NULL,
   mode = "CAR")
@@ -14,7 +14,7 @@ otpr_distance(otpcon = NULL, fromPlace = NULL, toPlace = NULL,
 
 \item{toPlace}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.36484, -2.27108)`}
 
-\item{mode}{Character, mode of travel. Valid values are WALK, BICYCLE, or CAR. Default is CAR.}
+\item{mode}{Character vector, single mode of travel. Valid values are WALK, BICYCLE, or CAR. Default is CAR.}
 }
 \value{
 If OTP has not returned an error then a list containing \code{errorId}
