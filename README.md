@@ -17,4 +17,4 @@ devtools::install_github("marcusyoung/otpr")
 
 ## Status
 
-Currently under development. Functions `otpr_distance` and `otpr_time` currently implemented. Use help(?) for guidance.
+Currently under development. Functions `otp_connect`, `otpr_distance` and `otpr_time` currently implemented. Use help(?) for guidance.
