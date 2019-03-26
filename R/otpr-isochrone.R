@@ -19,7 +19,7 @@
 #' @param cutoffs Numeric vector, containing the cutoff times in seconds, for
 #' example: 'c(900, 1800. 2700)'
 #' would request 15, 30 and 60 minute isochrones. Can be a single value.
-#' @param batch Logical.
+#' @param batch Logical. If true, goal direction is turned off and a full path tree is built
 #' @param arriveBy Logical. Whether the specified date and time is for
 #' departure (FALSE) or arrival (TRUE). Default is FALSE.
 #' @param maxWalkDistance Numeric. The maximum distance (in meters) the user is
@@ -42,6 +42,8 @@
 #' }
 #' @examples \dontrun{
 #' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
+#'
+#' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), fromLocation = FALSE, cutoffs = c(900, 1800, 2700), mode = "BUS")
 #'}
 #' @export
 otpr_isochrone <-
