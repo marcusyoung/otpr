@@ -4,13 +4,12 @@
 \alias{otpr_time}
 \title{Finds the time in minutes between supplied origin and destination}
 \usage{
-otpr_time(otpcon, fromPlace = NULL, toPlace = NULL, mode = "CAR",
-  date = NULL, time = NULL, maxWalkDistance = 800,
-  walkReluctance = 2, arriveBy = FALSE, transferPenalty = 0,
-  minTransferTime = 0, detail = FALSE)
+otpr_time(otpcon, fromPlace, toPlace, mode = "CAR", date, time,
+  maxWalkDistance = 800, walkReluctance = 2, arriveBy = FALSE,
+  transferPenalty = 0, minTransferTime = 0, detail = FALSE)
 }
 \arguments{
-\item{otpcon}{An OTP connection object produced by \code{otp_connect()}.}
+\item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}
 
 \item{fromPlace}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
 
@@ -18,14 +17,15 @@ otpr_time(otpcon, fromPlace = NULL, toPlace = NULL, mode = "CAR",
 
 \item{mode}{Character vector, mode(s) of travel. Valid values are: TRANSIT, WALK, BICYCLE,
 CAR, BUS, RAIL, OR 'c("TRANSIT", "BICYCLE")'. Note that WALK mode is automatically
-included for TRANSIT, BUS, and RAIL. Default is CAR.}
+included for TRANSIT, BUS, and RAIL. TRANSIT will use all available transit modes. Default is CAR.}
 
 \item{date}{Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
-Only relevant for TRANSIT modes.}
+Only relevant if \code{mode} includes public transport. Default is current system date.}
 
 \item{time}{Character, must be in the format hh:mm:ss.
 If \code{arriveBy} is FALSE (the default) this is the desired departure time, otherwise the
-desired arrival time.}
+desired arrival time. Only relevant if \code{mode} includes public transport.
+Default is current system time.}
 
 \item{maxWalkDistance}{Numeric. The maximum distance (in meters) the user is
 willing to walk. Default = 800.}
@@ -33,10 +33,12 @@ willing to walk. Default = 800.}
 \item{walkReluctance}{Integer. A multiplier for how bad walking is, compared
 to being in transit for equal lengths of time. Default = 2.}
 
-\item{arriveBy}{Logical. Default is FALSE.}
+\item{arriveBy}{Logical. Whether trip should depart (FALSE) or arrive (TRUE) at the specified
+date and time. Default is FALSE.}
 
 \item{transferPenalty}{Integer. An additional penalty added to boardings after
-the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high value to discourage transfers. Default is 0.}
+the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high
+value to discourage transfers. Default is 0.}
 
 \item{minTransferTime}{Integer. The minimum time, in seconds, between successive
 trips on different vehicles. This is designed to allow for imperfect schedule
@@ -58,4 +60,15 @@ varies:
 \description{
 Finds the time in minutes between supplied origin and destination by specified mode(s).
 If \code{detail} is set to TRUE returns time for each mode, waiting time and number of transfers.
+}
+\examples{
+\dontrun{
+otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
+
+otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+mode = "BUS", date = "03-26-2019", time = "08:00:00")
+
+otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+mode = "BUS", date = "03-26-2019", time = "08:00:00", detail = TRUE)
+}
 }

@@ -4,11 +4,10 @@
 \alias{otpr_distance}
 \title{Finds the distance in metres between supplied origin and destination}
 \usage{
-otpr_distance(otpcon = NULL, fromPlace = NULL, toPlace = NULL,
-  mode = "CAR")
+otpr_distance(otpcon, fromPlace, toPlace, mode = "CAR")
 }
 \arguments{
-\item{otpcon}{An OTP connection object produced by \code{otp_connect()}.}
+\item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}
 
 \item{fromPlace}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
 
@@ -25,4 +24,12 @@ with the error message returned by OTP.
 \description{
 Finds the distance in metres between supplied origin and destination. Only makes
 sense for walk, cycle or car modes (not transit)
+}
+\examples{
+\dontrun{
+otpr_distance(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
+
+otpr_distance(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+mode = "WALK")
+}
 }

@@ -1,0 +1,183 @@
+#' Returns one or more travel time isochrones in GeoJSON format
+#'
+#' Returns one or more travel time isochrone in GeoJSON format. Only works correctly for
+#' walk and/or transit modes - a limitation of OTP. Isochrones can be generated either
+#' \emph{from} a location or \emph{to} a location.
+#' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
+#' @param location Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
+#' @param direction Character, either "to" or "from". If "from" (default) the isochrone
+#' will be generated \emph{from} the \code{location}. If "to" the isochrone will be generated
+#' \emph{to} the \code{location}.
+#' @param mode Character, mode of travel. Valid values are: WALK, TRANSIT, BUS, or RAIL.
+#' Note that WALK mode is automatically included for TRANSIT, BUS and RAIL. TRANSIT will use all
+#' available transit modes. Default is TRANSIT.
+#' @param date Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
+#' Only relevant if \code{mode} includes public transport. Default is current system date.
+#' @param time Character, must be in the format hh:mm:ss. If \code{arriveBy} is FALSE (the default)
+#' this is the desired departure time, otherwise the desired arrival time. Default
+#' is current system time.
+#' @param cutoffs Numeric vector, containing the cutoff times in seconds, for
+#' example: 'c(900, 1800. 2700)'
+#' would request 15, 30 and 60 minute isochrones. Can be a single value.
+#' @param batch Logical.
+#' @param arriveBy Logical. Whether the specified date and time is for
+#' departure (FALSE) or arrival (TRUE). Default is FALSE.
+#' @param maxWalkDistance Numeric. The maximum distance (in meters) the user is
+#' willing to walk. Default = 800.
+#' @param walkReluctance Integer. A multiplier for how bad walking is, compared
+#' to being in transit for equal lengths of time. Default = 2.
+#' @param transferPenalty Integer. An additional penalty added to boardings after
+#' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high
+#' value to discourage transfers. Default is 0.
+#' @param minTransferTime Integer. The minimum time, in seconds, between successive
+#' trips on different vehicles. This is designed to allow for imperfect schedule
+#' adherence. This is a minimum; transfers over longer distances might use a longer time.
+#' Default is 0.
+#' @return Returns a list. First element in the list is \code{errorId}. This is "OK" if
+#' OTP has returned GeoJSON, otherwise it is "ERROR". The second element of list
+#' varies:
+#' \itemize{
+#' \item If \code{errorId} is "ERROR" then \code{response} contains the OTP error message.
+#' \item If \code{errorId} is "OK" then \code{response} contains the GeoJSON for the isochrone(s).
+#' }
+#' @examples \dontrun{
+#' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
+#'}
+#' @export
+otpr_isochrone <-
+  function(otpcon,
+           location,
+           direction = "from",
+           mode = "TRANSIT",
+           date,
+           time,
+           cutoffs,
+           batch = TRUE,
+           arriveBy = FALSE,
+           maxWalkDistance = 800,
+           walkReluctance = 2,
+           transferPenalty = 0,
+           minTransferTime = 0
+
+  )
+  {
+
+    if(missing(date)){
+      date <- format(Sys.Date(), "%m-%d-%Y")
+    }
+
+    if(missing(time)) {
+      time <- format(Sys.time(), "%H:%M:%S")
+    }
+
+
+    #argument checks
+
+    coll <- checkmate::makeAssertCollection()
+    checkmate::assert_choice(direction, c("from", "to"), add = coll)
+    checkmate::assert_integerish(cutoffs, lower = 0, add = coll)
+    checkmate::assert_logical(batch, add = coll)
+    checkmate::assert_class(otpcon, "otpconnect", add = coll)
+    checkmate::assert_numeric(
+      location,
+      lower =  -180,
+      upper = 180,
+      len = 2,
+      add = coll
+    )
+    checkmate::assert_int(maxWalkDistance, lower = 0, add = coll)
+    checkmate::assert_int(walkReluctance, lower = 0, add = coll)
+    checkmate::assert_int(transferPenalty, lower = 0, add = coll)
+    checkmate::assert_int(minTransferTime, lower = 0, add = coll)
+    checkmate::assert_logical(arriveBy, add = coll)
+    checkmate::assert_choice(
+      mode,
+      choices = c("WALK", "BUS", "RAIL", "TRANSIT"),
+      null.ok = F,
+      add = coll
+    )
+    checkmate::reportAssertions(coll)
+
+
+    # add WALK to relevant modes
+    if (identical(mode, "TRANSIT") |
+        identical(mode, "BUS") |
+        identical(mode, "RAIL")) {
+      mode <- append(mode, "WALK")
+    }
+
+    mode <- paste(mode, collapse = ",")
+
+    # check date and time are valid
+
+    if (otpr_isDate(date) == FALSE) {
+      stop("date must be in the format mm-dd-yyyy")
+    }
+
+    if (otpr_isTime(time) == FALSE) {
+      stop("time must be in the format hh:mm:ss")
+    }
+
+    # Construct URL
+    routerUrl <- make_url(otpcon)
+    routerUrl <- paste0(routerUrl, "/isochrone")
+
+    # make cutoffs into list
+    cutoffs <- as.list(cutoffs)
+    names(cutoffs) <- rep("cutoffSec", length(cutoffs))
+
+    if (direction == "from") {
+      req <- httr::GET(
+        routerUrl,
+        query =
+          append(list(
+          fromPlace = paste(location, collapse = ","),
+          mode = mode,
+          batch = batch,
+          date = date,
+          time = time,
+          maxWalkDistance = maxWalkDistance,
+          walkReluctance = walkReluctance,
+          arriveBy = arriveBy,
+          transferPenalty = transferPenalty,
+          minTransferTime = minTransferTime
+        ), cutoffs)
+      )
+    } else if (direction == "to") {
+      # due to OTP bug when we require an isochrone to the location we must provide the
+      # location in toPlace, but also provide fromPlace (which is ignored). Here we
+      # make fromPlace the same as toPlace.
+      req <- httr::GET(
+        routerUrl,
+        query =
+          append(list(
+          toPlace = paste(location, collapse = ","),
+          fromPlace = paste(location, collapse = ","), # due to OTP bug
+          mode = mode,
+          batch = batch,
+          date = date,
+          time = time,
+          maxWalkDistance = maxWalkDistance,
+          walkReluctance = walkReluctance,
+          arriveBy = arriveBy,
+          transferPenalty = transferPenalty,
+          minTransferTime = minTransferTime
+        ), cutoffs)
+      )
+    }
+
+    # convert response content into text
+    text <- httr::content(req, as = "text", encoding = "UTF-8")
+
+    # Check that Geojson is returned
+
+    if (grepl("\"type\":\"FeatureCollection\"", text)) {
+      errorId <- "OK"
+    } else {
+      errorId <- "ERROR"
+    }
+    response <-
+      list("errorId" = errorId,
+           "response" = text)
+    return (response)
+  }

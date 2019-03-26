@@ -1,12 +1,19 @@
 # otpr
 
 otpr is an R package that provides a simple wrapper for the OpenTripPlanner (OTP) API.
+To use otpr you will need a running instance of OTP.
 
-## Installation - OpenTripPlanner
+The purpose of the package is to submit a query to the relevant OTP API resource, parse
+the OTP response and return useful R objects. It does not provide functionality beyond that.
+This is left to the discretion of the user who can, for example, structure and process multiple queries in
+any desired fashion. Examples of how to populate an origin-destination matrix
+are provided in my tutorial:
 
-To use otpr you will need a running instance of OTP. A tutorial complete with sample data is available at https://github.com/marcusyoung/otp-tutorial. 
+*OpenTripPlanner Tutorial - creating and querying your own multi-modal route planner*
 
-## Installation - R Package
+[https://github.com/marcusyoung/otp-tutorial](https://github.com/marcusyoung/otp-tutorial). 
+
+## Installation
 
 Install the package with **devtools** as follows:
 
@@ -17,4 +24,4 @@ devtools::install_github("marcusyoung/otpr")
 
 ## Status
 
-Currently under development. Functions `otp_connect`, `otpr_distance` and `otpr_time` currently implemented. Use help(?) for guidance.
+Under development. Functions `otp_connect`, `otpr_distance`, `otpr_time` and `otpr_isochrone` are currently implemented. Use help(?) for further guidance.

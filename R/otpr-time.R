@@ -3,24 +3,27 @@
 #' Finds the time in minutes between supplied origin and destination by specified mode(s).
 #' If \code{detail} is set to TRUE returns time for each mode, waiting time and number of transfers.
 #'
-#' @param otpcon An OTP connection object produced by \code{otp_connect()}.
+#' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
 #' @param fromPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
 #' @param toPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.36484, -2.27108)`
 #' @param mode Character vector, mode(s) of travel. Valid values are: TRANSIT, WALK, BICYCLE,
 #' CAR, BUS, RAIL, OR 'c("TRANSIT", "BICYCLE")'. Note that WALK mode is automatically
-#' included for TRANSIT, BUS, and RAIL. Default is CAR.
+#' included for TRANSIT, BUS, and RAIL. TRANSIT will use all available transit modes. Default is CAR.
 #' @param date Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
-#' Only relevant for TRANSIT modes.
+#' Only relevant if \code{mode} includes public transport. Default is current system date.
 #' @param time Character, must be in the format hh:mm:ss.
 #' If \code{arriveBy} is FALSE (the default) this is the desired departure time, otherwise the
-#' desired arrival time.
-#' @param arriveBy Logical. Default is FALSE.
+#' desired arrival time. Only relevant if \code{mode} includes public transport.
+#' Default is current system time.
+#' @param arriveBy Logical. Whether trip should depart (FALSE) or arrive (TRUE) at the specified
+#' date and time. Default is FALSE.
 #' @param maxWalkDistance Numeric. The maximum distance (in meters) the user is
 #' willing to walk. Default = 800.
 #' @param walkReluctance Integer. A multiplier for how bad walking is, compared
 #' to being in transit for equal lengths of time. Default = 2.
 #' @param transferPenalty Integer. An additional penalty added to boardings after
-#' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high value to discourage transfers. Default is 0.
+#' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high
+#' value to discourage transfers. Default is 0.
 #' @param minTransferTime Integer. The minimum time, in seconds, between successive
 #' trips on different vehicles. This is designed to allow for imperfect schedule
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
@@ -34,16 +37,23 @@
 #' \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 #' \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
 #' }
+#' @examples \dontrun{
+#' otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
+#'
+#' otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+#' mode = "BUS", date = "03-26-2019", time = "08:00:00")
+#'
+#' otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+#' mode = "BUS", date = "03-26-2019", time = "08:00:00", detail = TRUE)
+#'}
 #' @export
-#'
-#'
 otpr_time <-
   function(otpcon,
-           fromPlace = NULL,
-           toPlace = NULL,
+           fromPlace,
+           toPlace,
            mode = "CAR",
-           date = NULL,
-           time = NULL,
+           date,
+           time,
            maxWalkDistance = 800,
            walkReluctance = 2,
            arriveBy = FALSE,
@@ -52,6 +62,16 @@ otpr_time <-
            detail = FALSE)
   {
     mode <- toupper(mode)
+
+
+    if(missing(date)){
+        date <- format(Sys.Date(), "%m-%d-%Y")
+    }
+
+    if(missing(time)) {
+      time <- format(Sys.time(), "%H:%M:%S")
+    }
+
 
     #argument checks
 
@@ -71,11 +91,10 @@ otpr_time <-
       len = 2,
       add = coll
     )
+    checkmate::assert_int(maxWalkDistance, lower = 0, add = coll)
     checkmate::assert_int(walkReluctance, lower = 0, add = coll)
     checkmate::assert_int(transferPenalty, lower = 0, add = coll)
     checkmate::assert_int(minTransferTime, lower = 0, add = coll)
-    checkmate::assert_number(minTransferTime, lower = 0, add = coll)
-    checkmate::assert_logical(arriveBy, add = coll)
     checkmate::assert_logical(detail, add = coll)
     checkmate::reportAssertions(coll)
 
@@ -85,12 +104,12 @@ otpr_time <-
     # check for valid modes
     valid_mode <-
       list(
-        c("TRANSIT"),
-        c("WALK"),
-        c("BICYCLE"),
-        c("CAR"),
-        c("BUS"),
-        c("RAIL"),
+        "TRANSIT",
+        "WALK",
+        "BICYCLE",
+        "CAR",
+        "BUS",
+        "RAIL",
         c("TRANSIT", "BICYCLE")
       )
 
@@ -99,16 +118,20 @@ otpr_time <-
       stop(
         paste0(
           "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL',
-          OR 'c('TRANSIT', 'BICYCLE')', but is '",
+          or 'c('TRANSIT', 'BICYCLE')', but is '",
           mode,
           "'."
         )
       )
     }
 
-    # add WALK to relevant modes
+    # add WALK to relevant modes - as mode may be a vector of length > 1 use identical
+    # otpr_vectorMatch is TRUE if mode is c("TRANSIT", "BICYCLE") or c("BICYCLE", "TRANSIT")
 
-    if (mode == "TRANSIT" | mode == "BUS" | mode == "RAIL") {
+    if (identical(mode, "TRANSIT") |
+        identical(mode, "BUS") |
+        identical(mode, "RAIL") |
+        otpr_vectorMatch(mode, c("TRANSIT", "BICYCLE"))) {
       mode <- append(mode, "WALK")
     }
 
@@ -116,11 +139,11 @@ otpr_time <-
 
     # check date and time are valid
 
-    if (IsDate(date) == FALSE) {
+    if (otpr_isDate(date) == FALSE) {
       stop("date must be in the format mm-dd-yyyy")
     }
 
-    if (IsTime(time) == FALSE) {
+    if (otpr_isTime(time) == FALSE) {
       stop("time must be in the format hh:mm:ss")
     }
 
@@ -160,7 +183,7 @@ otpr_time <-
       # set error.id to OK
       error.id <- "OK"
       # get first itinerary
-      df <- asjson$plan$itineraries[1, ]
+      df <- asjson$plan$itineraries[1,]
       # check if need to return detailed response
       if (detail == TRUE) {
         # need to convert times from epoch format
