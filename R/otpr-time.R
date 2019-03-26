@@ -149,8 +149,7 @@ otpr_time <-
 
 
     # Construct URL
-    routerUrl <- make_url(otpcon)
-    routerUrl <- paste0(routerUrl, "/plan")
+    routerUrl <- paste0(make_url(otpcon), "/plan")
 
     # Use GET from the httr package to make API call and place in req - returns json by default.
     # Not using numItineraries due to odd OTP behaviour - if request only 1 itinerary don't

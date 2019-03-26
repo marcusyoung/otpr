@@ -5,8 +5,8 @@
 #' \emph{from} a location or \emph{to} a location.
 #' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
 #' @param location Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
-#' @param direction Character, either "to" or "from". If "from" (default) the isochrone
-#' will be generated \emph{from} the \code{location}. If "to" the isochrone will be generated
+#' @param fromLocation Logical. If TRUE (default) the isochrone
+#' will be generated \emph{from} the \code{location}. If FALSE the isochrone will be generated
 #' \emph{to} the \code{location}.
 #' @param mode Character, mode of travel. Valid values are: WALK, TRANSIT, BUS, or RAIL.
 #' Note that WALK mode is automatically included for TRANSIT, BUS and RAIL. TRANSIT will use all
@@ -47,7 +47,7 @@
 otpr_isochrone <-
   function(otpcon,
            location,
-           direction = "from",
+           fromLocation = TRUE,
            mode = "TRANSIT",
            date,
            time,
@@ -74,7 +74,7 @@ otpr_isochrone <-
     #argument checks
 
     coll <- checkmate::makeAssertCollection()
-    checkmate::assert_choice(direction, c("from", "to"), add = coll)
+    checkmate::assert_logical(fromLocation, add = coll)
     checkmate::assert_integerish(cutoffs, lower = 0, add = coll)
     checkmate::assert_logical(batch, add = coll)
     checkmate::assert_class(otpcon, "otpconnect", add = coll)
@@ -118,15 +118,15 @@ otpr_isochrone <-
       stop("time must be in the format hh:mm:ss")
     }
 
+
     # Construct URL
-    routerUrl <- make_url(otpcon)
-    routerUrl <- paste0(routerUrl, "/isochrone")
+    routerUrl <- paste0(make_url(otpcon), "/isochrone")
 
     # make cutoffs into list
     cutoffs <- as.list(cutoffs)
     names(cutoffs) <- rep("cutoffSec", length(cutoffs))
 
-    if (direction == "from") {
+    if (isTRUE(fromLocation)) {
       req <- httr::GET(
         routerUrl,
         query =
@@ -143,7 +143,7 @@ otpr_isochrone <-
           minTransferTime = minTransferTime
         ), cutoffs)
       )
-    } else if (direction == "to") {
+    } else {
       # due to OTP bug when we require an isochrone to the location we must provide the
       # location in toPlace, but also provide fromPlace (which is ignored). Here we
       # make fromPlace the same as toPlace.
