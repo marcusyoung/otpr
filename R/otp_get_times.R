@@ -38,16 +38,16 @@
 #' \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
 #' }
 #' @examples \dontrun{
-#' otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
+#' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
 #'
-#' otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+#' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
 #' mode = "BUS", date = "03-26-2019", time = "08:00:00")
 #'
-#' otpr_time(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+#' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
 #' mode = "BUS", date = "03-26-2019", time = "08:00:00", detail = TRUE)
 #'}
 #' @export
-otpr_time <-
+otp_get_times <-
   function(otpcon,
            fromPlace,
            toPlace,
@@ -131,7 +131,7 @@ otpr_time <-
     if (identical(mode, "TRANSIT") |
         identical(mode, "BUS") |
         identical(mode, "RAIL") |
-        otpr_vectorMatch(mode, c("TRANSIT", "BICYCLE"))) {
+        otp_vector_match(mode, c("TRANSIT", "BICYCLE"))) {
       mode <- append(mode, "WALK")
     }
 
@@ -139,11 +139,11 @@ otpr_time <-
 
     # check date and time are valid
 
-    if (otpr_isDate(date) == FALSE) {
+    if (otp_is_date(date) == FALSE) {
       stop("date must be in the format mm-dd-yyyy")
     }
 
-    if (otpr_isTime(time) == FALSE) {
+    if (otp_is_time(time) == FALSE) {
       stop("time must be in the format hh:mm:ss")
     }
 

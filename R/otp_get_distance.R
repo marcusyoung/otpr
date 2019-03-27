@@ -12,13 +12,13 @@
 #' error then a list containing \code{errorId} with the OTP error code and \code{errorMessage}
 #' with the error message returned by OTP.
 #' @examples \dontrun{
-#' otpr_distance(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
+#' otp_get_distance(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
 #'
-#' otpr_distance(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
+#' otp_get_distance(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108),
 #' mode = "WALK")
 #'}
 #' @export
-otpr_distance <-
+otp_get_distance <-
   function(otpcon,
            fromPlace,
            toPlace,

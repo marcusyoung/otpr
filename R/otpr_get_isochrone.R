@@ -41,13 +41,13 @@
 #' \item If \code{errorId} is "OK" then \code{response} contains the GeoJSON for the isochrone(s).
 #' }
 #' @examples \dontrun{
-#' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
+#' otp_get_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
 #'
-#' otpr_isochrone(otpcon, location = c(53.48805, -2.24258), fromLocation = FALSE,
+#' otp_get_isochrone(otpcon, location = c(53.48805, -2.24258), fromLocation = FALSE,
 #' cutoffs = c(900, 1800, 2700), mode = "BUS")
 #'}
 #' @export
-otpr_isochrone <-
+otp_get_isochrone <-
   function(otpcon,
            location,
            fromLocation = TRUE,
@@ -113,11 +113,11 @@ otpr_isochrone <-
 
     # check date and time are valid
 
-    if (otpr_isDate(date) == FALSE) {
+    if (otp_is_date(date) == FALSE) {
       stop("date must be in the format mm-dd-yyyy")
     }
 
-    if (otpr_isTime(time) == FALSE) {
+    if (otp_is_time(time) == FALSE) {
       stop("time must be in the format hh:mm:ss")
     }
 

@@ -25,7 +25,7 @@ devtools::install_github("marcusyoung/otpr")
 
 ## Status
 
-Functions `otp_connect`, `otpr_distance`, `otpr_time` and `otpr_isochrone` are currently implemented. Use help(?) for further guidance.
+Functions `otp_connect`, `otp_get_distance`, `otp_get_times` and `otp_get_isochrone` are currently implemented. Use help(?) for further guidance.
 
 The package is under development but this only takes place on development branches. The master
 branch is considered stable.
