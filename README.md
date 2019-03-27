@@ -25,7 +25,17 @@ devtools::install_github("marcusyoung/otpr")
 
 ## Status
 
-Functions `otp_connect`, `otp_get_distance`, `otp_get_times` and `otp_get_isochrone` are currently implemented. Use help(?) for further guidance.
+The following functions are currently implemented:
+
+* `otp_connect` - set up and confirm a connection to an OTP instance.
+
+* `otp_get_distance` - get the distance in metres between supplied origin and destination.
+
+* `otp_get_times` - get the time in minutes between supplied origin and destination and,
+if requested, the time for each mode, waiting time and number of transfers.
+
+* `otp_get_isochrone` - get one or more travel time isochrones in GeoJSON format.
+
 
 The package is under development but this only takes place on development branches. The master
 branch is considered stable.

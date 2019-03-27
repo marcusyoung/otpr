@@ -12,3 +12,4 @@ otp_is_date(date)
 \description{
 Checks the date format
 }
+\keyword{internal}

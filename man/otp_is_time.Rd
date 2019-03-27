@@ -12,3 +12,4 @@ otp_is_time(time)
 \description{
 Checks the time format
 }
+\keyword{internal}

@@ -14,3 +14,4 @@ otp_vector_match(a, b)
 \description{
 Checks if two vectors are the same but where order doesn't matter
 }
+\keyword{internal}
