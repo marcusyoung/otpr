@@ -23,7 +23,7 @@ Install the package with **devtools** as follows:
 devtools::install_github("marcusyoung/otpr")
 ```
 
-## Status
+## Functions
 
 The following functions are currently implemented:
 
@@ -36,6 +36,7 @@ if requested, the time for each mode, waiting time and number of transfers.
 
 * `otp_get_isochrone` - get one or more travel time isochrones in GeoJSON format.
 
+## Status
 
 The package is under development but this only takes place on development branches. The master
 branch is considered stable.
