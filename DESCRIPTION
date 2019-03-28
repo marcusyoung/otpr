@@ -1,12 +1,12 @@
 Package: otpr
-Title: An R wrapper for OpenTripPlanner
+Title: An R Wrapper for OpenTripPlanner
 Version: 0.1.0
 Authors@R: c(
     person("Marcus", "Young", email = "M.A.Young@soton.ac.uk", role = c("aut", "cre"))
     )
-Description: An R wrapper for OpenTripPlanner (OTP) <http://www.opentripplanner.org/>.
-    OTP is an open source platform for multi-modal and multi-agency
-    journey planning written in Java. OTP provides a REST API which otpr uses to query OTP.
+Description: An API wrapper for the OpenTripPlanner (OTP) <http://www.opentripplanner.org/>
+    REST API. Queries are submitted to the relevant OTP API resource, the response
+    is parsed and useful R objects are returned.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
