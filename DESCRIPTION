@@ -4,7 +4,7 @@ Version: 0.1.0
 Authors@R: c(
     person("Marcus", "Young", email = "M.A.Young@soton.ac.uk", role = c("aut", "cre"))
     )
-Description: An API wrapper for the OpenTripPlanner (OTP) <http://www.opentripplanner.org/>
+Description: An R wrapper for the OpenTripPlanner (OTP) <http://www.opentripplanner.org/>
     REST API. Queries are submitted to the relevant OTP API resource, the response
     is parsed and useful R objects are returned.
 License: MIT + file LICENSE
