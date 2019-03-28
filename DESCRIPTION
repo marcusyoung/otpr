@@ -1,5 +1,5 @@
 Package: otpr
-Title: An R Wrapper for OpenTripPlanner
+Title: An R Wrapper for the OpenTripPlanner REST API
 Version: 0.1.0
 Authors@R: c(
     person("Marcus", "Young", email = "M.A.Young@soton.ac.uk", role = c("aut", "cre"))
