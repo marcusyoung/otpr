@@ -1,3 +1,5 @@
+^releases$
+^README\.Rmd$
 ^\.travis\.yml$
 ^\.github$
 ^.*\.Rproj$
