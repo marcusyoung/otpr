@@ -52,7 +52,7 @@ Returns a list. First element in the list is \code{errorId}. This is "OK" if
 OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
 varies:
 \itemize{
-\item If OTP has retuned an error then \code{errorMessage} contains the OTP error message.
+\item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
 }

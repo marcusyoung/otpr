@@ -1,3 +1,6 @@
+^LICENCE\.md$
+^cran-comments\.md$
+^CRAN-RELEASE$
 ^releases$
 ^README\.Rmd$
 ^\.travis\.yml$
