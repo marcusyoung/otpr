@@ -15,7 +15,13 @@ knitr::opts_chunk$set(
 
 # otpr
 
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
 [![Build Status](https://travis-ci.org/marcusyoung/otpr.svg?branch=master)](https://travis-ci.org/marcusyoung/otpr)
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+
+<!-- badges: end -->
 
 ## Overview
 
@@ -28,8 +34,11 @@ This package will be useful to researchers and transport planners who want to us
 
 ## Installation
 
-```{r, eval = FALSE}
-# To install the development version from GitHub:
+``` r
+# Install from CRAN
+install.packages("otpr")
+
+# Or the development version from GitHub:
 # install.packages("devtools")
 devtools::install_github("marcusyoung/otpr")
 ```
@@ -80,7 +89,7 @@ otp_get_distance(
 
 ### Time between two points
 
-The get the trip duration in minutes between an origin and destination use `otp_get_times()`. 
+To get the trip duration in minutes between an origin and destination use `otp_get_times()`. 
 You can specify the required mode: TRANSIT (all available transit modes), BUS, RAIL, CAR, 
 BICYCLE, and WALK are valid. All the public transit modes automatically allow WALK.
 There is also the option to combine TRANSIT with BICYCLE.
@@ -162,3 +171,9 @@ of using **otpr** functions, and helps you get the most from the package, for ex
 an origin-destination matrix.
 
 For more guidance on how **otpr**, in conjunction with OTP, can be used to generate data for input into models, read [An automated framework to derive model variables from open transport data using R, PostgreSQL and OpenTripPlanner](https://eprints.soton.ac.uk/389728/).
+
+## Getting help
+
+* Please [report any issues or bugs](https://github.com/marcusyoung/otpr/issues).
+* Get citation information for **otpr** using: `citation(package = 'otpr')`.
+

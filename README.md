@@ -3,8 +3,15 @@
 
 # otpr
 
+<!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
 [![Build
 Status](https://travis-ci.org/marcusyoung/otpr.svg?branch=master)](https://travis-ci.org/marcusyoung/otpr)
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+
+<!-- badges: end -->
 
 ## Overview
 
@@ -21,7 +28,10 @@ derive variables for use in transportation models.
 ## Installation
 
 ``` r
-# To install the development version from GitHub:
+# Install from CRAN
+install.packages("otpr")
+
+# Or the development version from GitHub:
 # install.packages("devtools")
 devtools::install_github("marcusyoung/otpr")
 ```
@@ -99,7 +109,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 4084
+#> [1] 5563
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -192,3 +202,10 @@ For more guidance on how **otpr**, in conjunction with OTP, can be used
 to generate data for input into models, read [An automated framework to
 derive model variables from open transport data using R, PostgreSQL and
 OpenTripPlanner](https://eprints.soton.ac.uk/389728/).
+
+## Getting help
+
+  - Please [report any issues or
+    bugs](https://github.com/marcusyoung/otpr/issues).
+  - Get citation information for **otpr** using: `citation(package =
+    'otpr')`.
