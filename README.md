@@ -30,8 +30,16 @@ derive variables for use in transportation models.
 ``` r
 # Install from CRAN
 install.packages("otpr")
+```
 
-# Or the development version from GitHub:
+### Development version
+
+To get a bug fix, or use a feature from the development version, you can
+install otpr from GitHub. See
+[NEWS](https://github.com/marcusyoung/otpr/blob/master/NEWS.md) for
+changes since last release.
+
+``` r
 # install.packages("devtools")
 devtools::install_github("marcusyoung/otpr")
 ```
@@ -91,7 +99,7 @@ otp_get_distance(
 
 ### Time between two points
 
-To get the trip duration in minutes between an origin and destination
+To get the trip duration in seconds between an origin and destination
 use `otp_get_times()`. You can specify the required mode: TRANSIT (all
 available transit modes), BUS, RAIL, CAR, BICYCLE, and WALK are valid.
 All the public transit modes automatically allow WALK. There is also the
@@ -109,7 +117,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 5563
+#> [1] 5087
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -133,10 +141,10 @@ otp_get_times(
 
 To get more information about the trip when using transit modes,
 `otp_get_times()` can be called with the ‘detail’ argument set to TRUE.
-The trip duration is then further broken down by time on transit,
-walking time (from/to and between stops), waiting time (when changing
-transit vehicle or mode), and number of transfers (when changing transit
-vehicle or
+The trip duration (minutes) is then further broken down by time on
+transit, walking time (from/to and between stops), waiting time (when
+changing transit vehicle or mode), and number of transfers (when
+changing transit vehicle or
 mode).
 
 ``` r
