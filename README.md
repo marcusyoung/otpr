@@ -7,9 +7,10 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/otpr)](https://cran.r-project.org/package=otpr)
 [![Build
 Status](https://travis-ci.org/marcusyoung/otpr.svg?branch=master)](https://travis-ci.org/marcusyoung/otpr)
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/otpr)](https://cran.r-project.org/package=otpr)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
 <!-- badges: end -->
@@ -65,6 +66,13 @@ otpcon <- otp_connect()
 #> Router http://localhost:8080/otp/routers/default exists
 ```
 
+## Function behaviour
+
+The functions that query the OTP API return a list of two elements. The
+first element is an errorId - with the value “OK” or the error code
+returned by OTP. If errorId is “OK”, the second element will contain the
+query response; otherwise it will contain the OTP error message.
+
 ### Distance between two points
 
 To get the trip distance in metres between an origin and destination on
@@ -118,7 +126,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 5087
+#> [1] 5147
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -179,13 +187,20 @@ location.
 
 ``` r
 # 900, 1800 and 2700 second isochrones for travel *to* Manchester Airport by any transit mode
-otp_get_isochrone(
+my_isochrone <- otp_get_isochrone(
   otpcon,
   location = c(53.36484, -2.27108),
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700),
   mode = "TRANSIT"
 )
+
+# function returns a list of two elements
+names(my_isochrone)
+#> [1] "errorId"  "response"
+
+# now write the GeoJSON (in the "response" element) to a file so it can be opened in QGIS (for example)
+write(my_isochrone$response, file = "my_isochrone.geojson")
 ```
 
 ## Learning more
