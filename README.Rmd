@@ -69,7 +69,9 @@ otpcon <- otp_connect()
 
 ```
 
-## Function behaviour
+## Querying the OTP API
+
+### Function behaviour
 
 The functions that query the OTP API return a list of two elements. The first
 element is an errorId - with the value "OK" or the error code returned by OTP. If

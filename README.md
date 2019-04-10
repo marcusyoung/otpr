@@ -66,7 +66,9 @@ otpcon <- otp_connect()
 #> Router http://localhost:8080/otp/routers/default exists
 ```
 
-## Function behaviour
+## Querying the OTP API
+
+### Function behaviour
 
 The functions that query the OTP API return a list of two elements. The
 first element is an errorId - with the value “OK” or the error code
