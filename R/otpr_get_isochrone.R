@@ -6,16 +6,20 @@
 #' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
 #' @param location Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
 #' @param fromLocation Logical. If TRUE (default) the isochrone
-#' will be generated \emph{from} the \code{location}. If FALSE the isochrone will be generated
-#' \emph{to} the \code{location}.
-#' @param mode Character, mode of travel. Valid values are: WALK, TRANSIT, BUS, or RAIL.
-#' Note that WALK mode is automatically included for TRANSIT, BUS and RAIL. TRANSIT will use all
-#' available transit modes. Default is TRANSIT.
-#' @param date Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
-#' Only relevant if \code{mode} includes public transport. Default is current system date.
-#' @param time Character, must be in the format hh:mm:ss. If \code{arriveBy} is FALSE (the default)
-#' this is the desired departure time, otherwise the desired arrival time. Default
-#' is current system time.
+#' will be generated \emph{from} the \code{location}. If FALSE the isochrone will
+#' be generated \emph{to} the \code{location}.
+#' @param format Character, required format of returned isochrone(s). Either JSON
+#' (returns GeoJSON) or SF (returns simple feature collection). Default is JSON.
+#' @param mode Character, mode of travel. Valid values are: WALK, TRANSIT, BUS,
+#' or RAIL.
+#' Note that WALK mode is automatically included for TRANSIT, BUS and RAIL.
+#' TRANSIT will use all available transit modes. Default is TRANSIT.
+#' @param date Character, must be in the format mm-dd-yyyy. This is the desired
+#' date of travel. Only relevant if \code{mode} includes public transport.
+#' Default is current system date.
+#' @param time Character, must be in the format hh:mm:ss. If \code{arriveBy} is
+#' FALSE (the default) this is the desired departure time, otherwise the desired
+#' arrival time. Default is current system time.
 #' @param cutoffs Numeric vector, containing the cutoff times in seconds, for
 #' example: 'c(900, 1800. 2700)'
 #' would request 15, 30 and 60 minute isochrones. Can be a single value.
@@ -51,6 +55,7 @@ otp_get_isochrone <-
   function(otpcon,
            location,
            fromLocation = TRUE,
+           format = "JSON",
            mode = "TRANSIT",
            date,
            time,
@@ -73,6 +78,9 @@ otp_get_isochrone <-
       time <- format(Sys.time(), "%H:%M:%S")
     }
 
+    # allow lowercase
+    format <- toupper(format)
+    mode <- toupper(mode)
 
     #argument checks
 
@@ -97,6 +105,12 @@ otp_get_isochrone <-
       mode,
       choices = c("WALK", "BUS", "RAIL", "TRANSIT"),
       null.ok = F,
+      add = coll
+    )
+    checkmate::assert_choice(
+      format,
+      choices = c("JSON", "SF"),
+      null.ok = FALSE,
       add = coll
     )
     checkmate::reportAssertions(coll)
@@ -170,17 +184,21 @@ otp_get_isochrone <-
     }
 
     # convert response content into text
-    text <- httr::content(req, as = "text", encoding = "UTF-8")
+    req <- httr::content(req, as = "text", encoding = "UTF-8")
 
-    # Check that Geojson is returned
-
-    if (grepl("\"type\":\"FeatureCollection\"", text)) {
+    # Check that GeoJSON is returned
+    if (grepl("\"type\":\"FeatureCollection\"", req)) {
       errorId <- "OK"
+      # convert to SF if requested
+      if (format == "SF"){
+        req <- geojsonsf::geojson_sf(req)
+      }
     } else {
       errorId <- "ERROR"
     }
+
     response <-
       list("errorId" = errorId,
-           "response" = text)
+           "response" = req)
     return (response)
   }

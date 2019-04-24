@@ -5,9 +5,9 @@
 \title{Returns one or more travel time isochrones in GeoJSON format}
 \usage{
 otp_get_isochrone(otpcon, location, fromLocation = TRUE,
-  mode = "TRANSIT", date, time, cutoffs, batch = TRUE,
-  arriveBy = FALSE, maxWalkDistance = 800, walkReluctance = 2,
-  transferPenalty = 0, minTransferTime = 0)
+  format = "JSON", mode = "TRANSIT", date, time, cutoffs,
+  batch = TRUE, arriveBy = FALSE, maxWalkDistance = 800,
+  walkReluctance = 2, transferPenalty = 0, minTransferTime = 0)
 }
 \arguments{
 \item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}
@@ -15,19 +15,24 @@ otp_get_isochrone(otpcon, location, fromLocation = TRUE,
 \item{location}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
 
 \item{fromLocation}{Logical. If TRUE (default) the isochrone
-will be generated \emph{from} the \code{location}. If FALSE the isochrone will be generated
-\emph{to} the \code{location}.}
+will be generated \emph{from} the \code{location}. If FALSE the isochrone will
+be generated \emph{to} the \code{location}.}
 
-\item{mode}{Character, mode of travel. Valid values are: WALK, TRANSIT, BUS, or RAIL.
-Note that WALK mode is automatically included for TRANSIT, BUS and RAIL. TRANSIT will use all
-available transit modes. Default is TRANSIT.}
+\item{format}{Character, required format of returned isochrone(s). Either JSON
+(returns GeoJSON) or SF (returns simple feature collection). Default is JSON.}
 
-\item{date}{Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
-Only relevant if \code{mode} includes public transport. Default is current system date.}
+\item{mode}{Character, mode of travel. Valid values are: WALK, TRANSIT, BUS,
+or RAIL.
+Note that WALK mode is automatically included for TRANSIT, BUS and RAIL.
+TRANSIT will use all available transit modes. Default is TRANSIT.}
 
-\item{time}{Character, must be in the format hh:mm:ss. If \code{arriveBy} is FALSE (the default)
-this is the desired departure time, otherwise the desired arrival time. Default
-is current system time.}
+\item{date}{Character, must be in the format mm-dd-yyyy. This is the desired
+date of travel. Only relevant if \code{mode} includes public transport.
+Default is current system date.}
+
+\item{time}{Character, must be in the format hh:mm:ss. If \code{arriveBy} is
+FALSE (the default) this is the desired departure time, otherwise the desired
+arrival time. Default is current system time.}
 
 \item{cutoffs}{Numeric vector, containing the cutoff times in seconds, for
 example: 'c(900, 1800. 2700)'
