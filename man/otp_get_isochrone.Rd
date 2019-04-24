@@ -2,7 +2,7 @@
 % Please edit documentation in R/otpr_get_isochrone.R
 \name{otp_get_isochrone}
 \alias{otp_get_isochrone}
-\title{Returns one or more travel time isochrones in GeoJSON format}
+\title{Returns one or more travel time isochrones}
 \usage{
 otp_get_isochrone(otpcon, location, fromLocation = TRUE,
   mode = "TRANSIT", date, time, cutoffs, batch = TRUE,
@@ -63,9 +63,10 @@ varies:
 }
 }
 \description{
-Returns one or more travel time isochrone in GeoJSON format. Only works correctly for
-walk and/or transit modes - a limitation of OTP. Isochrones can be generated either
-\emph{from} a location or \emph{to} a location.
+Returns one or more travel time isochrone in either GeoJSON format or as an
+\strong{sf} object. Only works correctly for walk and/or transit modes - a limitation
+of OTP. Isochrones can be generated either \emph{from} a location or \emph{to}
+a location.
 }
 \examples{
 \dontrun{

@@ -1,8 +1,9 @@
-#' Returns one or more travel time isochrones in GeoJSON format
+#' Returns one or more travel time isochrones
 #'
-#' Returns one or more travel time isochrone in GeoJSON format. Only works correctly for
-#' walk and/or transit modes - a limitation of OTP. Isochrones can be generated either
-#' \emph{from} a location or \emph{to} a location.
+#' Returns one or more travel time isochrone in either GeoJSON format or as an
+#' \strong{sf} object. Only works correctly for walk and/or transit modes - a limitation
+#' of OTP. Isochrones can be generated either \emph{from} a location or \emph{to}
+#' a location.
 #' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
 #' @param location Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
 #' @param fromLocation Logical. If TRUE (default) the isochrone
