@@ -39,11 +39,13 @@
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
 #' @return Returns a list. First element in the list is \code{errorId}. This is "OK" if
-#' OTP has returned GeoJSON, otherwise it is "ERROR". The second element of list
-#' varies:
+#' OTP successfully returned the isochrone(s), otherwise it is "ERROR". The second
+#' element of list varies:
 #' \itemize{
 #' \item If \code{errorId} is "ERROR" then \code{response} contains the OTP error message.
-#' \item If \code{errorId} is "OK" then \code{response} contains the GeoJSON for the isochrone(s).
+#' \item If \code{errorId} is "OK" then \code{response} contains the the isochrone(s) in
+#' either GeoJSON format or as an \strong{sf} object, depending on the value of the
+#' \code{format} argument.
 #' }
 #' @examples \dontrun{
 #' otp_get_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
