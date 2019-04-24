@@ -128,7 +128,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 4491
+#> [1] 4744
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -241,7 +241,9 @@ tm_shape(osm_man) +
   tm_shape(my_isochrone$response) +
   tm_fill(
     col = "time",
-    alpha = 0.5,
+    alpha = 0.8,
+    palette = "-plasma",
+    n = 6,
     style = "cat",
     title = "Time (seconds)"
   ) + tm_layout(legend.position = c("left", "top"), legend.bg.color = "white", 
