@@ -128,7 +128,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 5147
+#> [1] 4491
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -182,12 +182,14 @@ otp_get_times(
 ### Travel time isochrones
 
 The `otp_get_isochrone()` function can be used to get one or more travel
-time isochrones in GeoJSON format. These are only available for transit
-or walking modes (OTP limitation). They can be generated either *from*
-(default) or *to* the specified
-location.
+time isochrones in either GeoJSON or SF format. These are only available
+for transit or walking modes (OTP limitation). They can be generated
+either *from* (default) or *to* the specified location.
+
+#### GeoJSON example
 
 ``` r
+
 # 900, 1800 and 2700 second isochrones for travel *to* Manchester Airport by any transit mode
 my_isochrone <- otp_get_isochrone(
   otpcon,
@@ -204,6 +206,50 @@ names(my_isochrone)
 # now write the GeoJSON (in the "response" element) to a file so it can be opened in QGIS (for example)
 write(my_isochrone$response, file = "my_isochrone.geojson")
 ```
+
+#### SF example (currently available in development version)
+
+``` r
+
+# request format as "SF"
+my_isochrone <- otp_get_isochrone(
+  otpcon,
+  location = c(53.36484, -2.27108),
+  format = "SF",
+  fromLocation = FALSE,
+  cutoffs = c(900, 1800, 2700, 3600, 4500, 5400),
+  mode = "TRANSIT",
+  date = "11-12-2018",
+  time= "08:00:00",
+  maxWalkDistance = 1600,
+  walkReluctance = 5,
+  minTransferTime = 600
+)
+
+# plot using tmap package
+
+library(tmap)
+library(tmaptools)
+
+# set bounding box
+bbox <- bb(my_isochrone$response)
+# get OSM tiles
+osm_man <- read_osm(bbox, ext = 1.1)
+# plot isochrones
+tm_shape(osm_man) +
+  tm_rgb() +
+  tm_shape(my_isochrone$response) +
+  tm_fill(
+    col = "time",
+    alpha = 0.5,
+    style = "cat",
+    title = "Time (seconds)"
+  ) + tm_layout(legend.position = c("left", "top"), legend.bg.color = "white", 
+                main.title = "15-90 minute isochrone to Manchester Airport", 
+                main.title.size = 0.8)
+```
+
+<img src="man/figures/unnamed-chunk-7-1.png" width="80%" />
 
 ## Learning more
 
