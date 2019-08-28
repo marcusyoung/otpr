@@ -1,4 +1,4 @@
-# otpr 0.1.0.9000
+# otpr 0.2.0
 
 ## New features
 * Added option to `otp_get_isochrone()` to return isochrone as either GeoJSON (default)
