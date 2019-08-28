@@ -128,7 +128,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 4744
+#> [1] 85.85
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -145,7 +145,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 2740
+#> [1] 45.67
 ```
 
 ### Breakdown of time by mode, waiting time and transfers
@@ -207,7 +207,7 @@ names(my_isochrone)
 write(my_isochrone$response, file = "my_isochrone.geojson")
 ```
 
-#### SF example (currently available in development version)
+#### SF example
 
 ``` r
 

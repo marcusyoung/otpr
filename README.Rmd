@@ -180,7 +180,7 @@ write(my_isochrone$response, file = "my_isochrone.geojson")
 
 ```
 
-#### SF example (currently available in development version)
+#### SF example
 
 ``` {r, out.width='80%'}
 
