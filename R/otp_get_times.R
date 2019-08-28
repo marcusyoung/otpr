@@ -221,9 +221,9 @@ otp_get_times <-
           list("errorId" = error.id, "itineraries" = ret.df)
         return (response)
       } else {
-        # detail not needed - just return travel time in seconds
+        # detail not needed - just return travel time in minutes
         response <-
-          list("errorId" = error.id, "duration" = df$duration)
+          list("errorId" = error.id, "duration" = round(df$duration / 60, digits = 2))
         return (response)
       }
     } else {
