@@ -104,7 +104,7 @@ otp_get_distance(
 
 ### Time between two points
 
-To get the trip duration in seconds between an origin and destination use `otp_get_times()`. 
+To get the trip duration in minutes between an origin and destination use `otp_get_times()`. 
 You can specify the required mode: TRANSIT (all available transit modes), BUS, RAIL, CAR, 
 BICYCLE, and WALK are valid. All the public transit modes automatically allow WALK.
 There is also the option to combine TRANSIT with BICYCLE.

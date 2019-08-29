@@ -105,12 +105,12 @@ otp_get_distance(
 #> [1] "OK"
 #> 
 #> $distance
-#> [1] 16235.36
+#> [1] 16235.37
 ```
 
 ### Time between two points
 
-To get the trip duration in seconds between an origin and destination
+To get the trip duration in minutes between an origin and destination
 use `otp_get_times()`. You can specify the required mode: TRANSIT (all
 available transit modes), BUS, RAIL, CAR, BICYCLE, and WALK are valid.
 All the public transit modes automatically allow WALK. There is also the
@@ -128,7 +128,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 85.85
+#> [1] 70.87
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -145,7 +145,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 45.67
+#> [1] 45.68
 ```
 
 ### Breakdown of time by mode, waiting time and transfers
@@ -174,7 +174,7 @@ otp_get_times(
 #> 
 #> $itineraries
 #>                 start                 end duration walkTime transitTime
-#> 1 2018-11-25 08:02:57 2018-11-25 08:48:37    45.67      7.9          31
+#> 1 2018-11-25 08:02:57 2018-11-25 08:48:38    45.68     7.92          31
 #>   waitingTime transfers
 #> 1        6.77         1
 ```
