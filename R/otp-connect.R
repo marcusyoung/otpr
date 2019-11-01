@@ -8,6 +8,11 @@
 #' @param router A string, e.g. "UK2018". Optional, default is "default".
 #' @param port A positive integer. Optional, default is 8080.
 #' @param ssl Logical, indicates whether to use https. Optional, default is FALSE.
+#' @param tz A string, containing the timezone of the router's graph. This should be
+#' a valid tz (see: \url{https://en.wikipedia.org/wiki/List_of_tz_database_time_zones}).
+#' For example: "Europe/Berlin". Default is "", where the timezone is
+#' assumed to be the same as the current system timezone (as obtained from
+#' \code{Sys.timezone()}).
 #' @param check Logical. If TRUE connection object is only returned if OTP
 #'     instance and router are confirmed reachable. Optional, default is TRUE.
 #' @return Returns S3 object of class otpconnect. If \code{check} is TRUE
@@ -25,6 +30,7 @@
 otp_connect <- function(hostname = "localhost",
                         router = "default",
                         port = 8080,
+                        tz = "",
                         ssl = FALSE,
                         check = TRUE)
 {
@@ -42,6 +48,7 @@ otp_connect <- function(hostname = "localhost",
     hostname = hostname,
     router = router,
     port = port,
+    tz = tz,
     ssl = ssl
   )
 
