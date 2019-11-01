@@ -8,11 +8,12 @@
 #' @param router A string, e.g. "UK2018". Optional, default is "default".
 #' @param port A positive integer. Optional, default is 8080.
 #' @param ssl Logical, indicates whether to use https. Optional, default is FALSE.
-#' @param tz A string, containing the timezone of the router's graph. This should be
-#' a valid tz (see: \url{https://en.wikipedia.org/wiki/List_of_tz_database_time_zones}).
+#' @param tz A string, containing the time zone of the router's graph. This should be
+#' a valid time zone (checked against vector returned by `OlsonNames()`).
 #' For example: "Europe/Berlin". Default is "", where the timezone is
 #' assumed to be the same as the current system timezone (as obtained from
-#' \code{Sys.timezone()}).
+#' \code{Sys.timezone()}). The default will be ok if the current system time zone
+#' matches the time zone of the OTP graph.
 #' @param check Logical. If TRUE connection object is only returned if OTP
 #'     instance and router are confirmed reachable. Optional, default is TRUE.
 #' @return Returns S3 object of class otpconnect. If \code{check} is TRUE
@@ -35,7 +36,7 @@ otp_connect <- function(hostname = "localhost",
                         check = TRUE)
 {
   # argument checks
-
+  
   coll <- checkmate::makeAssertCollection()
   checkmate::assert_string(hostname, add = coll)
   checkmate::assert_string(router, add = coll)
@@ -43,6 +44,16 @@ otp_connect <- function(hostname = "localhost",
   checkmate::assert_logical(ssl, add = coll)
   checkmate::assert_logical(check, add = coll)
   checkmate::reportAssertions(coll)
+  
+  # Check if tz is a valid timezone
+  
+  # define the set of valid time zones
+  tz_set <- c(OlsonNames(), "")
+  
+  if (isFALSE(checkmate::test_choice(tz, tz_set))) {
+    stop("Assertion on 'tz' failed:", " Must be a valid time zone")
+  }
+  
 
   otpcon <- list(
     hostname = hostname,

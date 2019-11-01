@@ -187,9 +187,9 @@ otp_get_times <-
       if (detail == TRUE) {
         # need to convert times from epoch format
         df$start <-
-          as.POSIXct(df$startTime / 1000, origin = "1970-01-01")
+          as.POSIXct(df$startTime / 1000, origin = "1970-01-01", tz = otpcon$tz)
         df$end <-
-          as.POSIXct(df$endTime / 1000, origin = "1970-01-01")
+          as.POSIXct(df$endTime / 1000, origin = "1970-01-01", tz = otpcon$tz)
         # create new columns for nicely formatted dates and times
         #df$startDate <- format(start.time, "%d-%m-%Y")
         #df$startTime <- format(start.time, "%I:%M%p")

@@ -5,7 +5,7 @@
 \title{Set up and confirm a connection to an OTP instance.}
 \usage{
 otp_connect(hostname = "localhost", router = "default", port = 8080,
-  ssl = FALSE, check = TRUE)
+  tz = "", ssl = FALSE, check = TRUE)
 }
 \arguments{
 \item{hostname}{A string, e.g. "ec2-34-217-73-26.us-west-2.compute.amazonaws.com".
@@ -14,6 +14,13 @@ Optional, default is "localhost".}
 \item{router}{A string, e.g. "UK2018". Optional, default is "default".}
 
 \item{port}{A positive integer. Optional, default is 8080.}
+
+\item{tz}{A string, containing the time zone of the router's graph. This should be
+a valid time zone (checked against vector returned by `OlsonNames()`).
+For example: "Europe/Berlin". Default is "", where the timezone is
+assumed to be the same as the current system timezone (as obtained from
+\code{Sys.timezone()}). The default will be ok if the current system time zone
+matches the time zone of the OTP graph.}
 
 \item{ssl}{Logical, indicates whether to use https. Optional, default is FALSE.}
 
