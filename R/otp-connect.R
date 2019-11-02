@@ -8,11 +8,12 @@
 #' @param router A string, e.g. "UK2018". Optional, default is "default".
 #' @param port A positive integer. Optional, default is 8080.
 #' @param ssl Logical, indicates whether to use https. Optional, default is FALSE.
-#' @param tz A string, containing the time zone of the router's graph. This
-#' should be a valid time zone (checked against vector returned by `OlsonNames()`).
-#' For example: "Europe/Berlin". Default is the timezone of the current system
-#' (obtained from \code{Sys.timezone()}). Using the default will be ok if the
-#' current system time zone is the same as the time zone of the OTP graph.
+#' @param tz A string, containing the time zone of the router's graph. Optional.
+#' This should be a valid time zone (checked against vector returned by
+#' `OlsonNames()`). For example: "Europe/Berlin". Default is the timezone of the
+#' current system (obtained from \code{Sys.timezone()}). Using the default will
+#' be ok if the current system time zone is the same as the time zone of the OTP
+#' graph.
 #' @param check Logical. If TRUE connection object is only returned if OTP
 #'     instance and router are confirmed reachable. Optional, default is TRUE.
 #' @return Returns S3 object of class otpconnect. If \code{check} is TRUE

@@ -15,11 +15,12 @@ Optional, default is "localhost".}
 
 \item{port}{A positive integer. Optional, default is 8080.}
 
-\item{tz}{A string, containing the time zone of the router's graph. This
-should be a valid time zone (checked against vector returned by `OlsonNames()`).
-For example: "Europe/Berlin". Default is the timezone of the current system
-(obtained from \code{Sys.timezone()}). Using the default will be ok if the
-current system time zone is the same as the time zone of the OTP graph.}
+\item{tz}{A string, containing the time zone of the router's graph. Optional.
+This should be a valid time zone (checked against vector returned by
+`OlsonNames()`). For example: "Europe/Berlin". Default is the timezone of the
+current system (obtained from \code{Sys.timezone()}). Using the default will
+be ok if the current system time zone is the same as the time zone of the OTP
+graph.}
 
 \item{ssl}{Logical, indicates whether to use https. Optional, default is FALSE.}
 
