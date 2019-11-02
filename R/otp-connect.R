@@ -47,10 +47,7 @@ otp_connect <- function(hostname = "localhost",
 
   # Check if tz is a valid timezone
 
-  # define the set of valid time zones
-  tz_set <- c(OlsonNames(), "")
-
-  if (isFALSE(checkmate::test_choice(tz, tz_set))) {
+  if (isFALSE(checkmate::test_choice(tz, OlsonNames()))) {
     stop("Assertion on 'tz' failed:", " Must be a valid time zone")
   }
 
