@@ -10,7 +10,7 @@ system. When the local system time zone is the same as the time zone of the
 router's graph then there will be no confusion. However, if the time zone of the
 graph is different from the time zone of the local system then the start and end
 times will be expressed in the local system time zone and not the time zone of the
-graph. To adddress this the following changes have been made:
+graph. To address this the following changes have been made:
     * Added a `tz` argument to the `otp_connect()` function. By default this
 is set to the local system's time zone. If the router's graph is in a different
 time zone the user can specify it (for example, "Europe/Berlin").
