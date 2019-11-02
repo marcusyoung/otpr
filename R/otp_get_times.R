@@ -190,6 +190,7 @@ otp_get_times <-
           as.POSIXct(df$startTime / 1000, origin = "1970-01-01", tz = otpcon$tz)
         df$end <-
           as.POSIXct(df$endTime / 1000, origin = "1970-01-01", tz = otpcon$tz)
+        df$timeZone <- attributes(df$start)$tzone[1]
         # create new columns for nicely formatted dates and times
         #df$startDate <- format(start.time, "%d-%m-%Y")
         #df$startTime <- format(start.time, "%I:%M%p")
@@ -202,6 +203,7 @@ otp_get_times <-
             select = c(
               'start',
               'end',
+              'timeZone',
               'duration',
               'walkTime',
               'transitTime',
@@ -210,7 +212,7 @@ otp_get_times <-
             )
           )
         # convert seconds into minutes where applicable
-        ret.df[, 3:6] <- round(ret.df[, 3:6] / 60, digits = 2)
+        ret.df[, 4:7] <- round(ret.df[, 4:7] / 60, digits = 2)
         # rename walkTime column as appropriate - this a mistake in OTP
         if (mode == "CAR") {
           names(ret.df)[names(ret.df) == 'walkTime'] <- 'driveTime'
