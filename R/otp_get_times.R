@@ -253,6 +253,8 @@ otp_get_times <-
 
           legs$departureWait[is.na(legs$departureWait)] <- 0
 
+          legs$duration <- round(legs$duration / 60, 2)
+
           ret.legs <- subset(
             legs,
             select = c(
