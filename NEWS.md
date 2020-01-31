@@ -1,4 +1,6 @@
-# otpr 0.2.0.9000
+# otpr 0.3.0.9000
+
+# otpr 0.3.0
 
 ## New features
 
@@ -6,9 +8,9 @@
 transit itinerary. There is a new parameter available for `otp_get_times()` called 
 `includeLegs`. If this is set to TRUE (default is FALSE) and `detail` is also set
 to TRUE and `mode` includes a transit mode, then the list returned by the
-function will contain a third dataframe called `legs`. This contains a row for each
-leg of the trip. Information provided includes `departureWait` which is the
-length of time in minutes required to wait for start of the leg.
+function will contain a third dataframe called `legs`. This consists of a row for
+each leg of the trip. Information provided includes `departureWait` which is the
+length of time in minutes required to wait for the start of a leg.
 
 * Added support for time zones (#7). The OTP API returns itinerary start and end
 times as EPOCH values. otpr converts these to hh:mm:ss format using the `as.POSIXct()`
@@ -24,7 +26,7 @@ is set to the local system's time zone. If the router's graph is in a different
 time zone the user can specify it (for example, "Europe/Berlin").
     * The dataframe returned by `otp_get_times()` when the `detail` argument is set to
 TRUE now includes an additional 'time zone' column. This shows the time zone of 
-the returned itinerary start and end times. This makes explit what time zone
+the returned itinerary start and end times. This makes explicit what time zone
 these times are expressed in.
 
 
