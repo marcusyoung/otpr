@@ -249,7 +249,7 @@ otp_get_times <-
           legs$departureWait <-
             round(abs((
               as.numeric(legs$fromArrival - legs$fromDeparture)
-            ) / 60), 4)
+            ) / 60), 2)
 
           legs$departureWait[is.na(legs$departureWait)] <- 0
 
