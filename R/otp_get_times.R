@@ -255,11 +255,14 @@ otp_get_times <-
 
           legs$duration <- round(legs$duration / 60, 2)
 
+          legs$timeZone <- attributes(legs$startTime)$tzone[1]
+
           ret.legs <- subset(
             legs,
             select = c(
               'startTime',
               'endTime',
+              'timeZone',
               'mode',
               'departureWait',
               'duration',
