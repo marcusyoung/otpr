@@ -6,7 +6,8 @@
 \usage{
 otp_get_times(otpcon, fromPlace, toPlace, mode = "CAR", date, time,
   maxWalkDistance = 800, walkReluctance = 2, arriveBy = FALSE,
-  transferPenalty = 0, minTransferTime = 0, detail = FALSE)
+  transferPenalty = 0, minTransferTime = 0, detail = FALSE,
+  includeLegs = FALSE)
 }
 \arguments{
 \item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}
@@ -46,6 +47,8 @@ adherence. This is a minimum; transfers over longer distances might use a longer
 Default is 0.}
 
 \item{detail}{Logical. Default is FALSE.}
+
+\item{includeLegs}{Logical. Default is FALSE. Determines whether or not details of each journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but only when \code{detail} is TRUE and \code{mode} contains transit modes (Legs are not relevant for CAR, BICYCLE or WALK modes).}
 }
 \value{
 Returns a list. First element in the list is \code{errorId}. This is "OK" if
@@ -55,6 +58,7 @@ varies:
 \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
+\item If there is no error and \code{detail} and \code{legs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe.
 }
 }
 \description{
