@@ -29,6 +29,7 @@
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
 #' @param detail Logical. Default is FALSE.
+#' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but only when \code{detail} is TRUE and \code{mode} contains transit modes (Legs are not relevant for CAR, BICYCLE or WALK modes).
 #' @return Returns a list. First element in the list is \code{errorId}. This is "OK" if
 #' OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
 #' varies:
@@ -36,6 +37,7 @@
 #' \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 #' \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 #' \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
+#' \item If there is no error and \code{detail} and \code{legs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe.
 #' }
 #' @examples \dontrun{
 #' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
@@ -59,16 +61,17 @@ otp_get_times <-
            arriveBy = FALSE,
            transferPenalty = 0,
            minTransferTime = 0,
-           detail = FALSE)
+           detail = FALSE,
+           includeLegs = FALSE)
   {
     mode <- toupper(mode)
 
 
-    if(missing(date)){
-        date <- format(Sys.Date(), "%m-%d-%Y")
+    if (missing(date)) {
+      date <- format(Sys.Date(), "%m-%d-%Y")
     }
 
-    if(missing(time)) {
+    if (missing(time)) {
       time <- format(Sys.time(), "%H:%M:%S")
     }
 
@@ -103,15 +106,13 @@ otp_get_times <-
 
     # check for valid modes
     valid_mode <-
-      list(
-        "TRANSIT",
-        "WALK",
-        "BICYCLE",
-        "CAR",
-        "BUS",
-        "RAIL",
-        c("TRANSIT", "BICYCLE")
-      )
+      list("TRANSIT",
+           "WALK",
+           "BICYCLE",
+           "CAR",
+           "BUS",
+           "RAIL",
+           c("TRANSIT", "BICYCLE"))
 
     if (!(Position(function(x)
       identical(x, mode), valid_mode, nomatch = 0) > 0)) {
@@ -133,6 +134,8 @@ otp_get_times <-
         identical(mode, "RAIL") |
         otp_vector_match(mode, c("TRANSIT", "BICYCLE"))) {
       mode <- append(mode, "WALK")
+      # set flag so know dealing with transit modes
+      transitModes <- TRUE
     }
 
     mode <- paste(mode, collapse = ",")
@@ -175,7 +178,7 @@ otp_get_times <-
     # convert response content into text
     text <- httr::content(req, as = "text", encoding = "UTF-8")
     # parse text to json
-    asjson <- jsonlite::fromJSON(text)
+    asjson <- jsonlite::fromJSON(text, flatten = TRUE)
 
     # Check for errors - if no error object, continue to process content
     if (is.null(asjson$error$id)) {
@@ -221,11 +224,73 @@ otp_get_times <-
         }
         response <-
           list("errorId" = error.id, "itineraries" = ret.df)
+        # get and process legs if required
+        if (isTRUE(transitModes & isTRUE(includeLegs))) {
+          legs <- df$legs[[1]]
+          legs <- janitor::clean_names(legs, case = "lower_camel")
+
+          legs$startTime <-
+            as.POSIXct(legs$startTime / 1000,
+                       origin = "1970-01-01",
+                       tz = otpcon$tz)
+          legs$endTime <-
+            as.POSIXct(legs$endTime / 1000,
+                       origin = "1970-01-01",
+                       tz = otpcon$tz)
+          legs$fromArrival <-
+            as.POSIXct(legs$fromArrival / 1000,
+                       origin = "1970-01-01",
+                       tz = otpcon$tz)
+          legs$fromDeparture <-
+            as.POSIXct(legs$fromDeparture / 1000,
+                       origin = "1970-01-01",
+                       tz = otpcon$tz)
+
+          legs$departureWait <-
+            round(abs((
+              as.numeric(legs$fromArrival - legs$fromDeparture)
+            ) / 60), 4)
+
+          legs$departureWait[is.na(legs$departureWait)] <- 0
+
+          ret.legs <- subset(
+            legs,
+            select = c(
+              'startTime',
+              'endTime',
+              'mode',
+              'departureWait',
+              'duration',
+              'distance',
+              'routeType',
+              'routeId',
+              'routeShortName',
+              'routeLongName',
+              'headsign',
+              'agencyName',
+              'agencyUrl',
+              'agencyId',
+              'fromName',
+              'fromLon',
+              'fromLat',
+              'fromStopId',
+              'fromStopCode',
+              'toName',
+              'toLon',
+              'toLat',
+              'toStopId',
+              'toStopCode'
+            )
+          )
+
+          response[["legs"]] <- ret.legs
+        }
         return (response)
       } else {
         # detail not needed - just return travel time in minutes
         response <-
-          list("errorId" = error.id, "duration" = round(df$duration / 60, digits = 2))
+          list("errorId" = error.id,
+               "duration" = round(df$duration / 60, digits = 2))
         return (response)
       }
     } else {
