@@ -4,10 +4,22 @@
 \alias{otp_get_isochrone}
 \title{Returns one or more travel time isochrones}
 \usage{
-otp_get_isochrone(otpcon, location, fromLocation = TRUE,
-  format = "JSON", mode = "TRANSIT", date, time, cutoffs,
-  batch = TRUE, arriveBy = FALSE, maxWalkDistance = 800,
-  walkReluctance = 2, transferPenalty = 0, minTransferTime = 0)
+otp_get_isochrone(
+  otpcon,
+  location,
+  fromLocation = TRUE,
+  format = "JSON",
+  mode = "TRANSIT",
+  date,
+  time,
+  cutoffs,
+  batch = TRUE,
+  arriveBy = FALSE,
+  maxWalkDistance = 800,
+  walkReluctance = 2,
+  transferPenalty = 0,
+  minTransferTime = 0
+)
 }
 \arguments{
 \item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}

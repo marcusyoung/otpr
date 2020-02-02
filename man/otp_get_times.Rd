@@ -4,10 +4,21 @@
 \alias{otp_get_times}
 \title{Finds the time in minutes between supplied origin and destination}
 \usage{
-otp_get_times(otpcon, fromPlace, toPlace, mode = "CAR", date, time,
-  maxWalkDistance = 800, walkReluctance = 2, arriveBy = FALSE,
-  transferPenalty = 0, minTransferTime = 0, detail = FALSE,
-  includeLegs = FALSE)
+otp_get_times(
+  otpcon,
+  fromPlace,
+  toPlace,
+  mode = "CAR",
+  date,
+  time,
+  maxWalkDistance = 800,
+  walkReluctance = 2,
+  arriveBy = FALSE,
+  transferPenalty = 0,
+  minTransferTime = 0,
+  detail = FALSE,
+  includeLegs = FALSE
+)
 }
 \arguments{
 \item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}
@@ -58,7 +69,7 @@ varies:
 \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
-\item If there is no error and \code{detail} and \code{legs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe.
+\item If there is no error and \code{detail} and \code{includelegs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe.
 }
 }
 \description{

@@ -37,7 +37,7 @@
 #' \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 #' \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 #' \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
-#' \item If there is no error and \code{detail} and \code{legs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe.
+#' \item If there is no error and \code{detail} and \code{includelegs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe.
 #' }
 #' @examples \dontrun{
 #' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))

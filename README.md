@@ -43,7 +43,7 @@ changes since last release.
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("marcusyoung/otpr")
+# devtools::install_github("marcusyoung/otpr")
 ```
 
 ## Getting started
@@ -56,8 +56,7 @@ library(otpr)
 
 The first step is to call `otp_connect()`, which defines the parameters
 needed to connect to a router on a running OTP instance. The function
-can also confirm that the router is
-reachable.
+can also confirm that the router is reachable.
 
 ``` r
 # For a basic instance of OTP running on localhost with standard ports and a 'default' router
@@ -66,14 +65,29 @@ otpcon <- otp_connect()
 #> Router http://localhost:8080/otp/routers/default exists
 ```
 
+#### Handling Time Zones
+
+If the time zone of an OTP graph *differs* from the time zone of the
+local system running **otpr** then by default returned trip start and
+end times will be expressed in the local system’s time zone and not the
+time zone of the graph. This is because the OTP API returns EPOCH values
+and the conversion to date and time format occurs on the local system. A
+‘timeZone’ column is included in returned dataframes that contain start
+and end times to make this explicit. If you wish to have start and end
+times expressed in the time zone of the graph, the ‘tz’ argument can be
+specified when calling the `otp_connect()` function. This must be a
+valid time zone (checked against the vector returned by `OlsonNames()`);
+for example: “Europe/Berlin”.
+
 ## Querying the OTP API
 
 ### Function behaviour
 
-The functions that query the OTP API return a list of two elements. The
-first element is an errorId - with the value “OK” or the error code
-returned by OTP. If errorId is “OK”, the second element will contain the
-query response; otherwise it will contain the OTP error message.
+The functions that query the OTP API generally return a list of two
+elements. The first element is an errorId - with the value “OK” or the
+error code returned by OTP. If errorId is “OK”, the second element will
+contain the query response; otherwise it will contain the OTP error
+message.
 
 ### Distance between two points
 
@@ -117,18 +131,18 @@ All the public transit modes automatically allow WALK. There is also the
 option to combine TRANSIT with BICYCLE.
 
 ``` r
-# Time between Manchester city centre and Manchester airport by BUS
+# Time between Manchester city centre and Manchester airport by BICYCLE
 otp_get_times(
   otpcon,
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
-  mode = "BUS"
+  mode = "BICYCLE"
 )
 #> $errorId
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 70.87
+#> [1] 59.98
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -155,8 +169,7 @@ To get more information about the trip when using transit modes,
 The trip duration (minutes) is then further broken down by time on
 transit, walking time (from/to and between stops), waiting time (when
 changing transit vehicle or mode), and number of transfers (when
-changing transit vehicle or
-mode).
+changing transit vehicle or mode).
 
 ``` r
 # Time between Manchester city centre and Manchester airport by TRANSIT with detail
@@ -173,10 +186,52 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $itineraries
-#>                 start                 end duration walkTime transitTime
-#> 1 2018-11-25 08:02:57 2018-11-25 08:48:38    45.68     7.92          31
-#>   waitingTime transfers
-#> 1        6.77         1
+#>                 start                 end      timeZone duration walkTime
+#> 1 2018-11-25 08:02:57 2018-11-25 08:48:38 Europe/London    45.68     7.92
+#>   transitTime waitingTime transfers
+#> 1          31        6.77         1
+```
+
+#### Details of each leg for transit-based trips
+
+To get information about each leg of transit-based trips,
+`otp_get_times()` can be called with both the ‘detail’ and ‘includeLegs’
+arguments set to TRUE. A third element, called ‘legs’, will then be
+returned. The ‘legs’ element is a dataframe containing a row for each
+leg of the trip. The information provided for each leg includes start
+and end times, duration, distance, mode, route details, agency details,
+and stop names. There is also a column called ‘departureWait’ which is
+the length of time in minutes required to wait before the start of a
+leg. The sum of ‘departureWait’ will equal the total waiting time for
+the itinerary.
+
+``` r
+# Time between Manchester city centre and Manchester airport by TRANSIT with detail and legs
+trip <- otp_get_times(
+  otpcon,
+  fromPlace = c(53.48805,-2.24258),
+  toPlace = c(53.36484,-2.27108),
+  mode = "TRANSIT",
+  date = "11-25-2018",
+  time = "08:00:00",
+  detail = TRUE,
+  includeLegs = TRUE
+)
+
+# View legs (first 10 columns)
+trip$legs[1:10]
+#>             startTime             endTime      timeZone mode departureWait
+#> 1 2018-11-25 08:02:57 2018-11-25 08:05:59 Europe/London WALK          0.00
+#> 2 2018-11-25 08:06:00 2018-11-25 08:15:00 Europe/London TRAM          0.02
+#> 3 2018-11-25 08:15:00 2018-11-25 08:16:16 Europe/London WALK          0.00
+#> 4 2018-11-25 08:23:00 2018-11-25 08:45:00 Europe/London RAIL          6.73
+#> 5 2018-11-25 08:45:01 2018-11-25 08:48:38 Europe/London WALK          0.02
+#>   duration  distance routeType       routeId routeShortName
+#> 1     3.03   201.273        NA          <NA>           <NA>
+#> 2     9.00  1428.317         0 2:MET:   4:I:              4
+#> 3     1.27    97.309        NA          <NA>           <NA>
+#> 4    22.00 14922.188         2        1:3434           3434
+#> 5     3.62   248.503        NA          <NA>           <NA>
 ```
 
 ### Travel time isochrones
@@ -196,7 +251,9 @@ my_isochrone <- otp_get_isochrone(
   location = c(53.36484, -2.27108),
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700),
-  mode = "TRANSIT"
+  mode = "TRANSIT",
+  date = "11-25-2018",
+  time = "08:00:00"
 )
 
 # function returns a list of two elements
@@ -251,7 +308,7 @@ tm_shape(osm_man) +
                 main.title.size = 0.8)
 ```
 
-<img src="man/figures/unnamed-chunk-7-1.png" width="80%" />
+<img src="man/figures/unnamed-chunk-8-1.png" width="80%" />
 
 ## Learning more
 

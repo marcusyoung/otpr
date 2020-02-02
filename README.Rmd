@@ -46,7 +46,7 @@ To get a bug fix, or use a feature from the development version, you can install
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("marcusyoung/otpr")
+# devtools::install_github("marcusyoung/otpr")
 ```
 
 
@@ -69,11 +69,24 @@ otpcon <- otp_connect()
 
 ```
 
+#### Handling Time Zones
+
+If the time zone of an OTP graph *differs* from the time zone of the local system
+running **otpr** then by default returned trip start and end times will be expressed
+in the local system's time zone and not the time zone of the graph. This is because
+the OTP API returns EPOCH values and the conversion to date and time format occurs
+on the local system. A 'timeZone' column is included in returned dataframes
+that contain start and end times to make this explicit. If you wish to have start
+and end times expressed in the time zone of the graph, the 'tz' argument can be
+specified when calling the `otp_connect()` function. This must be a valid time zone
+(checked against the vector returned by `OlsonNames()`); for example: "Europe/Berlin".
+
+
 ## Querying the OTP API
 
 ### Function behaviour
 
-The functions that query the OTP API return a list of two elements. The first
+The functions that query the OTP API generally return a list of two elements. The first
 element is an errorId - with the value "OK" or the error code returned by OTP. If
 errorId is "OK", the second element will contain the query response; otherwise it
 will contain the OTP error message.
@@ -110,12 +123,12 @@ BICYCLE, and WALK are valid. All the public transit modes automatically allow WA
 There is also the option to combine TRANSIT with BICYCLE.
 
 ``` {r}
-# Time between Manchester city centre and Manchester airport by BUS
+# Time between Manchester city centre and Manchester airport by BICYCLE
 otp_get_times(
   otpcon,
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
-  mode = "BUS"
+  mode = "BICYCLE"
 )
 
 
@@ -153,6 +166,34 @@ otp_get_times(
 
 ```
 
+#### Details of each leg for transit-based trips
+
+To get information about each leg of transit-based trips, `otp_get_times()` can be called
+with both the 'detail' and 'includeLegs' arguments set to TRUE. A third element, called 'legs',
+will then be returned. The 'legs' element is a dataframe containing a row for each leg of the trip.
+The information provided for each leg includes start and end times, duration, distance, mode,
+route details, agency details, and stop names. There is also a column called 'departureWait'
+which is the length of time in minutes required to wait before the start of a leg. The sum
+of 'departureWait' will equal the total waiting time for the itinerary.
+
+``` {r}
+# Time between Manchester city centre and Manchester airport by TRANSIT with detail and legs
+trip <- otp_get_times(
+  otpcon,
+  fromPlace = c(53.48805,-2.24258),
+  toPlace = c(53.36484,-2.27108),
+  mode = "TRANSIT",
+  date = "11-25-2018",
+  time = "08:00:00",
+  detail = TRUE,
+  includeLegs = TRUE
+)
+
+# View legs (first 10 columns)
+trip$legs[1:10]
+
+```
+
 ### Travel time isochrones
 
 The `otp_get_isochrone()` function can be used to get one or more travel time isochrones
@@ -169,7 +210,9 @@ my_isochrone <- otp_get_isochrone(
   location = c(53.36484, -2.27108),
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700),
-  mode = "TRANSIT"
+  mode = "TRANSIT",
+  date = "11-25-2018",
+  time = "08:00:00"
 )
 
 # function returns a list of two elements
@@ -182,7 +225,7 @@ write(my_isochrone$response, file = "my_isochrone.geojson")
 
 #### SF example
 
-``` {r, out.width='80%'}
+``` {r, message=FALSE, out.width='80%'}
 
 # request format as "SF"
 my_isochrone <- otp_get_isochrone(

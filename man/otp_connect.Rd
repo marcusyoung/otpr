@@ -4,8 +4,14 @@
 \alias{otp_connect}
 \title{Set up and confirm a connection to an OTP instance.}
 \usage{
-otp_connect(hostname = "localhost", router = "default", port = 8080,
-  tz = Sys.timezone(), ssl = FALSE, check = TRUE)
+otp_connect(
+  hostname = "localhost",
+  router = "default",
+  port = 8080,
+  tz = Sys.timezone(),
+  ssl = FALSE,
+  check = TRUE
+)
 }
 \arguments{
 \item{hostname}{A string, e.g. "ec2-34-217-73-26.us-west-2.compute.amazonaws.com".

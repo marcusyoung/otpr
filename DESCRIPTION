@@ -14,8 +14,9 @@ LazyData: true
 Imports:
     checkmate,
     httr,
+    geojsonsf,
     janitor,
     jsonlite,
-    geojsonsf
-RoxygenNote: 6.1.1
+    lwgeom
+RoxygenNote: 7.0.2
 Suggests: testthat
