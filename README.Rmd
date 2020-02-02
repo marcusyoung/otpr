@@ -46,7 +46,7 @@ To get a bug fix, or use a feature from the development version, you can install
 
 ``` r
 # install.packages("devtools")
-# devtools::install_github("marcusyoung/otpr")
+  devtools::install_github("marcusyoung/otpr")
 ```
 
 

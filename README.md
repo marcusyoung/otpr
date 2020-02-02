@@ -43,7 +43,7 @@ changes since last release.
 
 ``` r
 # install.packages("devtools")
-# devtools::install_github("marcusyoung/otpr")
+  devtools::install_github("marcusyoung/otpr")
 ```
 
 ## Getting started
