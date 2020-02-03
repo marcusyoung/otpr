@@ -1,10 +1,11 @@
 # otpr 0.3.0.9000
 
-## Other
+## New features
 
-* Now also imports the lwgeom package and the `st_make_valid()` function is used
+* Now also imports the **lwgeom** package. The `st_make_valid()` function is used
 in `otp_get_isochrone()` to correct any geometry errors in the sf object before 
-it is returned to the user.
+it is returned to the user. OTP appears to return polygons that fail validation
+by `st_is_valid` from the **sf** package.
 
 # otpr 0.3.0
 
