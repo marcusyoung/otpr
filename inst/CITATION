@@ -4,10 +4,10 @@ citEntry(entry="Manual",
          author = c(
          person("Marcus Young")),
          title = "{otpr: An API wrapper for OpenTripPlanner}",
-         year = {2019},
+         year = {2020},
 
 textVersion =
-paste("Marcus Young (2019).",
+paste("Marcus Young (2020).",
 "otpr: An API wrapper for OpenTripPlanner.")
 
 )
