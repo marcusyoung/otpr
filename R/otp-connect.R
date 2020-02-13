@@ -5,7 +5,8 @@
 #'
 #' @param hostname A string, e.g. "ec2-34-217-73-26.us-west-2.compute.amazonaws.com".
 #'     Optional, default is "localhost".
-#' @param router A string, e.g. "UK2018". Optional, default is "default".
+#' @param router A string, e.g. "UK2018". Optional, default is "default". Ignored if
+#' OTP v2.x as router support is removed.
 #' @param port A positive integer. Optional, default is 8080.
 #' @param ssl Logical, indicates whether to use https. Optional, default is FALSE.
 #' @param tz A string, containing the time zone of the router's graph. Optional.
@@ -14,10 +15,7 @@
 #' current system (obtained from \code{Sys.timezone()}). Using the default will
 #' be ok if the current system time zone is the same as the time zone of the OTP
 #' graph.
-#' @param check Logical. If TRUE connection object is only returned if OTP
-#'     instance and router are confirmed reachable. Optional, default is TRUE.
-#' @return Returns S3 object of class otpconnect. If \code{check} is TRUE
-#'     and the router is not reachable the object is not returned.
+#' @return Returns S3 object of class otpconnect if reachable.
 #' @examples \dontrun{
 #' otpcon <- otpr_connect()
 #' otpcon <- otpr_connect(router = "UK2018",
@@ -63,6 +61,7 @@ otp_connect <- function(hostname = "localhost",
   # Set the name for the class
   class(otpcon) <- append(class(otpcon), "otpconnect")
 
+  # Check for OTP version
 
   # If check then confirm router is queryable
 
