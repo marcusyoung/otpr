@@ -49,11 +49,11 @@ otp_connect <- function(hostname = "localhost",
   checkmate::reportAssertions(coll)
 
   # Check if tz is a valid timezone
-
   if (isFALSE(checkmate::test_choice(tz, OlsonNames()))) {
     stop("Assertion on 'tz' failed:", " Must be a valid time zone")
   }
 
+  # Create the otpcon object
   otpcon <- list(
     hostname = hostname,
     version = 0,
