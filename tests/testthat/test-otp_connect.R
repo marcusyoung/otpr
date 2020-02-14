@@ -10,9 +10,9 @@ skip_if_no_otp <- function() {
 # the following tests require an OTPv1 instance at http://localhost:8080/otp with "default" router
 
 test_that("default object is created and make_url method works correctly", {
+  skip_if_no_otp()
   otpcon <- otp_connect()
   expect_s3_class(otpcon, "otpconnect")
-  skip_if_no_otp()
   expect_match(make_url(otpcon)$router, "http://localhost:8080/otp/routers/default")
   expect_match(make_url(otpcon)$otp, "http://localhost:8080/otp")
 })
