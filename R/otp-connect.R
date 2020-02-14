@@ -15,6 +15,7 @@
 #' current system (obtained from \code{Sys.timezone()}). Using the default will
 #' be ok if the current system time zone is the same as the time zone of the OTP
 #' graph.
+#' @param check Deprecated and has no effect.
 #' @return Returns S3 object of class otpconnect if reachable.
 #' @examples \dontrun{
 #' otpcon <- otpr_connect()
@@ -30,8 +31,14 @@ otp_connect <- function(hostname = "localhost",
                         router = "default",
                         port = 8080,
                         tz = Sys.timezone(),
-                        ssl = FALSE)
+                        ssl = FALSE,
+                        check = TRUE)
 {
+
+  # the check argument is now deprecated and has no effect
+  if (!missing("check"))
+    warning("argument 'check' has been deprecated and has no effect", call. = FALSE)
+
   # argument checks
 
   coll <- checkmate::makeAssertCollection()

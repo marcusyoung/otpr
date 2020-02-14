@@ -9,7 +9,8 @@ otp_connect(
   router = "default",
   port = 8080,
   tz = Sys.timezone(),
-  ssl = FALSE
+  ssl = FALSE,
+  check = TRUE
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ be ok if the current system time zone is the same as the time zone of the OTP
 graph.}
 
 \item{ssl}{Logical, indicates whether to use https. Optional, default is FALSE.}
+
+\item{check}{Deprecated and has no effect.}
 }
 \value{
 Returns S3 object of class otpconnect if reachable.
