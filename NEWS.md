@@ -1,6 +1,25 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # otpr 0.3.0.9000
 
+## Breaking changes
+
+* `otp_connect()` no longer supports the optional `check` argument. This function
+will now always check that the OTP server and specified router are reachable. This
+is because the major version of OTP must now be retrieved from the `../otp` endpoint
+so that **otpr** can support OTP versions 1 and 2.
+
 ## New features
+
+* Support for OTP version 2:
+  * `otp_connect()` now retrieves the version of the OTP server. This is contained
+  in the otpconnect object that is returned and reported to the user.
+  * `otp_get_isochrone()` is only supported in OTPv1 as this feature has been removed
+  from OTPv2.
+  * OTPv2 does not support named or multiple routers.
 
 * Now also imports the **lwgeom** package. The `st_make_valid()` function is used
 in `otp_get_isochrone()` to correct any geometry errors in the sf object before 
