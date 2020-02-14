@@ -152,7 +152,7 @@ otp_get_times <-
 
 
     # Construct URL
-    routerUrl <- paste0(make_url(otpcon), "/plan")
+    routerUrl <- paste0(make_url(otpcon)$router, "/plan")
 
     # Use GET from the httr package to make API call and place in req - returns json by default.
     # Not using numItineraries due to odd OTP behaviour - if request only 1 itinerary don't
@@ -190,9 +190,9 @@ otp_get_times <-
       if (detail == TRUE) {
         # need to convert times from epoch format
         df$start <-
-          as.POSIXct(df$startTime / 1000, origin = "1970-01-01", tz = otpcon$tz)
+          otp_from_epoch(df$startTime, otpcon$tz)
         df$end <-
-          as.POSIXct(df$endTime / 1000, origin = "1970-01-01", tz = otpcon$tz)
+          otp_from_epoch(df$endTime, otpcon$tz)
         df$timeZone <- attributes(df$start)$tzone[1]
         # create new columns for nicely formatted dates and times
         #df$startDate <- format(start.time, "%d-%m-%Y")
@@ -230,21 +230,13 @@ otp_get_times <-
           legs <- janitor::clean_names(legs, case = "lower_camel")
 
           legs$startTime <-
-            as.POSIXct(legs$startTime / 1000,
-                       origin = "1970-01-01",
-                       tz = otpcon$tz)
+            otp_from_epoch(legs$startTime, otpcon$tz)
           legs$endTime <-
-            as.POSIXct(legs$endTime / 1000,
-                       origin = "1970-01-01",
-                       tz = otpcon$tz)
+            otp_from_epoch(legs$endTime, otpcon$tz)
           legs$fromArrival <-
-            as.POSIXct(legs$fromArrival / 1000,
-                       origin = "1970-01-01",
-                       tz = otpcon$tz)
+            otp_from_epoch(legs$fromArrival, otpcon$tz)
           legs$fromDeparture <-
-            as.POSIXct(legs$fromDeparture / 1000,
-                       origin = "1970-01-01",
-                       tz = otpcon$tz)
+            otp_from_epoch(legs$fromDeparture, otpcon$tz)
 
           legs$departureWait <-
             round(abs((

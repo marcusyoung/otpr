@@ -59,7 +59,7 @@ otp_get_distance <-
 
 
     # Construct URL
-    routerUrl <- paste0(make_url(otpcon), "/plan")
+    routerUrl <- paste0(make_url(otpcon)$router, "/plan")
 
     # Use GET from the httr package to make API call and place in req - returns json by default
     req <- httr::GET(routerUrl,

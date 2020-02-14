@@ -2,7 +2,7 @@
 % Please edit documentation in R/otpr_get_isochrone.R
 \name{otp_get_isochrone}
 \alias{otp_get_isochrone}
-\title{Returns one or more travel time isochrones}
+\title{Returns one or more travel time isochrones (OTPv1 only)}
 \usage{
 otp_get_isochrone(
   otpcon,
