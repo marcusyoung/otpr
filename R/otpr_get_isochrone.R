@@ -200,7 +200,7 @@ otp_get_isochrone <-
       if (format == "SF"){
         req <- geojsonsf::geojson_sf(req)
         # correct invalid geometry that OTP tends to return
-        req <- lwgeom::st_make_valid(req)
+        req <- sf::st_make_valid(req)
       }
     } else {
       errorId <- "ERROR"

@@ -14,3 +14,4 @@ otp_from_epoch(epoch, tz)
 \description{
 Convert time from EPOCH format
 }
+\keyword{internal}

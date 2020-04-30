@@ -1,9 +1,26 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
-# otpr 0.3.0.9000
+# otpr 0.4.0
+
+## Experimental feature
+
+* Support for OTP version 2 (experimental). As OTPv2 has not yet been released
+changes to its codebase could cause errors in **otpr** or unexpected behaviour
+when used against an OTPv2 instance. This version was tested against commit [cce4e7ea](https://github.com/opentripplanner/OpenTripPlanner/commit/cce4e7ea157948156a67c0552d1a9228c8844b00).
+Please report any problems in [Issues](https://github.com/marcusyoung/otpr/issues).
+Current known issues:
+    * `otp_get_isochrone()` is only supported in OTPv1 as this feature has been removed
+    from OTPv2.
+    * The `maxWalkDistance` parameter used in the `otp_get_times()` function is treated
+    as a hard limit when the mode is either WALK or BICYCLE. This could result in no itinerary being
+    returned as the default is 800m. This is different from the behaviour of OTPv1
+    where this parameter is effectively ignored when the mode is WALK and not applied at all
+    to BICYCLE trips. Workaround: provide a large value to this parameter for these modes.
+    * The 'routeType' and 'agencyUrl' columns do not appear in the data frame of
+    journey legs as these are not returned by OTPv2. 
 
 ## Deprecated arguments
 
@@ -12,15 +29,16 @@ will now always check that the OTP server and specified router are reachable. Th
 is because the version of OTP must now be retrieved from the `../otp` endpoint
 so that **otpr** can support OTP versions 1 and 2.
 
-## New features
+## Other
 
-* Support for OTP version 2:
-  * `otp_connect()` now retrieves the version of the OTP server. This is contained
-  in the otpconnect object that is returned and reported to the user.
-  * `otp_get_isochrone()` is only supported in OTPv1 as this feature has been removed
-  from OTPv2.
-  * OTPv2 does not support named or multiple routers.
-* Now also imports the **lwgeom** package. The `st_make_valid()` function is used
+* Compatibility with R 4.0.0. Note: R 4.0.0 requires reinstillation of all packages
+on your system. In particular, make sure that you have re-installed **curl**, 
+as `otp_connect()` can appear to fail without the reason - that **curl** has not been
+installed after 4.0.0 - being explicitly reported. 
+* `otp_connect()` now retrieves the version of the OTP server. This is contained
+in the otpconnect object that is returned and reported to the user. Note that OTPv2
+does not support named or multiple routers.
+* Now also imports the **sf** package. The `st_make_valid()` function is used 
 in `otp_get_isochrone()` to correct any geometry errors in the sf object before 
 it is returned to the user. OTP appears to return polygons that fail validation
 by `st_is_valid` from the **sf** package.

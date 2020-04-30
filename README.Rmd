@@ -37,7 +37,7 @@ This package will be useful to researchers and transport planners who want to us
 
 ``` r
 # Install from CRAN
-install.packages("otpr")
+# install.packages("otpr")
 ```
 
 ### Development version
@@ -46,7 +46,7 @@ To get a bug fix, or use a feature from the development version, you can install
 
 ``` r
 # install.packages("devtools")
-  devtools::install_github("marcusyoung/otpr")
+# devtools::install_github("marcusyoung/otpr")
 ```
 
 
@@ -139,8 +139,8 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00"
+  date = "04-29-2020",
+  time = "07:15:00"
 )
 
 ```
@@ -159,8 +159,8 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00",
+  date = "04-29-2020",
+  time = "07:15:00",
   detail = TRUE
 )
 
@@ -183,14 +183,14 @@ trip <- otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00",
+  date = "04-29-2020",
+  time = "07:15:00",
   detail = TRUE,
   includeLegs = TRUE
 )
 
-# View legs (first 10 columns)
-trip$legs[1:10]
+# View legs (first 9 columns)
+trip$legs[1:9]
 
 ```
 
@@ -211,8 +211,8 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00"
+  date = "04-29-2020",
+  time = "07:15:00"
 )
 
 # function returns a list of two elements
@@ -225,7 +225,7 @@ write(my_isochrone$response, file = "my_isochrone.geojson")
 
 #### SF example
 
-``` {r, message=FALSE, out.width='80%'}
+``` {r, message=FALSE, warning=FALSE, out.width='80%'}
 
 # request format as "SF"
 my_isochrone <- otp_get_isochrone(
@@ -235,8 +235,8 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700, 3600, 4500, 5400),
   mode = "TRANSIT",
-  date = "11-12-2018",
-  time= "08:00:00",
+  date = "04-29-2020",
+  time= "07:15:00",
   maxWalkDistance = 1600,
   walkReluctance = 5,
   minTransferTime = 600
@@ -281,6 +281,8 @@ If you are new to OTP, then the best place to start is to work through the tutor
 everything you need, including example data. The tutorial also has examples
 of using **otpr** functions, and helps you get the most from the package, for example using it to populate
 an origin-destination matrix.
+
+If you are already experienced with OTPv1 and want to try v2, you will need to build it from source. See this [guide](http://docs.opentripplanner.org/en/dev-2.x/Developers-Guide/) and this [basic tutorial](http://docs.opentripplanner.org/en/dev-2.x/Basic-Tutorial/#get-otp) from the OTP project team.
 
 For more guidance on how **otpr**, in conjunction with OTP, can be used to generate data for input into models, read [An automated framework to derive model variables from open transport data using R, PostgreSQL and OpenTripPlanner](https://eprints.soton.ac.uk/389728/).
 

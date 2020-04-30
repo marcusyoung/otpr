@@ -2,6 +2,8 @@
 
 context("Test the otp_connect function")
 
+# use Sys.setenv("OTP_ON_LOCALHOST" = TRUE)
+
 skip_if_no_otp <- function() {
   if(!identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE"))
     skip("Not running test as the environment variable OTP_ON_LOCALHOST is not set to TRUE")

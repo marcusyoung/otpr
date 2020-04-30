@@ -31,7 +31,7 @@ derive variables for use in transportation models.
 
 ``` r
 # Install from CRAN
-install.packages("otpr")
+# install.packages("otpr")
 ```
 
 ### Development version
@@ -43,7 +43,7 @@ changes since last release.
 
 ``` r
 # install.packages("devtools")
-  devtools::install_github("marcusyoung/otpr")
+# devtools::install_github("marcusyoung/otpr")
 ```
 
 ## Getting started
@@ -62,6 +62,7 @@ can also confirm that the router is reachable.
 # For a basic instance of OTP running on localhost with standard ports and a 'default' router
 # this is all that's needed
 otpcon <- otp_connect()
+#> http://localhost:8080/otp is running OTPv1
 #> Router http://localhost:8080/otp/routers/default exists
 ```
 
@@ -106,7 +107,7 @@ otp_get_distance(
 #> [1] "OK"
 #> 
 #> $distance
-#> [1] 29207.19
+#> [1] 29051.51
 
 # Now for BICYCLE
 otp_get_distance(
@@ -119,7 +120,7 @@ otp_get_distance(
 #> [1] "OK"
 #> 
 #> $distance
-#> [1] 16235.37
+#> [1] 16065.04
 ```
 
 ### Time between two points
@@ -142,7 +143,7 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 59.98
+#> [1] 60.12
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -152,14 +153,14 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00"
+  date = "04-29-2020",
+  time = "07:15:00"
 )
 #> $errorId
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 45.68
+#> [1] 42.2
 ```
 
 ### Breakdown of time by mode, waiting time and transfers
@@ -178,8 +179,8 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00",
+  date = "04-29-2020",
+  time = "07:15:00",
   detail = TRUE
 )
 #> $errorId
@@ -187,9 +188,9 @@ otp_get_times(
 #> 
 #> $itineraries
 #>                 start                 end      timeZone duration walkTime
-#> 1 2018-11-25 08:02:57 2018-11-25 08:48:38 Europe/London    45.68     7.92
+#> 1 2020-04-29 07:37:31 2020-04-29 08:19:43 Europe/London     42.2     5.17
 #>   transitTime waitingTime transfers
-#> 1          31        6.77         1
+#> 1          37        0.03         0
 ```
 
 #### Details of each leg for transit-based trips
@@ -212,26 +213,22 @@ trip <- otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00",
+  date = "04-29-2020",
+  time = "07:15:00",
   detail = TRUE,
   includeLegs = TRUE
 )
 
-# View legs (first 10 columns)
-trip$legs[1:10]
+# View legs (first 9 columns)
+trip$legs[1:9]
 #>             startTime             endTime      timeZone mode departureWait
-#> 1 2018-11-25 08:02:57 2018-11-25 08:05:59 Europe/London WALK          0.00
-#> 2 2018-11-25 08:06:00 2018-11-25 08:15:00 Europe/London TRAM          0.02
-#> 3 2018-11-25 08:15:00 2018-11-25 08:16:16 Europe/London WALK          0.00
-#> 4 2018-11-25 08:23:00 2018-11-25 08:45:00 Europe/London RAIL          6.73
-#> 5 2018-11-25 08:45:01 2018-11-25 08:48:38 Europe/London WALK          0.02
-#>   duration  distance routeType       routeId routeShortName
-#> 1     3.03   201.273        NA          <NA>           <NA>
-#> 2     9.00  1428.317         0 2:MET:   4:I:              4
-#> 3     1.27    97.309        NA          <NA>           <NA>
-#> 4    22.00 14922.188         2        1:3434           3434
-#> 5     3.62   248.503        NA          <NA>           <NA>
+#> 1 2020-04-29 07:37:31 2020-04-29 07:38:59 Europe/London WALK          0.00
+#> 2 2020-04-29 07:39:00 2020-04-29 08:16:00 Europe/London RAIL          0.02
+#> 3 2020-04-29 08:16:01 2020-04-29 08:19:43 Europe/London WALK          0.02
+#>   duration  distance routeId routeShortName
+#> 1     1.47    98.057    <NA>           <NA>
+#> 2    37.00 17872.820 1:13081    TP:MBR->MIA
+#> 3     3.70   245.949    <NA>           <NA>
 ```
 
 ### Travel time isochrones
@@ -252,8 +249,8 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700),
   mode = "TRANSIT",
-  date = "11-25-2018",
-  time = "08:00:00"
+  date = "04-29-2020",
+  time = "07:15:00"
 )
 
 # function returns a list of two elements
@@ -276,8 +273,8 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700, 3600, 4500, 5400),
   mode = "TRANSIT",
-  date = "11-12-2018",
-  time= "08:00:00",
+  date = "04-29-2020",
+  time= "07:15:00",
   maxWalkDistance = 1600,
   walkReluctance = 5,
   minTransferTime = 600

@@ -65,19 +65,19 @@ otp_get_times <-
            includeLegs = FALSE)
   {
     mode <- toupper(mode)
-
-
+    
+    
     if (missing(date)) {
       date <- format(Sys.Date(), "%m-%d-%Y")
     }
-
+    
     if (missing(time)) {
       time <- format(Sys.time(), "%H:%M:%S")
     }
-
-
+    
+    
     #argument checks
-
+    
     coll <- checkmate::makeAssertCollection()
     checkmate::assert_class(otpcon, "otpconnect", add = coll)
     checkmate::assert_numeric(
@@ -100,10 +100,10 @@ otp_get_times <-
     checkmate::assert_int(minTransferTime, lower = 0, add = coll)
     checkmate::assert_logical(detail, add = coll)
     checkmate::reportAssertions(coll)
-
+    
     fromPlace <- paste(fromPlace, collapse = ",")
     toPlace <- paste(toPlace, collapse = ",")
-
+    
     # check for valid modes
     valid_mode <-
       list("TRANSIT",
@@ -113,22 +113,19 @@ otp_get_times <-
            "BUS",
            "RAIL",
            c("TRANSIT", "BICYCLE"))
-
+    
     if (!(Position(function(x)
       identical(x, mode), valid_mode, nomatch = 0) > 0)) {
       stop(
         paste0(
-          "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL',
-          or 'c('TRANSIT', 'BICYCLE')', but is '",
-          mode,
-          "'."
+          "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL', or 'c('TRANSIT', 'BICYCLE')', but is '", mode,"'."
         )
       )
     }
-
+    
     # add WALK to relevant modes - as mode may be a vector of length > 1 use identical
     # otpr_vectorMatch is TRUE if mode is c("TRANSIT", "BICYCLE") or c("BICYCLE", "TRANSIT")
-
+    
     if (identical(mode, "TRANSIT") |
         identical(mode, "BUS") |
         identical(mode, "RAIL") |
@@ -137,23 +134,23 @@ otp_get_times <-
       # set flag so know dealing with transit modes
       transitModes <- TRUE
     }
-
+    
     mode <- paste(mode, collapse = ",")
-
+    
     # check date and time are valid
-
+    
     if (otp_is_date(date) == FALSE) {
       stop("date must be in the format mm-dd-yyyy")
     }
-
+    
     if (otp_is_time(time) == FALSE) {
       stop("time must be in the format hh:mm:ss")
     }
-
-
+    
+    
     # Construct URL
     routerUrl <- paste0(make_url(otpcon)$router, "/plan")
-
+    
     # Use GET from the httr package to make API call and place in req - returns json by default.
     # Not using numItineraries due to odd OTP behaviour - if request only 1 itinerary don't
     # necessarily get the top/best itinerary, sometimes a suboptimal itinerary is returned.
@@ -167,88 +164,105 @@ otp_get_times <-
         mode = mode,
         date = date,
         time = time,
-        maxWalkDistance = maxWalkDistance,
-        walkReluctance = walkReluctance,
-        arriveBy = arriveBy,
-        transferPenalty = transferPenalty,
-        minTransferTime = minTransferTime
+        maxWalkDistance = maxWalkDistance
       )
     )
-
+    
     # convert response content into text
     text <- httr::content(req, as = "text", encoding = "UTF-8")
     # parse text to json
     asjson <- jsonlite::fromJSON(text, flatten = TRUE)
-
-    # Check for errors - if no error object, continue to process content
-    if (is.null(asjson$error$id)) {
-      # set error.id to OK
+    
+    # Check for errors
+    if (!is.null(asjson$error$id)) {
+      response <-
+        list("errorId" = asjson$error$id,
+             "errorMessage" = asjson$error$msg)
+      return (response)
+    } else {
       error.id <- "OK"
-      # get first itinerary
-      df <- asjson$plan$itineraries[1,]
-      # check if need to return detailed response
-      if (detail == TRUE) {
-        # need to convert times from epoch format
-        df$start <-
-          otp_from_epoch(df$startTime, otpcon$tz)
-        df$end <-
-          otp_from_epoch(df$endTime, otpcon$tz)
-        df$timeZone <- attributes(df$start)$tzone[1]
-        # create new columns for nicely formatted dates and times
-        #df$startDate <- format(start.time, "%d-%m-%Y")
-        #df$startTime <- format(start.time, "%I:%M%p")
-        #df$endDate <- format(end.time, "%d-%m-%Y")
-        #df$endTime <- format(end.time, "%I:%M%p")
-        # subset the dataframe ready to return
-        ret.df <-
-          subset(
-            df,
-            select = c(
-              'start',
-              'end',
-              'timeZone',
-              'duration',
-              'walkTime',
-              'transitTime',
-              'waitingTime',
-              'transfers'
-            )
+    }
+    
+    # OTPv2
+    # OTPv2 does not return an error when there is no itinerary - for
+    # example if date is out of range of the GTFS schedules. So now also check that
+    # there is at least 1 intinerary present.
+    if (length(asjson$plan$itineraries) == 0) {
+      response <-
+        list(
+          "errorId" = -9999,
+          "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules or the maxWalkDistance parameter (default 800m) might be too restrictive."
+        )
+      return (response)
+    }
+    
+    
+    # get first itinerary
+    df <- asjson$plan$itineraries[1, ]
+    # check if need to return detailed response
+    if (detail == TRUE) {
+      # need to convert times from epoch format
+      df$start <-
+        otp_from_epoch(df$startTime, otpcon$tz)
+      df$end <-
+        otp_from_epoch(df$endTime, otpcon$tz)
+      df$timeZone <- attributes(df$start)$tzone[1]
+      # create new columns for nicely formatted dates and times
+      #df$startDate <- format(start.time, "%d-%m-%Y")
+      #df$startTime <- format(start.time, "%I:%M%p")
+      #df$endDate <- format(end.time, "%d-%m-%Y")
+      #df$endTime <- format(end.time, "%I:%M%p")
+      # subset the dataframe ready to return
+      ret.df <-
+        subset(
+          df,
+          select = c(
+            'start',
+            'end',
+            'timeZone',
+            'duration',
+            'walkTime',
+            'transitTime',
+            'waitingTime',
+            'transfers'
           )
-        # convert seconds into minutes where applicable
-        ret.df[, 4:7] <- round(ret.df[, 4:7] / 60, digits = 2)
-        # rename walkTime column as appropriate - this a mistake in OTP
-        if (mode == "CAR") {
-          names(ret.df)[names(ret.df) == 'walkTime'] <- 'driveTime'
-        } else if (mode == "BICYCLE") {
-          names(ret.df)[names(ret.df) == 'walkTime'] <- 'cycleTime'
-        }
-        response <-
-          list("errorId" = error.id, "itineraries" = ret.df)
-        # get and process legs if required
-        if (isTRUE(transitModes & isTRUE(includeLegs))) {
-          legs <- df$legs[[1]]
-          legs <- janitor::clean_names(legs, case = "lower_camel")
-
-          legs$startTime <-
-            otp_from_epoch(legs$startTime, otpcon$tz)
-          legs$endTime <-
-            otp_from_epoch(legs$endTime, otpcon$tz)
-          legs$fromArrival <-
-            otp_from_epoch(legs$fromArrival, otpcon$tz)
-          legs$fromDeparture <-
-            otp_from_epoch(legs$fromDeparture, otpcon$tz)
-
-          legs$departureWait <-
-            round(abs((
-              as.numeric(legs$fromArrival - legs$fromDeparture)
-            ) / 60), 2)
-
-          legs$departureWait[is.na(legs$departureWait)] <- 0
-
-          legs$duration <- round(legs$duration / 60, 2)
-
-          legs$timeZone <- attributes(legs$startTime)$tzone[1]
-
+        )
+      # convert seconds into minutes where applicable
+      ret.df[, 4:7] <- round(ret.df[, 4:7] / 60, digits = 2)
+      # rename walkTime column as appropriate - this a mistake in OTP
+      if (mode == "CAR") {
+        names(ret.df)[names(ret.df) == 'walkTime'] <- 'driveTime'
+      } else if (mode == "BICYCLE") {
+        names(ret.df)[names(ret.df) == 'walkTime'] <- 'cycleTime'
+      }
+      response <-
+        list("errorId" = error.id, "itineraries" = ret.df)
+      # get and process legs if required
+      if (isTRUE(transitModes & isTRUE(includeLegs))) {
+        legs <- df$legs[[1]]
+        legs <- janitor::clean_names(legs, case = "lower_camel")
+        
+        legs$startTime <-
+          otp_from_epoch(legs$startTime, otpcon$tz)
+        legs$endTime <-
+          otp_from_epoch(legs$endTime, otpcon$tz)
+        legs$fromArrival <-
+          otp_from_epoch(legs$fromArrival, otpcon$tz)
+        legs$fromDeparture <-
+          otp_from_epoch(legs$fromDeparture, otpcon$tz)
+        
+        legs$departureWait <-
+          round(abs((
+            as.numeric(legs$fromArrival - legs$fromDeparture)
+          ) / 60), 2)
+        
+        legs$departureWait[is.na(legs$departureWait)] <- 0
+        
+        legs$duration <- round(legs$duration / 60, 2)
+        
+        legs$timeZone <- attributes(legs$startTime)$tzone[1]
+        
+        if (otpcon$version == 1) {
           ret.legs <- subset(
             legs,
             select = c(
@@ -279,22 +293,48 @@ otp_get_times <-
               'toStopCode'
             )
           )
-
-          response[["legs"]] <- ret.legs
+        } else {
+          # OTPv2
+          # If OTPv2 don't include 'routeType' and 'agencyUrl' from ret.legs as these are
+          # not returned by OTPv2 (as at #cce4e7ea)
+          ret.legs <- subset(
+            legs,
+            select = c(
+              'startTime',
+              'endTime',
+              'timeZone',
+              'mode',
+              'departureWait',
+              'duration',
+              'distance',
+              'routeId',
+              'routeShortName',
+              'routeLongName',
+              'headsign',
+              'agencyName',
+              'agencyId',
+              'fromName',
+              'fromLon',
+              'fromLat',
+              'fromStopId',
+              'fromStopCode',
+              'toName',
+              'toLon',
+              'toLat',
+              'toStopId',
+              'toStopCode'
+            )
+          )
         }
-        return (response)
-      } else {
-        # detail not needed - just return travel time in minutes
-        response <-
-          list("errorId" = error.id,
-               "duration" = round(df$duration / 60, digits = 2))
-        return (response)
+        
+        response[["legs"]] <- ret.legs
       }
+      return (response)
     } else {
-      # there is an error - return the error code and message
+      # detail not needed - just return travel time in minutes
       response <-
-        list("errorId" = asjson$error$id,
-             "errorMessage" = asjson$error$msg)
+        list("errorId" = error.id,
+             "duration" = round(df$duration / 60, digits = 2))
       return (response)
     }
   }
