@@ -1,4 +1,4 @@
-#' Returns one or more travel time isochrones
+#' Returns one or more travel time isochrones (OTPv1 only)
 #'
 #' Returns one or more travel time isochrone in either GeoJSON format or as an
 #' \strong{sf} object. Only works correctly for walk and/or transit modes - a limitation
@@ -73,6 +73,10 @@ otp_get_isochrone <-
   )
   {
 
+    if(otpcon$version != 1) {
+      stop("OTP server is running OTPv", otpcon$version, ". otp_get_isochrone() is only supported in OTPv1")
+    }
+
     if(missing(date)){
       date <- format(Sys.Date(), "%m-%d-%Y")
     }
@@ -140,7 +144,7 @@ otp_get_isochrone <-
 
 
     # Construct URL
-    routerUrl <- paste0(make_url(otpcon), "/isochrone")
+    routerUrl <- paste0(make_url(otpcon)$router, "/isochrone")
 
     # make cutoffs into list
     cutoffs <- as.list(cutoffs)
@@ -196,7 +200,7 @@ otp_get_isochrone <-
       if (format == "SF"){
         req <- geojsonsf::geojson_sf(req)
         # correct invalid geometry that OTP tends to return
-        req <- lwgeom::st_make_valid(req)
+        req <- sf::st_make_valid(req)
       }
     } else {
       errorId <- "ERROR"

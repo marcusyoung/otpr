@@ -24,11 +24,9 @@ otp_get_distance <-
            toPlace,
            mode = "CAR")
   {
-
-
     mode <- toupper(mode)
-
-
+    
+    
     coll <- checkmate::makeAssertCollection()
     checkmate::assert_class(otpcon, "otpconnect", add = coll)
     checkmate::assert_numeric(
@@ -52,52 +50,58 @@ otp_get_distance <-
       add = coll
     )
     checkmate::reportAssertions(coll)
-
+    
     fromPlace <- paste(fromPlace, collapse = ",")
     toPlace <- paste(toPlace, collapse = ",")
     mode <- paste(mode, collapse = ",")
-
-
+    
+    
     # Construct URL
-    routerUrl <- paste0(make_url(otpcon), "/plan")
-
+    routerUrl <- paste0(make_url(otpcon)$router, "/plan")
+    
     # Use GET from the httr package to make API call and place in req - returns json by default
     req <- httr::GET(routerUrl,
-               query = list(
-                 fromPlace = fromPlace,
-                 toPlace = toPlace,
-                 mode = mode
-               ))
+                     query = list(
+                       fromPlace = fromPlace,
+                       toPlace = toPlace,
+                       mode = mode
+                     ))
     # convert response content into text
     text <- httr::content(req, as = "text", encoding = "UTF-8")
     # parse text to json
     asjson <- jsonlite::fromJSON(text)
-
-    # Check for errors - if no error object, continue to process content
-    if (is.null(asjson$error$id)) {
-      # set error.id to OK
-      error.id <- "OK"
-      if (mode == "CAR") {
-        # for car the distance is only recorded in the legs objects. Only one leg
-        # should be returned if mode is car and we pick that
-        response <-
-          list(
-            "errorId" = error.id,
-            "distance" = asjson$plan$itineraries$legs[[1]]$distance
-          )
-        return (response)
-        # for walk or cycle
-      } else {
-        response <-
-          list("errorId" = error.id,
-               "distance" = asjson$plan$itineraries$walkDistance)
-        return (response)
-      }
-    } else {
-      # there is an error - return the error code and message
+    
+    # Check for errors
+    if (!is.null(asjson$error$id)) {
       response <-
         list("errorId" = asjson$error$id,
              "errorMessage" = asjson$error$msg)
+      return (response)
+    } else {
+      error.id <- "OK"
+    }
+    
+    # OTPv2 does not always return an error when there is no itinerary. So now
+    # also check that there is at least 1 intinerary present.
+    if (length(asjson$plan$itineraries) == 0) {
+      response <-
+        list("errorId" = -9999,
+             "errorMessage" = "No itinerary returned.")
+      return (response)
+    }
+    
+    if (mode == "CAR") {
+      # for car the distance is only recorded in the legs objects. Only one leg
+      # should be returned if mode is car and we pick that
+      response <-
+        list("errorId" = error.id,
+             "distance" = asjson$plan$itineraries$legs[[1]]$distance)
+      return (response)
+      # for walk or cycle
+    } else {
+      response <-
+        list("errorId" = error.id,
+             "distance" = asjson$plan$itineraries$walkDistance)
       return (response)
     }
   }

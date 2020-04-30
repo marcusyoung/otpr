@@ -24,4 +24,12 @@ otp_vector_match <- function(a, b)  {
   return(identical(sort(a), sort(b)))
 }
 
+#' Convert time from EPOCH format
+#' @param epoch, time since EPOCH (milliseconds)
+#' @param tz, timezone (string)
+#' @keywords internal
+otp_from_epoch <- function(epoch, tz) {
+  return(as.POSIXct(epoch / 1000, origin = "1970-01-01", tz = tz))
+}
+
 
