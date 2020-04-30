@@ -225,10 +225,10 @@ trip$legs[1:9]
 #> 1 2020-04-29 07:37:31 2020-04-29 07:38:59 Europe/London WALK          0.00
 #> 2 2020-04-29 07:39:00 2020-04-29 08:16:00 Europe/London RAIL          0.02
 #> 3 2020-04-29 08:16:01 2020-04-29 08:19:43 Europe/London WALK          0.02
-#>   duration  distance routeId routeShortName
-#> 1     1.47    98.057    <NA>           <NA>
-#> 2    37.00 17872.820 1:13081    TP:MBR->MIA
-#> 3     3.70   245.949    <NA>           <NA>
+#>   duration  distance routeType routeId
+#> 1     1.47    98.057        NA    <NA>
+#> 2    37.00 17872.820         2 1:13081
+#> 3     3.70   245.949        NA    <NA>
 ```
 
 ### Travel time isochrones
@@ -325,6 +325,13 @@ This includes everything you need, including example data. The tutorial
 also has examples of using **otpr** functions, and helps you get the
 most from the package, for example using it to populate an
 origin-destination matrix.
+
+If you are already experienced with OTPv1 and want to try v2, you will
+need to build it from source. See this
+[guide](http://docs.opentripplanner.org/en/dev-2.x/Developers-Guide/)
+and this [basic
+tutorial](http://docs.opentripplanner.org/en/dev-2.x/Basic-Tutorial/#get-otp)
+from the OTP project team.
 
 For more guidance on how **otpr**, in conjunction with OTP, can be used
 to generate data for input into models, read [An automated framework to
