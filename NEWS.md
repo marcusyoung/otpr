@@ -3,7 +3,7 @@ output:
   html_document: default
   pdf_document: default
 ---
-# otpr 0.4.0
+# otpr 0.3.0.9000
 
 ## Experimental feature
 
@@ -31,7 +31,7 @@ so that **otpr** can support OTP versions 1 and 2.
 
 ## Other
 
-* Compatibility with R 4.0.0. Note: R 4.0.0 requires reinstillation of all packages
+* Compatibility with R 4.0.0. Note: R 4.0.0 requires reinstallation of all packages
 on your system. In particular, make sure that you have re-installed **curl**, 
 as `otp_connect()` can appear to fail without the reason - that **curl** has not been
 installed after 4.0.0 - being explicitly reported. 
