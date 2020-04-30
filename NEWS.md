@@ -3,7 +3,7 @@ output:
   html_document: default
   pdf_document: default
 ---
-# otpr 0.3.0.9000
+# otpr 0.4.0
 
 ## Experimental feature
 
