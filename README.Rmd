@@ -33,6 +33,15 @@ useful R objects.
 
 This package will be useful to researchers and transport planners who want to use OTP to generate trip data for accessibility analysis or to derive variables for use in transportation models.
 
+## Version support
+
+**otpr** supports OTP versions 1 and 2. However, as OTPv2 has not yet been released and changes to its codebase could cause errors in otpr or unexpected behaviour, OTPv2 support is currently considered experimental. Known issues with OTPv2 include:
+
+* `otp_get_isochrone()` is only supported in OTPv1 as this feature has been removed from OTPv2.
+* The maxWalkDistance parameter used in the `otp_get_times()` function is treated as a hard limit when the mode is either WALK or BICYCLE. This could result in no itinerary being returned as the default is 800m. This is different from the behaviour of OTPv1 where this parameter is effectively ignored when the mode is WALK and not applied at all to BICYCLE trips. Workaround: provide a large value to this parameter for these modes.
+* The 'routeType' and 'agencyUrl' columns do not appear in the data frame of journey legs as these are not returned by OTPv2.
+
+
 ## Installation
 
 ``` r
