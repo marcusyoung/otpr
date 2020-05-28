@@ -24,10 +24,10 @@ being present. There is some inconsistency in the columns that are returned by O
 for the legs, dependent on the mode, and what values appear in the original GTFS feeds.
 Rather than limit the leg detail to the smaller subset of columns that are guaranteed
 to be present, the function now includes columns in the `legs` dataframe for the attributes
-that are present (as well as additional *otpr* calculated columns). This could mean some
+that are present (as well as additional **otpr** calculated columns). This could mean some
 inconsistency in the columns returned in the `legs` dataframe between queries.
 If you make use of these extra columns in post-processing then you may need additional
-code to check for column existance.
+code to check for column existence.
 
 # otpr 0.4.0
 
