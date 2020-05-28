@@ -3,6 +3,32 @@ output:
   html_document: default
   pdf_document: default
 ---
+
+# otpr 0.4.0.9999
+
+## Behaviour change
+
+* `otp_get_times()` now returns a legs datafame, when requested, for WALK, BICYCLE 
+and CAR modes. For these modes this will contain a single leg. This is for consistency
+with other modes.
+
+## Bug fixes
+
+* Since 0.4.0 some parameters (`walkReluctance`, `arriveBy`, `transferPenalty` 
+and `minTransferTime`) were not being passed to the OTP API by the
+`otp_connect_times()` function. This has been fixed.
+
+* There were instances when `otp_get_times()` would generate an error when journey legs
+were requested. This was due to an expected attribute in the OTP API response not 
+being present. There is some inconsistency in the columns that are returned by OTP
+for the legs, dependent on the mode, and what values appear in the original GTFS feeds.
+Rather than limit the leg detail to the smaller subset of columns that are guaranteed
+to be present, the function now includes columns in the `leg` dataframe for the attributes
+that are present (as well as additional *otpr* calculated columns). This could mean some
+inconsistency in the columns returned in the `legs` dataframe between queries.
+If you make use of these extra columns in post-processing then you may need additional
+code to check for column existance.
+
 # otpr 0.4.0
 
 ## Experimental feature
