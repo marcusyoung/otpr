@@ -272,8 +272,8 @@ otp_get_times <-
         
         legs$timeZone <- attributes(legs$startTime)$tzone[1]
         
-        # subset legs use %in% as sometimes columns are missing - for example
-        # routeShortName (presumbaly excluded from the API response if no value
+        # subset legs use names(legs) %in% as sometimes columns are missing - for example
+        # routeShortName (presumably excluded from the API response if no value
         # in any legs?). Also fewer columns when just a WALK, BICYCLE or CAR leg
         # is returned.
         
