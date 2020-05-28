@@ -1,9 +1,3 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
-
 # otpr 0.4.1
 
 ## Behaviour change
