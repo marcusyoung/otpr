@@ -23,7 +23,7 @@ were requested. This was due to an expected attribute in the OTP API response no
 being present. There is some inconsistency in the columns that are returned by OTP
 for the legs, dependent on the mode, and what values appear in the original GTFS feeds.
 Rather than limit the leg detail to the smaller subset of columns that are guaranteed
-to be present, the function now includes columns in the `leg` dataframe for the attributes
+to be present, the function now includes columns in the `legs` dataframe for the attributes
 that are present (as well as additional *otpr* calculated columns). This could mean some
 inconsistency in the columns returned in the `legs` dataframe between queries.
 If you make use of these extra columns in post-processing then you may need additional
