@@ -240,14 +240,14 @@ trip <- otp_get_times(
 
 # View legs (first 9 columns)
 trip$legs[1:9]
-#>             startTime             endTime      timeZone mode departureWait
-#> 1 2020-04-29 07:37:31 2020-04-29 07:38:59 Europe/London WALK          0.00
-#> 2 2020-04-29 07:39:00 2020-04-29 08:16:00 Europe/London RAIL          0.02
-#> 3 2020-04-29 08:16:01 2020-04-29 08:19:43 Europe/London WALK          0.02
-#>   duration  distance routeType routeId
-#> 1     1.47    98.057        NA    <NA>
-#> 2    37.00 17872.820         2 1:13081
-#> 3     3.70   245.949        NA    <NA>
+#>             startTime             endTime  distance mode duration
+#> 1 2020-04-29 07:37:31 2020-04-29 07:38:59    98.057 WALK     1.47
+#> 2 2020-04-29 07:39:00 2020-04-29 08:16:00 17872.820 RAIL    37.00
+#> 3 2020-04-29 08:16:01 2020-04-29 08:19:43   245.949 WALK     3.70
+#>                   agencyName                    agencyUrl routeType routeId
+#> 1                       <NA>                         <NA>        NA    <NA>
+#> 2 First TransPennine Express https://www.tpexpress.co.uk/         2 1:13081
+#> 3                       <NA>                         <NA>        NA    <NA>
 ```
 
 ### Travel time isochrones
