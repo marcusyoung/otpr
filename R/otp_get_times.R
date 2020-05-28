@@ -29,7 +29,7 @@
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
 #' @param detail Logical. Default is FALSE.
-#' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but only when \code{detail} is TRUE and \code{mode} contains transit modes (Legs are not relevant for CAR, BICYCLE or WALK modes).
+#' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but only when \code{detail} is also TRUE.
 #' @return Returns a list. First element in the list is \code{errorId}. This is "OK" if
 #' OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
 #' varies:
@@ -37,7 +37,7 @@
 #' \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 #' \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 #' \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
-#' \item If there is no error and \code{detail} and \code{includelegs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe.
+#' \item If there is no error and \code{detail} and \code{includelegs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe. Core columns in the \code{legs} dataframe will be consistent across all queries. However, as the OTP API does not consistently return the same attributes for the legs, there will be some variation in columns returned in the \code{legs} dataframe. You should bare this in mind if your post processing uses these columns (e.g. by checking for column existence).
 #' }
 #' @examples \dontrun{
 #' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
@@ -118,7 +118,9 @@ otp_get_times <-
       identical(x, mode), valid_mode, nomatch = 0) > 0)) {
       stop(
         paste0(
-          "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL', or 'c('TRANSIT', 'BICYCLE')', but is '", mode,"'."
+          "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL', or 'c('TRANSIT', 'BICYCLE')', but is '",
+          mode,
+          "'."
         )
       )
     }
@@ -131,8 +133,6 @@ otp_get_times <-
         identical(mode, "RAIL") |
         otp_vector_match(mode, c("TRANSIT", "BICYCLE"))) {
       mode <- append(mode, "WALK")
-      # set flag so know dealing with transit modes
-      transitModes <- TRUE
     }
     
     mode <- paste(mode, collapse = ",")
@@ -164,7 +164,11 @@ otp_get_times <-
         mode = mode,
         date = date,
         time = time,
-        maxWalkDistance = maxWalkDistance
+        maxWalkDistance = maxWalkDistance,
+        walkReluctance = walkReluctance,
+        arriveBy = arriveBy,
+        transferPenalty = transferPenalty,
+        minTransferTime = minTransferTime
       )
     )
     
@@ -189,10 +193,8 @@ otp_get_times <-
     # there is at least 1 intinerary present.
     if (length(asjson$plan$itineraries) == 0) {
       response <-
-        list(
-          "errorId" = -9999,
-          "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules or the maxWalkDistance parameter (default 800m) might be too restrictive."
-        )
+        list("errorId" = -9999,
+             "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules or the maxWalkDistance parameter (default 800m) might be too restrictive.")
       return (response)
     }
     
@@ -238,7 +240,7 @@ otp_get_times <-
       response <-
         list("errorId" = error.id, "itineraries" = ret.df)
       # get and process legs if required
-      if (isTRUE(transitModes & isTRUE(includeLegs))) {
+      if (isTRUE(includeLegs)) {
         legs <- df$legs[[1]]
         legs <- janitor::clean_names(legs, case = "lower_camel")
         
@@ -246,15 +248,23 @@ otp_get_times <-
           otp_from_epoch(legs$startTime, otpcon$tz)
         legs$endTime <-
           otp_from_epoch(legs$endTime, otpcon$tz)
-        legs$fromArrival <-
-          otp_from_epoch(legs$fromArrival, otpcon$tz)
         legs$fromDeparture <-
           otp_from_epoch(legs$fromDeparture, otpcon$tz)
         
-        legs$departureWait <-
-          round(abs((
-            as.numeric(legs$fromArrival - legs$fromDeparture)
-          ) / 60), 2)
+        # for one leg itineraries (e.g. WALK only trip) there won't
+        # be a fromArrival and we don't need to calculate depatureWait
+        
+        if (nrow(legs) > 1) {
+          legs$fromArrival <-
+            otp_from_epoch(legs$fromArrival, otpcon$tz)
+          legs$departureWait <-
+            round(abs((
+              as.numeric(legs$fromArrival - legs$fromDeparture)
+            ) / 60), 2)
+        } else {
+          legs$fromArrival <- NA
+          legs$departureWait <- 0
+        }
         
         legs$departureWait[is.na(legs$departureWait)] <- 0
         
@@ -262,70 +272,38 @@ otp_get_times <-
         
         legs$timeZone <- attributes(legs$startTime)$tzone[1]
         
-        if (otpcon$version == 1) {
-          ret.legs <- subset(
-            legs,
-            select = c(
-              'startTime',
-              'endTime',
-              'timeZone',
-              'mode',
-              'departureWait',
-              'duration',
-              'distance',
-              'routeType',
-              'routeId',
-              'routeShortName',
-              'routeLongName',
-              'headsign',
-              'agencyName',
-              'agencyUrl',
-              'agencyId',
-              'fromName',
-              'fromLon',
-              'fromLat',
-              'fromStopId',
-              'fromStopCode',
-              'toName',
-              'toLon',
-              'toLat',
-              'toStopId',
-              'toStopCode'
-            )
-          )
-        } else {
-          # OTPv2
-          # If OTPv2 don't include 'routeType' and 'agencyUrl' from ret.legs as these are
-          # not returned by OTPv2 (as at #cce4e7ea)
-          ret.legs <- subset(
-            legs,
-            select = c(
-              'startTime',
-              'endTime',
-              'timeZone',
-              'mode',
-              'departureWait',
-              'duration',
-              'distance',
-              'routeId',
-              'routeShortName',
-              'routeLongName',
-              'headsign',
-              'agencyName',
-              'agencyId',
-              'fromName',
-              'fromLon',
-              'fromLat',
-              'fromStopId',
-              'fromStopCode',
-              'toName',
-              'toLon',
-              'toLat',
-              'toStopId',
-              'toStopCode'
-            )
-          )
-        }
+        # subset legs use %in% as sometimes columns are missing - for example
+        # routeShortName (presumbaly excluded from the API response if no value
+        # in any legs?). Also fewer columns when just a WALK, BICYCLE or CAR leg
+        # is returned.
+        
+        ret.legs <- legs[, names(legs) %in% c(
+          'startTime',
+          'endTime',
+          'timeZone',
+          'mode',
+          'departureWait',
+          'duration',
+          'distance',
+          'routeType',
+          'routeId',
+          'routeShortName',
+          'routeLongName',
+          'headsign',
+          'agencyName',
+          'agencyUrl',
+          'agencyId',
+          'fromName',
+          'fromLon',
+          'fromLat',
+          'fromStopId',
+          'fromStopCode',
+          'toName',
+          'toLon',
+          'toLat',
+          'toStopId',
+          'toStopCode'
+        )]
         
         response[["legs"]] <- ret.legs
       }
