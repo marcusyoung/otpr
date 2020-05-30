@@ -10,7 +10,7 @@ with other modes.
 
 * Since 0.4.0 some parameters (`walkReluctance`, `arriveBy`, `transferPenalty` 
 and `minTransferTime`) were not being passed to the OTP API by the
-`otp_connect_times()` function. This has been fixed.
+`otp_get_times()` function. This has been fixed.
 
 * There were instances when `otp_get_times()` would generate an error when journey legs
 were requested. This was due to an expected attribute in the OTP API response not 
