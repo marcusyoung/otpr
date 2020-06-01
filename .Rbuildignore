@@ -7,3 +7,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^tests/otp$
+^lucene$
+^codecov\.yml$
