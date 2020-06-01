@@ -8,7 +8,7 @@
 #' @param toPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.36484, -2.27108)`
 #' @param mode Character vector, single mode of travel. Valid values are WALK, BICYCLE, or CAR. Default is CAR.
 #' @return If OTP has not returned an error then a list containing \code{errorId}
-#' with the value "OK", the \code{distance} in metres. If OTP has returned an
+#' with the value "OK", and the \code{distance} in metres. If OTP has returned an
 #' error then a list containing \code{errorId} with the OTP error code and \code{errorMessage}
 #' with the error message returned by OTP. In both cases there will be a third element
 #' named \code{query} which is a character string containing the URL that was submitted to the OTP API.

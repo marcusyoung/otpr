@@ -32,20 +32,22 @@
 #' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each
 #' journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but
 #' only when \code{detail} is also TRUE.
-#' @return Returns a list. First element in the list is \code{errorId}. This is "OK" if
-#' OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
+#' @return Returns a list of three or four elements. First element in the list is \code{errorId}.
+#' This is "OK" if OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
 #' varies:
 #' \itemize{
 #' \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 #' \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 #' \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
+#' }
 #' The third element of the list is \code{query}. This is a character string containing the URL
-#' that was submitted to the OTP API. If requested, there will be a fourth element, \code{legs}.
+#' that was submitted to the OTP API.
+#' 
+#' If requested, there will be a fourth element, \code{legs}.
 #' This is a dataframe and will contain core columns that are consistent across all queries.
 #' However, as the OTP API does not consistently return the same attributes for legs, there will
 #' be some variation in columns returned. You should bare this in mind if your post processing
 #' uses these columns (e.g. by checking for column existence).
-#' }
 #' @examples \dontrun{
 #' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
 #'

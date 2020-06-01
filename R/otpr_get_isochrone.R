@@ -46,9 +46,9 @@
 #' \item If \code{errorId} is "OK" then \code{response} contains the the isochrone(s) in
 #' either GeoJSON format or as an \strong{sf} object, depending on the value of the
 #' \code{format} argument.
-#' The third element is \code{query} which is a character string containing the URL
-#' that was submitted to the OTP API
 #' }
+#' The third element of the list is \code{query} which is a character string containing the URL
+#' that was submitted to the OTP API.
 #' @examples \dontrun{
 #' otp_get_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
 #'
