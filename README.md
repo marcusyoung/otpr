@@ -5,14 +5,17 @@
 
 <!-- badges: start -->
 
-[![CRAN
-status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
-[![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/grand-total/otpr)](https://cran.r-project.org/package=otpr)
 [![Build
 Status](https://travis-ci.org/marcusyoung/otpr.svg?branch=master)](https://travis-ci.org/marcusyoung/otpr)
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-
+[![CRAN
+status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
+[![Codecov test
+coverage](https://codecov.io/gh/marcusyoung/otpr/branch/master/graph/badge.svg)](https://codecov.io/gh/marcusyoung/otpr?branch=master)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/otpr)](https://cran.r-project.org/package=otpr)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 <!-- badges: end -->
 
 ## Overview
@@ -103,11 +106,12 @@ for example: “Europe/Berlin”.
 
 ### Function behaviour
 
-The functions that query the OTP API generally return a list of two
+The functions that query the OTP API generally return a list of three
 elements. The first element is an errorId - with the value “OK” or the
 error code returned by OTP. If errorId is “OK”, the second element will
 contain the query response; otherwise it will contain the OTP error
-message.
+message, the third element is the query URL that was sent to the OTP API
+(for information and useful for troubleshooting).
 
 ### Distance between two points
 
@@ -127,6 +131,9 @@ otp_get_distance(
 #> 
 #> $distance
 #> [1] 29051.51
+#> 
+#> $query
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=CAR"
 
 # Now for BICYCLE
 otp_get_distance(
@@ -140,6 +147,9 @@ otp_get_distance(
 #> 
 #> $distance
 #> [1] 16065.04
+#> 
+#> $query
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE"
 ```
 
 ### Time between two points
@@ -163,6 +173,9 @@ otp_get_times(
 #> 
 #> $duration
 #> [1] 60.12
+#> 
+#> $query
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=06-01-2020&time=17:13:47&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -180,6 +193,9 @@ otp_get_times(
 #> 
 #> $duration
 #> [1] 42.2
+#> 
+#> $query
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=TRANSIT,WALK&date=04-29-2020&time=07:15:00&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 ```
 
 ### Breakdown of time by mode, waiting time and transfers
@@ -210,6 +226,9 @@ otp_get_times(
 #> 1 2020-04-29 07:37:31 2020-04-29 08:19:43 Europe/London     42.2     5.17
 #>   transitTime waitingTime transfers
 #> 1          37        0.03         0
+#> 
+#> $query
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=TRANSIT,WALK&date=04-29-2020&time=07:15:00&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 ```
 
 #### Details of each leg for transit-based trips
@@ -274,7 +293,7 @@ my_isochrone <- otp_get_isochrone(
 
 # function returns a list of two elements
 names(my_isochrone)
-#> [1] "errorId"  "response"
+#> [1] "errorId"  "response" "query"
 
 # now write the GeoJSON (in the "response" element) to a file so it can be opened in QGIS (for example)
 write(my_isochrone$response, file = "my_isochrone.geojson")

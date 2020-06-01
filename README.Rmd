@@ -17,11 +17,11 @@ knitr::opts_chunk$set(
 
 
 <!-- badges: start -->
-[![CRAN status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/otpr)](https://cran.r-project.org/package=otpr)
 [![Build Status](https://travis-ci.org/marcusyoung/otpr.svg?branch=master)](https://travis-ci.org/marcusyoung/otpr)
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-
+[![CRAN status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
+[![Codecov test coverage](https://codecov.io/gh/marcusyoung/otpr/branch/master/graph/badge.svg)](https://codecov.io/gh/marcusyoung/otpr?branch=master)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/otpr)](https://cran.r-project.org/package=otpr)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 <!-- badges: end -->
 
 ## Overview
@@ -95,10 +95,11 @@ specified when calling the `otp_connect()` function. This must be a valid time z
 
 ### Function behaviour
 
-The functions that query the OTP API generally return a list of two elements. The first
+The functions that query the OTP API generally return a list of three elements. The first
 element is an errorId - with the value "OK" or the error code returned by OTP. If
 errorId is "OK", the second element will contain the query response; otherwise it
-will contain the OTP error message.
+will contain the OTP error message, the third element is the query URL that was sent to
+the OTP API (for information and useful for troubleshooting).
 
 ### Distance between two points
 
