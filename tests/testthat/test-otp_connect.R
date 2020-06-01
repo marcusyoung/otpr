@@ -1,8 +1,4 @@
-
-
 context("Test the otp_connect function")
-
-# use Sys.setenv("OTP_ON_LOCALHOST" = TRUE)
 
 skip_if_no_otp <- function() {
   if(!identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE"))
@@ -38,5 +34,4 @@ test_that("correct error when router does not exist", {
   skip_if_no_otp()
   expect_error(otp_connect(router = "test"), "Router http://localhost:8080/otp/routers/test does not exist")
 })
-
 

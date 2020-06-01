@@ -1,0 +1,80 @@
+context("Test the otp_get_isochrone function")
+
+if (identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE")) {
+  otpcon <- otp_connect()
+  
+  # setup test query results - amend for a new graph build
+  location <- c(50.75872, -1.28943)
+  toPlace <- c(50.75872, -1.28943)
+  date <- "06-01-2020"
+  time <- "06:00:00"
+  cutoffs <- c(300, 600, 900, 1200)
+  #response_query <- paste("http://localhost:8080/otp/routers/default/plan?fromPlace=", paste(fromPlace, collapse = ","), "&toPlace=", paste(toPlace, collapse = ","), "&mode=TRANSIT,WALK&date=", date, "&time=", time, "&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=600", sep="")
+}
+
+skip_if_no_otp <- function() {
+  if(!identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE"))
+    skip("Not running test as the environment variable OTP_ON_LOCALHOST is not set to TRUE")
+}
+
+test_that("Check geojson from location", {
+  skip_if_no_otp()
+  response <-
+    otp_get_isochrone(
+      otpcon,
+      location = location,
+      date = date,
+      time = time,
+      mode = "TRANSIT",
+      cutoffs = cutoffs
+    )
+  expect_true(grepl("\"type\":\"FeatureCollection\"", response$response))
+})
+
+test_that("Check geojson from location", {
+  skip_if_no_otp()
+  response <-
+    otp_get_isochrone(
+      otpcon,
+      location = location,
+      date = date,
+      time = time,
+      mode = "TRANSIT",
+      cutoffs = cutoffs
+    )
+  expect_equal(response$errorId, "OK")
+  expect_true(grepl("\"type\":\"FeatureCollection\"", response$response))
+})
+
+test_that("Check SF from location", {
+  skip_if_no_otp()
+  response <-
+    otp_get_isochrone(
+      otpcon,
+      location = location,
+      date = date,
+      time = time,
+      mode = "TRANSIT",
+      cutoffs = cutoffs,
+      format = "SF"
+    )
+  expect_equal(response$errorId, "OK")
+  expect_true(is(response$response[1], "sf"))
+})
+
+test_that("Check geojson TO location", {
+  skip_if_no_otp()
+  response <-
+    otp_get_isochrone(
+      otpcon,
+      location = location,
+      fromLocation = FALSE,
+      date = date,
+      time = time,
+      mode = "TRANSIT",
+      cutoffs = cutoffs
+    )
+  expect_equal(response$errorId, "OK")
+  expect_true(grepl("\"type\":\"FeatureCollection\"", response$response))
+  expect_true(grepl("toPlace=", response$query))
+})
