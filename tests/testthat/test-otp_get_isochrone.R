@@ -9,11 +9,24 @@ if (identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE")) {
   date <- "06-01-2020"
   time <- "06:00:00"
   cutoffs <- c(300, 600, 900, 1200)
-  #response_query <- paste("http://localhost:8080/otp/routers/default/plan?fromPlace=", paste(fromPlace, collapse = ","), "&toPlace=", paste(toPlace, collapse = ","), "&mode=TRANSIT,WALK&date=", date, "&time=", time, "&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=600", sep="")
+  response_query <-
+    paste(
+      "http://localhost:8080/otp/routers/default/isochrone?toPlace=",
+      paste(toPlace, collapse = ","),
+      "&fromPlace=",
+      paste(location, collapse = ","),
+      "&mode=TRANSIT,WALK&batch=TRUE&date=",
+      date,
+      "&time=",
+      time,
+      "&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=600&cutoffSec=",
+      paste(cutoffs, collapse = "&cutoffSec="),
+      sep = ""
+    )
 }
 
 skip_if_no_otp <- function() {
-  if(!identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE"))
+  if (!identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE"))
     skip("Not running test as the environment variable OTP_ON_LOCALHOST is not set to TRUE")
 }
 
@@ -59,7 +72,7 @@ test_that("Check SF from location", {
       format = "SF"
     )
   expect_equal(response$errorId, "OK")
-  expect_true(is(response$response[1], "sf"))
+  expect_s3_class(response$response[1], "sf")
 })
 
 test_that("Check geojson TO location", {
@@ -77,4 +90,26 @@ test_that("Check geojson TO location", {
   expect_equal(response$errorId, "OK")
   expect_true(grepl("\"type\":\"FeatureCollection\"", response$response))
   expect_true(grepl("toPlace=", response$query))
+})
+
+test_that("All parameters are passed in query", {
+  skip_if_no_otp
+  response <-
+    otp_get_isochrone(
+      otpcon,
+      location,
+      fromLocation = FALSE,
+      date = date,
+      time = time,
+      mode = "TRANSIT",
+      cutoffs = cutoffs,
+      maxWalkDistance = 800,
+      walkReluctance = 2,
+      arriveBy = FALSE,
+      transferPenalty = 0,
+      minTransferTime = 600,
+      format = "JSON",
+      batch = TRUE
+    )
+  expect_equal(response$query, response_query)
 })

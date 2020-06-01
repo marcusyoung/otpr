@@ -60,7 +60,7 @@ test_that("Check with detail", {
     )
   expect_equal(length(response), 3)
   expect_equal(response$errorId, "OK")
-  expect_true(is(response$itineraries, "data.frame"))
+  expect_s3_class(response$itineraries, "data.frame")
   expect_named(
     response$itineraries,
     c(
@@ -92,7 +92,7 @@ test_that("Check with legs", {
     )
   expect_equal(length(response), 4)
   expect_equal(response$errorId, "OK")
-  expect_true(is(response$legs, "data.frame"))
+  expect_s3_class(response$legs, "data.frame")
   expect_equal(nrow(response$legs), legs_number)
   expect_named(
     response$itineraries,
