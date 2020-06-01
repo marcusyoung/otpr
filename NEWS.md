@@ -6,6 +6,8 @@
 return the query URL that was submitted to the OTP API. This is for user reference
 and can be useful for troubleshooting.
 
+* Now also imports **urltools**, used to return decoded query URL.
+
 ## Other
 
 * Test coverage greatly extended.
