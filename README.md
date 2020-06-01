@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# otpr
+# otpr <img src='man/figures/sticker.png' align="right" height=250/>
 
 <!-- badges: start -->
 
@@ -175,7 +175,7 @@ otp_get_times(
 #> [1] 60.12
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=06-01-2020&time=17:13:47&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=06-02-2020&time=00:43:30&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 
 
 # By default the date and time of travel is taken as the current system date and

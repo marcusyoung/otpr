@@ -13,7 +13,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-# otpr
+# otpr <img src='man/figures/sticker.png' align="right" height=250/>
+
 
 
 <!-- badges: start -->
