@@ -17,9 +17,10 @@ otp_get_distance(otpcon, fromPlace, toPlace, mode = "CAR")
 }
 \value{
 If OTP has not returned an error then a list containing \code{errorId}
-with the value "OK" and the \code{distance} in metres. If OTP has returned an
+with the value "OK", the \code{distance} in metres. If OTP has returned an
 error then a list containing \code{errorId} with the OTP error code and \code{errorMessage}
-with the error message returned by OTP.
+with the error message returned by OTP. In both cases there will be a third element
+named \code{query} which is a character string containing the URL that was submitted to the OTP API.
 }
 \description{
 Finds the distance in metres between supplied origin and destination. Only makes

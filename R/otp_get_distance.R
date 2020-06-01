@@ -8,9 +8,10 @@
 #' @param toPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.36484, -2.27108)`
 #' @param mode Character vector, single mode of travel. Valid values are WALK, BICYCLE, or CAR. Default is CAR.
 #' @return If OTP has not returned an error then a list containing \code{errorId}
-#' with the value "OK" and the \code{distance} in metres. If OTP has returned an
+#' with the value "OK", the \code{distance} in metres. If OTP has returned an
 #' error then a list containing \code{errorId} with the OTP error code and \code{errorMessage}
-#' with the error message returned by OTP.
+#' with the error message returned by OTP. In both cases there will be a third element
+#' named \code{query} which is a character string containing the URL that was submitted to the OTP API.
 #' @examples \dontrun{
 #' otp_get_distance(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
 #'
@@ -66,6 +67,9 @@ otp_get_distance <-
                        toPlace = toPlace,
                        mode = mode
                      ))
+    # decode URL for return
+    url <- urltools::url_decode(req$url)
+    
     # convert response content into text
     text <- httr::content(req, as = "text", encoding = "UTF-8")
     # parse text to json
@@ -75,18 +79,20 @@ otp_get_distance <-
     if (!is.null(asjson$error$id)) {
       response <-
         list("errorId" = asjson$error$id,
-             "errorMessage" = asjson$error$msg)
+             "errorMessage" = asjson$error$msg,
+             "query" = url)
       return (response)
     } else {
       error.id <- "OK"
     }
     
     # OTPv2 does not always return an error when there is no itinerary. So now
-    # also check that there is at least 1 intinerary present.
+    # also check that there is at least 1 itinerary present.
     if (length(asjson$plan$itineraries) == 0) {
       response <-
         list("errorId" = -9999,
-             "errorMessage" = "No itinerary returned.")
+             "errorMessage" = "No itinerary returned.",
+             "query" = url)
       return (response)
     }
     
@@ -95,13 +101,15 @@ otp_get_distance <-
       # should be returned if mode is car and we pick that
       response <-
         list("errorId" = error.id,
-             "distance" = asjson$plan$itineraries$legs[[1]]$distance)
+             "distance" = asjson$plan$itineraries$legs[[1]]$distance,
+             "query" = url)
       return (response)
       # for walk or cycle
     } else {
       response <-
         list("errorId" = error.id,
-             "distance" = asjson$plan$itineraries$walkDistance)
+             "distance" = asjson$plan$itineraries$walkDistance,
+             "query" = url)
       return (response)
     }
   }

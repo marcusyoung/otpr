@@ -29,7 +29,9 @@
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
 #' @param detail Logical. Default is FALSE.
-#' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but only when \code{detail} is also TRUE.
+#' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each
+#' journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but
+#' only when \code{detail} is also TRUE.
 #' @return Returns a list. First element in the list is \code{errorId}. This is "OK" if
 #' OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
 #' varies:
@@ -37,7 +39,12 @@
 #' \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
 #' \item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
 #' \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
-#' \item If there is no error and \code{detail} and \code{includelegs} are both TRUE then \code{itineraries} as a dataframe and \code{legs} as a dataframe. Core columns in the \code{legs} dataframe will be consistent across all queries. However, as the OTP API does not consistently return the same attributes for the legs, there will be some variation in columns returned in the \code{legs} dataframe. You should bare this in mind if your post processing uses these columns (e.g. by checking for column existence).
+#' The third element of the list is \code{query}. This is a character string containing the URL
+#' that was submitted to the OTP API. If requested, there will be a fourth element, \code{legs}.
+#' This is a dataframe and will contain core columns that are consistent across all queries.
+#' However, as the OTP API does not consistently return the same attributes for legs, there will
+#' be some variation in columns returned. You should bare this in mind if your post processing
+#' uses these columns (e.g. by checking for column existence).
 #' }
 #' @examples \dontrun{
 #' otp_get_times(otpcon, fromPlace = c(53.48805, -2.24258), toPlace = c(53.36484, -2.27108))
@@ -156,6 +163,7 @@ otp_get_times <-
     # necessarily get the top/best itinerary, sometimes a suboptimal itinerary is returned.
     # OTP will return default number of itineraries depending on mode. This function returns
     # the first of those itineraries.
+    # See: https://groups.google.com/forum/#!topic/opentripplanner-users/xz6LD9Y13Vo
     req <- httr::GET(
       routerUrl,
       query = list(
@@ -172,6 +180,9 @@ otp_get_times <-
       )
     )
     
+    # decode URL for return
+    url <- urltools::url_decode(req$url)
+    
     # convert response content into text
     text <- httr::content(req, as = "text", encoding = "UTF-8")
     # parse text to json
@@ -180,8 +191,11 @@ otp_get_times <-
     # Check for errors
     if (!is.null(asjson$error$id)) {
       response <-
-        list("errorId" = asjson$error$id,
-             "errorMessage" = asjson$error$msg)
+        list(
+          "errorId" = asjson$error$id,
+          "errorMessage" = asjson$error$msg,
+          "query" = url
+        )
       return (response)
     } else {
       error.id <- "OK"
@@ -190,17 +204,20 @@ otp_get_times <-
     # OTPv2
     # OTPv2 does not return an error when there is no itinerary - for
     # example if date is out of range of the GTFS schedules. So now also check that
-    # there is at least 1 intinerary present.
+    # there is at least 1 itinerary present.
     if (length(asjson$plan$itineraries) == 0) {
       response <-
-        list("errorId" = -9999,
-             "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules or the maxWalkDistance parameter (default 800m) might be too restrictive.")
+        list(
+          "errorId" = -9999,
+          "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules or the maxWalkDistance parameter (default 800m) might be too restrictive.",
+          "query" = url
+        )
       return (response)
     }
     
     
     # get first itinerary
-    df <- asjson$plan$itineraries[1, ]
+    df <- asjson$plan$itineraries[1,]
     # check if need to return detailed response
     if (detail == TRUE) {
       # need to convert times from epoch format
@@ -238,7 +255,11 @@ otp_get_times <-
         names(ret.df)[names(ret.df) == 'walkTime'] <- 'cycleTime'
       }
       response <-
-        list("errorId" = error.id, "itineraries" = ret.df)
+        list(
+          "errorId" = error.id,
+          "itineraries" = ret.df,
+          "query" = url
+        )
       # get and process legs if required
       if (isTRUE(includeLegs)) {
         legs <- df$legs[[1]]
@@ -311,8 +332,11 @@ otp_get_times <-
     } else {
       # detail not needed - just return travel time in minutes
       response <-
-        list("errorId" = error.id,
-             "duration" = round(df$duration / 60, digits = 2))
+        list(
+          "errorId" = error.id,
+          "duration" = round(df$duration / 60, digits = 2),
+          "query" = url
+        )
       return (response)
     }
   }

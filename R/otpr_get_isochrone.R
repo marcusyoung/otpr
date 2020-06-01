@@ -22,7 +22,7 @@
 #' FALSE (the default) this is the desired departure time, otherwise the desired
 #' arrival time. Default is current system time.
 #' @param cutoffs Numeric vector, containing the cutoff times in seconds, for
-#' example: 'c(900, 1800. 2700)'
+#' example: 'c(900, 1800, 2700)'
 #' would request 15, 30 and 60 minute isochrones. Can be a single value.
 #' @param batch Logical. If true, goal direction is turned off and a full path tree is built
 #' @param arriveBy Logical. Whether the specified date and time is for
@@ -46,6 +46,8 @@
 #' \item If \code{errorId} is "OK" then \code{response} contains the the isochrone(s) in
 #' either GeoJSON format or as an \strong{sf} object, depending on the value of the
 #' \code{format} argument.
+#' The third element is \code{query} which is a character string containing the URL
+#' that was submitted to the OTP API
 #' }
 #' @examples \dontrun{
 #' otp_get_isochrone(otpcon, location = c(53.48805, -2.24258), cutoffs = c(900, 1800, 2700))
@@ -189,18 +191,22 @@ otp_get_isochrone <-
         ), cutoffs)
       )
     }
+    
+    # decode URL for return
+    url <- urltools::url_decode(req$url)
 
     # convert response content into text
-    req <- httr::content(req, as = "text", encoding = "UTF-8")
+    text <- httr::content(req, as = "text", encoding = "UTF-8")
 
     # Check that GeoJSON is returned
-    if (grepl("\"type\":\"FeatureCollection\"", req)) {
+    if (grepl("\"type\":\"FeatureCollection\"", text)) {
       errorId <- "OK"
+      isochrone <- text
       # convert to SF if requested
       if (format == "SF"){
-        req <- geojsonsf::geojson_sf(req)
+        isochrone <- geojsonsf::geojson_sf(isochrone)
         # correct invalid geometry that OTP tends to return
-        req <- sf::st_make_valid(req)
+        isochrone <- sf::st_make_valid(isochrone)
       }
     } else {
       errorId <- "ERROR"
@@ -208,6 +214,7 @@ otp_get_isochrone <-
 
     response <-
       list("errorId" = errorId,
-           "response" = req)
+           "response" = isochrone,
+           "query" = url)
     return (response)
   }
