@@ -1,3 +1,15 @@
+# otpr 0.4.1.9000
+
+## New Features
+
+* `otp_get_distance()`, `otp_get_times()` and `otp_get_isochrone()` now also
+return the query URL that was submitted to the OTP API. This is for user reference
+and can be useful for troubleshooting.
+
+## Other
+
+* Test coverage greatly extended.
+
 # otpr 0.4.1
 
 ## Behaviour change
