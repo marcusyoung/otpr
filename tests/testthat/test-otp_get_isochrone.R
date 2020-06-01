@@ -30,6 +30,19 @@ skip_if_no_otp <- function() {
     skip("Not running test as the environment variable OTP_ON_LOCALHOST is not set to TRUE")
 }
 
+test_that("Check that error if OTPv2", {
+  otpcon2 <- otpcon
+  otpcon2$version <- 2
+  expect_error(otp_get_isochrone(
+    otpcon2,
+    location = location,
+    date = date,
+    time = time,
+    mode = "TRANSIT",
+    cutoffs = cutoffs
+  ), "OTP server is running OTPv2. otp_get_isochrone() is only supported in OTPv1", fixed = TRUE)
+})
+
 test_that("Check geojson from location", {
   skip_if_no_otp()
   response <-
