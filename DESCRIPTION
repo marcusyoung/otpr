@@ -18,6 +18,9 @@ Imports:
     geojsonsf,
     janitor,
     jsonlite,
-    sf
+    sf,
+    urltools
 RoxygenNote: 7.1.0
-Suggests: testthat
+Suggests: 
+    testthat,
+    covr
