@@ -30,7 +30,7 @@ test_that("Check for invalid mode", {
   expect_equal(grepl("Mode must be one of:", error, fixed = TRUE), TRUE)
 })
 
-test_that("Check no detail", {
+test_that("basic query no detail", {
   skip_if_no_otp()
   response <-
     otp_get_times(
@@ -46,7 +46,7 @@ test_that("Check no detail", {
   expect_equal(round(response$duration, 2), transit_duration)
 })
 
-test_that("Check with detail", {
+test_that("query with detail", {
   skip_if_no_otp()
   response <-
     otp_get_times(
@@ -77,7 +77,7 @@ test_that("Check with detail", {
   expect_equal(round(response$itineraries$duration, 2), transit_duration)
 })
 
-test_that("Check with legs", {
+test_that("query with legs", {
   skip_if_no_otp()
   response <-
     otp_get_times(
@@ -110,7 +110,7 @@ test_that("Check with legs", {
   expect_equal(round(response$itineraries$duration, 2), transit_duration)
 })
 
-test_that("Check arriveby", {
+test_that("query with arriveby", {
   skip_if_no_otp()
   response <-
     otp_get_times(
@@ -127,8 +127,8 @@ test_that("Check arriveby", {
   expect_equal(response$itineraries$end, arriveBy_time)
 })
 
-test_that("All parameters are passed in query", {
-  skip_if_no_otp
+test_that("all parameters are passed in query", {
+  skip_if_no_otp()
   response <-
     otp_get_times(
       otpcon,

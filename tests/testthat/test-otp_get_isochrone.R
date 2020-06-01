@@ -30,7 +30,8 @@ skip_if_no_otp <- function() {
     skip("Not running test as the environment variable OTP_ON_LOCALHOST is not set to TRUE")
 }
 
-test_that("Check that error if OTPv2", {
+test_that("Error when using OTPv2", {
+  skip_if_no_otp()
   otpcon2 <- otpcon
   otpcon2$version <- 2
   expect_error(otp_get_isochrone(
@@ -43,21 +44,7 @@ test_that("Check that error if OTPv2", {
   ), "OTP server is running OTPv2. otp_get_isochrone() is only supported in OTPv1", fixed = TRUE)
 })
 
-test_that("Check geojson from location", {
-  skip_if_no_otp()
-  response <-
-    otp_get_isochrone(
-      otpcon,
-      location = location,
-      date = date,
-      time = time,
-      mode = "TRANSIT",
-      cutoffs = cutoffs
-    )
-  expect_true(grepl("\"type\":\"FeatureCollection\"", response$response))
-})
-
-test_that("Check geojson from location", {
+test_that("query geojson format from location", {
   skip_if_no_otp()
   response <-
     otp_get_isochrone(
@@ -72,7 +59,7 @@ test_that("Check geojson from location", {
   expect_true(grepl("\"type\":\"FeatureCollection\"", response$response))
 })
 
-test_that("Check SF from location", {
+test_that("query SF format from location", {
   skip_if_no_otp()
   response <-
     otp_get_isochrone(
@@ -88,7 +75,7 @@ test_that("Check SF from location", {
   expect_s3_class(response$response[1], "sf")
 })
 
-test_that("Check geojson TO location", {
+test_that("query geojson format TO location", {
   skip_if_no_otp()
   response <-
     otp_get_isochrone(
@@ -105,8 +92,8 @@ test_that("Check geojson TO location", {
   expect_true(grepl("toPlace=", response$query))
 })
 
-test_that("All parameters are passed in query", {
-  skip_if_no_otp
+test_that("all parameters are passed in query", {
+  skip_if_no_otp()
   response <-
     otp_get_isochrone(
       otpcon,

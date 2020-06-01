@@ -16,7 +16,7 @@ skip_if_no_otp <- function() {
     skip("Not running test as the environment variable OTP_ON_LOCALHOST is not set to TRUE")
 }
 
-test_that("CAR - a list of two objects is returned; errorId is OK, value is 2245.693",
+test_that("CAR - a list of three objects is returned; errorId is OK, value is correct",
           {
             skip_if_no_otp()
             response <-
@@ -29,7 +29,7 @@ test_that("CAR - a list of two objects is returned; errorId is OK, value is 2245
             expect_equal(round(response$distance), car_distance)
           })
 
-test_that("WALK - list of two objects is returned; errorId is OK, value is 2245.693",
+test_that("WALK - list of three objects is returned; errorId is OK, value is correct",
           {
             skip_if_no_otp()
             response <-
@@ -42,7 +42,7 @@ test_that("WALK - list of two objects is returned; errorId is OK, value is 2245.
             expect_equal(round(response$distance), walk_distance)
           })
 
-test_that("BICYCLE - list of two objects is returned; errorId is OK, value is 2245.693",
+test_that("BICYCLE - list of three objects is returned; errorId is OK, value is correct",
           {
             skip_if_no_otp()
             response <-
