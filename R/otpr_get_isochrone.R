@@ -70,29 +70,30 @@ otp_get_isochrone <-
            maxWalkDistance = 800,
            walkReluctance = 2,
            transferPenalty = 0,
-           minTransferTime = 0
-
-  )
+           minTransferTime = 0)
   {
-
-    if(otpcon$version != 1) {
-      stop("OTP server is running OTPv", otpcon$version, ". otp_get_isochrone() is only supported in OTPv1")
+    if (otpcon$version != 1) {
+      stop(
+        "OTP server is running OTPv",
+        otpcon$version,
+        ". otp_get_isochrone() is only supported in OTPv1"
+      )
     }
-
-    if(missing(date)){
+    
+    if (missing(date)) {
       date <- format(Sys.Date(), "%m-%d-%Y")
     }
-
-    if(missing(time)) {
+    
+    if (missing(time)) {
       time <- format(Sys.time(), "%H:%M:%S")
     }
-
+    
     # allow lowercase
     format <- toupper(format)
     mode <- toupper(mode)
-
+    
     #argument checks
-
+    
     coll <- checkmate::makeAssertCollection()
     checkmate::assert_logical(fromLocation, add = coll)
     checkmate::assert_integerish(cutoffs, lower = 0, add = coll)
@@ -123,87 +124,90 @@ otp_get_isochrone <-
       add = coll
     )
     checkmate::reportAssertions(coll)
-
-
+    
+    
     # add WALK to relevant modes
     if (identical(mode, "TRANSIT") |
         identical(mode, "BUS") |
         identical(mode, "RAIL")) {
       mode <- append(mode, "WALK")
     }
-
+    
     mode <- paste(mode, collapse = ",")
-
+    
     # check date and time are valid
-
+    
     if (otp_is_date(date) == FALSE) {
       stop("date must be in the format mm-dd-yyyy")
     }
-
+    
     if (otp_is_time(time) == FALSE) {
       stop("time must be in the format hh:mm:ss")
     }
-
-
+    
+    
     # Construct URL
     routerUrl <- paste0(make_url(otpcon)$router, "/isochrone")
-
+    
     # make cutoffs into list
     cutoffs <- as.list(cutoffs)
     names(cutoffs) <- rep("cutoffSec", length(cutoffs))
-
+    
     if (isTRUE(fromLocation)) {
-      req <- httr::GET(
-        routerUrl,
-        query =
-          append(list(
-          fromPlace = paste(location, collapse = ","),
-          mode = mode,
-          batch = batch,
-          date = date,
-          time = time,
-          maxWalkDistance = maxWalkDistance,
-          walkReluctance = walkReluctance,
-          arriveBy = arriveBy,
-          transferPenalty = transferPenalty,
-          minTransferTime = minTransferTime
-        ), cutoffs)
-      )
+      req <- httr::GET(routerUrl,
+                       query =
+                         append(
+                           list(
+                             fromPlace = paste(location, collapse = ","),
+                             mode = mode,
+                             batch = batch,
+                             date = date,
+                             time = time,
+                             maxWalkDistance = maxWalkDistance,
+                             walkReluctance = walkReluctance,
+                             arriveBy = arriveBy,
+                             transferPenalty = transferPenalty,
+                             minTransferTime = minTransferTime
+                           ),
+                           cutoffs
+                         ))
     } else {
       # due to OTP bug when we require an isochrone to the location we must provide the
       # location in toPlace, but also provide fromPlace (which is ignored). Here we
       # make fromPlace the same as toPlace.
-      req <- httr::GET(
-        routerUrl,
-        query =
-          append(list(
-          toPlace = paste(location, collapse = ","),
-          fromPlace = paste(location, collapse = ","), # due to OTP bug
-          mode = mode,
-          batch = batch,
-          date = date,
-          time = time,
-          maxWalkDistance = maxWalkDistance,
-          walkReluctance = walkReluctance,
-          arriveBy = arriveBy,
-          transferPenalty = transferPenalty,
-          minTransferTime = minTransferTime
-        ), cutoffs)
-      )
+      req <- httr::GET(routerUrl,
+                       query =
+                         append(
+                           list(
+                             toPlace = paste(location, collapse = ","),
+                             fromPlace = paste(location, collapse = ","),
+                             # due to OTP bug
+                             mode = mode,
+                             batch = batch,
+                             date = date,
+                             time = time,
+                             maxWalkDistance = maxWalkDistance,
+                             walkReluctance = walkReluctance,
+                             arriveBy = arriveBy,
+                             transferPenalty = transferPenalty,
+                             minTransferTime = minTransferTime
+                           ),
+                           cutoffs
+                         ))
     }
     
     # decode URL for return
     url <- urltools::url_decode(req$url)
-
+    
     # convert response content into text
     text <- httr::content(req, as = "text", encoding = "UTF-8")
-
+    
     # Check that GeoJSON is returned
     if (grepl("\"type\":\"FeatureCollection\"", text)) {
       errorId <- "OK"
       isochrone <- text
       # convert to SF if requested
-      if (format == "SF"){
+      if (format == "SF") {
         isochrone <- geojsonsf::geojson_sf(isochrone)
         # correct invalid geometry that OTP tends to return
         isochrone <- sf::st_make_valid(isochrone)
@@ -211,7 +215,7 @@ otp_get_isochrone <-
     } else {
       errorId <- "ERROR"
     }
-
+    
     response <-
       list("errorId" = errorId,
            "response" = isochrone,

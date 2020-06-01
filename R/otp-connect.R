@@ -34,25 +34,24 @@ otp_connect <- function(hostname = "localhost",
                         ssl = FALSE,
                         check = TRUE)
 {
-
   # the check argument is now deprecated and has no effect
   if (!missing("check"))
     warning("argument 'check' has been deprecated and has no effect", call. = FALSE)
-
+  
   # argument checks
-
+  
   coll <- checkmate::makeAssertCollection()
   checkmate::assert_string(hostname, add = coll)
   checkmate::assert_string(router, add = coll)
   checkmate::assert_int(port, lower = 1, add = coll)
   checkmate::assert_logical(ssl, add = coll)
   checkmate::reportAssertions(coll)
-
+  
   # Check if tz is a valid timezone
   if (isFALSE(checkmate::test_choice(tz, OlsonNames()))) {
     stop("Assertion on 'tz' failed:", " Must be a valid time zone")
   }
-
+  
   # Create the otpcon object
   otpcon <- list(
     hostname = hostname,
@@ -62,10 +61,10 @@ otp_connect <- function(hostname = "localhost",
     tz = tz,
     ssl = ssl
   )
-
+  
   # Set the name for the class
   class(otpcon) <- append(class(otpcon), "otpconnect")
-
+  
   # Get OTP version
   # /otp API endpoint must be enabled on the OTP instance (it is by default)
   req <- try(httr::GET(make_url(otpcon)$otp), silent = T)
@@ -86,7 +85,7 @@ otp_connect <- function(hostname = "localhost",
     otpcon$version <- req$serverVersion$major
     message(make_url(otpcon)$otp, " is running OTPv", otpcon$version)
   }
-
+  
   # Confirm router is queryable
   if (check_router(otpcon) == 200) {
     message("Router ", make_url(otpcon)$router, " exists")
@@ -153,5 +152,5 @@ check_router.otpconnect <- function(x)
   } else{
     return(check$status_code)
   }
-
+  
 }

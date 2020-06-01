@@ -217,7 +217,7 @@ otp_get_times <-
     
     
     # get first itinerary
-    df <- asjson$plan$itineraries[1,]
+    df <- asjson$plan$itineraries[1, ]
     # check if need to return detailed response
     if (detail == TRUE) {
       # need to convert times from epoch format
@@ -255,11 +255,9 @@ otp_get_times <-
         names(ret.df)[names(ret.df) == 'walkTime'] <- 'cycleTime'
       }
       response <-
-        list(
-          "errorId" = error.id,
-          "itineraries" = ret.df,
-          "query" = url
-        )
+        list("errorId" = error.id,
+             "itineraries" = ret.df,
+             "query" = url)
       # get and process legs if required
       if (isTRUE(includeLegs)) {
         legs <- df$legs[[1]]

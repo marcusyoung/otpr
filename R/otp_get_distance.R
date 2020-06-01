@@ -78,9 +78,11 @@ otp_get_distance <-
     # Check for errors
     if (!is.null(asjson$error$id)) {
       response <-
-        list("errorId" = asjson$error$id,
-             "errorMessage" = asjson$error$msg,
-             "query" = url)
+        list(
+          "errorId" = asjson$error$id,
+          "errorMessage" = asjson$error$msg,
+          "query" = url
+        )
       return (response)
     } else {
       error.id <- "OK"
@@ -90,9 +92,11 @@ otp_get_distance <-
     # also check that there is at least 1 itinerary present.
     if (length(asjson$plan$itineraries) == 0) {
       response <-
-        list("errorId" = -9999,
-             "errorMessage" = "No itinerary returned.",
-             "query" = url)
+        list(
+          "errorId" = -9999,
+          "errorMessage" = "No itinerary returned.",
+          "query" = url
+        )
       return (response)
     }
     
@@ -100,16 +104,20 @@ otp_get_distance <-
       # for car the distance is only recorded in the legs objects. Only one leg
       # should be returned if mode is car and we pick that
       response <-
-        list("errorId" = error.id,
-             "distance" = asjson$plan$itineraries$legs[[1]]$distance,
-             "query" = url)
+        list(
+          "errorId" = error.id,
+          "distance" = asjson$plan$itineraries$legs[[1]]$distance,
+          "query" = url
+        )
       return (response)
       # for walk or cycle
     } else {
       response <-
-        list("errorId" = error.id,
-             "distance" = asjson$plan$itineraries$walkDistance,
-             "query" = url)
+        list(
+          "errorId" = error.id,
+          "distance" = asjson$plan$itineraries$walkDistance,
+          "query" = url
+        )
       return (response)
     }
   }
