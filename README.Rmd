@@ -302,3 +302,8 @@ For more guidance on how **otpr**, in conjunction with OTP, can be used to gener
 * Please [report any issues or bugs](https://github.com/marcusyoung/otpr/issues).
 * Get citation information for **otpr** using: `citation(package = 'otpr')`.
 
+## Want to say thanks?
+
+<a href="https://ko-fi.com/marcusyoung"><img src='man/figures/BuyMeACoffee_blue@2x.png' align="left" width=200/></a>
+
+</br>
