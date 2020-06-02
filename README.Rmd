@@ -45,18 +45,18 @@ This package will be useful to researchers and transport planners who want to us
 
 ## Installation
 
-``` r
+``` {r eval=FALSE}
 # Install from CRAN
-# install.packages("otpr")
+install.packages("otpr")
 ```
 
 ### Development version
 
 To get a bug fix, or use a feature from the development version, you can install otpr from GitHub. See [NEWS](https://github.com/marcusyoung/otpr/blob/master/NEWS.md) for changes since last release.
 
-``` r
-# install.packages("devtools")
-# devtools::install_github("marcusyoung/otpr")
+``` {r eval=FALSE}
+install.packages("devtools")
+devtools::install_github("marcusyoung/otpr")
 ```
 
 
