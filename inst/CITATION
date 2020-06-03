@@ -5,9 +5,12 @@ citEntry(entry="Manual",
          person("Marcus Young")),
          title = "{otpr: An API wrapper for OpenTripPlanner}",
          year = {2020},
+         note = {R package version 0.4.1},
+         url = {https://CRAN.R-project.org/package=otpr}
 
 textVersion =
 paste("Marcus Young (2020).",
-"otpr: An API wrapper for OpenTripPlanner.")
-
+"otpr: An API wrapper for OpenTripPlanner.", "R package version 0.4.1.", "https://CRAN.R-project.org/package=otpr"
 )
+)
+
