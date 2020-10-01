@@ -1,5 +1,7 @@
 ---
-output: github_document
+output: 
+  md_document:
+    variant: markdown_github
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -45,7 +47,7 @@ This package will be useful to researchers and transport planners who want to us
 
 ## Installation
 
-``` {r eval=FALSE}
+```{r install, eval=FALSE}
 # Install from CRAN
 install.packages("otpr")
 ```
@@ -54,7 +56,7 @@ install.packages("otpr")
 
 To get a bug fix, or use a feature from the development version, you can install otpr from GitHub. See [NEWS](https://github.com/marcusyoung/otpr/blob/master/NEWS.md) for changes since last release.
 
-``` {r eval=FALSE}
+```{r eval=FALSE}
 install.packages("devtools")
 devtools::install_github("marcusyoung/otpr")
 ```
@@ -72,7 +74,7 @@ The first step is to call `otp_connect()`, which defines the parameters needed t
 to a router on a running OTP instance. The function can also confirm that the
 router is reachable.
 
-``` {r}
+```{r}
 # For a basic instance of OTP running on localhost with standard ports and a 'default' router
 # this is all that's needed
 otpcon <- otp_connect()
@@ -108,7 +110,7 @@ To get the trip distance in metres between an origin and destination on the stre
 and/or path network use `otp_get_distance()`. You can specify the required mode: 
 CAR (default), BICYCLE or WALK are valid.
 
-``` {r}
+```{r}
 # Distance between Manchester city centre and Manchester airport by CAR
 otp_get_distance(
   otpcon,
@@ -133,7 +135,7 @@ You can specify the required mode: TRANSIT (all available transit modes), BUS, R
 BICYCLE, and WALK are valid. All the public transit modes automatically allow WALK.
 There is also the option to combine TRANSIT with BICYCLE.
 
-``` {r}
+```{r}
 # Time between Manchester city centre and Manchester airport by BICYCLE
 otp_get_times(
   otpcon,
@@ -163,7 +165,7 @@ can be called with the 'detail' argument set to TRUE. The trip duration (minutes
 broken down by time on transit, walking time (from/to and between stops), waiting time
 (when changing transit vehicle or mode), and number of transfers (when changing transit vehicle or mode).
 
-``` {r}
+```{r}
 # Time between Manchester city centre and Manchester airport by TRANSIT with detail
 otp_get_times(
   otpcon,
@@ -187,7 +189,7 @@ route details, agency details, and stop names. There is also a column called 'de
 which is the length of time in minutes required to wait before the start of a leg. The sum
 of 'departureWait' will equal the total waiting time for the itinerary.
 
-``` {r}
+```{r}
 # Time between Manchester city centre and Manchester airport by TRANSIT with detail and legs
 trip <- otp_get_times(
   otpcon,
@@ -213,7 +215,7 @@ They can be generated either *from* (default) or *to* the specified location.
 
 #### GeoJSON example
 
-``` {r}
+```{r}
 
 # 900, 1800 and 2700 second isochrones for travel *to* Manchester Airport by any transit mode
 my_isochrone <- otp_get_isochrone(
@@ -236,7 +238,7 @@ write(my_isochrone$response, file = "my_isochrone.geojson")
 
 #### SF example
 
-``` {r, message=FALSE, warning=FALSE, out.width='80%'}
+```{r, message=FALSE, warning=FALSE, out.width='80%'}
 
 # request format as "SF"
 my_isochrone <- otp_get_isochrone(
@@ -283,7 +285,7 @@ tm_shape(osm_man) +
 
 The example function calls shown above can be extended by passing additional parameters to the OTP API. Further information is available in the documentation for each function: 
 
-``` {r eval=FALSE}
+```{r eval=FALSE}
 # get help on using the otp_get_times() function
 ?otp_get_times
 ```
