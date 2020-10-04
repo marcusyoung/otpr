@@ -306,7 +306,7 @@ For more guidance on how **otpr**, in conjunction with OTP, can be used to gener
 
 ## How to cite
 
-* Please cite **otpr** if you use it. Get citation information using: `citation(package = 'otpr')`:
+Please cite **otpr** if you use it. Get citation information using: `citation(package = 'otpr')`:
 
 ```{r}
 citation(package = 'otpr')
