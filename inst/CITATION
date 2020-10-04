@@ -1,4 +1,4 @@
-citHeader("To cite the otpr package in publications, please use the following. You can obtain the specific DOI for the version from: https://doi.org/10.5281/zenodo.4065250")
+citHeader("To cite the otpr package in publications, please use the following. You can obtain the DOI for a specific version from: https://zenodo.org/record/4065250")
 
 citEntry(entry="Manual",
          author = c(
@@ -6,10 +6,10 @@ citEntry(entry="Manual",
          title = "{otpr: An API wrapper for OpenTripPlanner}",
          year = 2020,
          note = "{R package version 0.4.2}",
-         doi = {10.5281/zenodo.4065250},
+         doi = "{10.5281/zenodo.4065250}",
          textVersion =
           paste("Marcus Young (2020).",
-          "otpr: An API wrapper for OpenTripPlanner.", "R package version 0.4.2." "https://doi.org/10.5281/zenodo.4065250")
+          "otpr: An API wrapper for OpenTripPlanner.", "R package version 0.4.2.", "https://doi.org/10.5281/zenodo.4065250")
           )
           
 

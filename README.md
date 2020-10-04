@@ -181,7 +181,7 @@ otp_get_times(
 #> [1] 60.12
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=10-04-2020&time=14:31:08&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=10-04-2020&time=14:40:23&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -387,7 +387,28 @@ Getting help
 -   Please [report any issues or
     bugs](https://github.com/marcusyoung/otpr/issues).
 -   Get citation information for **otpr** using:
-    `citation(package = 'otpr')`.
+    `citation(package = 'otpr')`:
+
+``` r
+citation(package = 'otpr')
+#> 
+#> To cite the otpr package in publications, please use the following. You
+#> can obtain the DOI for a specific version from:
+#> https://zenodo.org/record/4065250
+#> 
+#>   Marcus Young (2020). otpr: An API wrapper for OpenTripPlanner. R
+#>   package version 0.4.2. https://doi.org/10.5281/zenodo.4065250
+#> 
+#> A BibTeX entry for LaTeX users is
+#> 
+#>   @Manual{,
+#>     author = {{Marcus Young}},
+#>     title = {{otpr: An API wrapper for OpenTripPlanner}},
+#>     year = {2020},
+#>     note = {{R package version 0.4.2}},
+#>     doi = {{10.5281/zenodo.4065250}},
+#>   }
+```
 
 Want to say thanks?
 -------------------

@@ -303,7 +303,11 @@ For more guidance on how **otpr**, in conjunction with OTP, can be used to gener
 ## Getting help
 
 * Please [report any issues or bugs](https://github.com/marcusyoung/otpr/issues).
-* Get citation information for **otpr** using: `citation(package = 'otpr')`.
+* Get citation information for **otpr** using: `citation(package = 'otpr')`:
+
+```{r}
+citation(package = 'otpr')
+```
 
 ## Want to say thanks?
 
