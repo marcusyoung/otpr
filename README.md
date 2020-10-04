@@ -181,7 +181,7 @@ otp_get_times(
 #> [1] 60.12
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=10-04-2020&time=14:40:23&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=10-04-2020&time=14:46:25&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -386,7 +386,11 @@ Getting help
 
 -   Please [report any issues or
     bugs](https://github.com/marcusyoung/otpr/issues).
--   Get citation information for **otpr** using:
+
+How to cite
+-----------
+
+-   Please cite **otpr** if you use it. Get citation information using:
     `citation(package = 'otpr')`:
 
 ``` r
