@@ -1,4 +1,27 @@
-# otpr 0.4.2.9000
+# otpr 0.4.2.9000 (Development version)
+
+## New Features
+
+* Support for creating and evaluating surfaces. The OTP surfaces endpoint enables
+efficient running of one-to-many queries. Once a surface for an origin has been
+generated (a surface is specific to a transport mode, date, time etc), distances
+from that origin to a set of locations (or 'opportunities') can be generated very
+quickly - many thousands in a few seconds. In addition, one or more indicators of
+accessibility for those opportunities can be generated at the same time. For example,
+if the opportunity was census workplace zones, a count of the number of zones and the
+number of jobs accessible from the origin at one-minute intervals are returned, along
+with a cumulative sum, enabling a rapid assessment of the number of job opportunities
+within, say, 30 minutes. There are two new functions to support surfaces:
+    * `otp_create_surface()` creates a surface stored in memory on the OTP server and
+    returns its Id number. It can optionally also retrieve and save a raster (geo TIFF)
+    of the surface for visualisation in R (or other GIS).
+    * `otp_evaluate_surface()` uses an existing surface and a pointset (loaded from a CSV file
+    provided to OTP at server startup) to calculate the travel time to each point location
+    in the pointset file and to generate accessibility indicators for one or more 'opportunity'
+    columns. A list is returned containing a dataframe for each 'opportunity' and, optionally,
+    a dataframe of the time taken to travel from the surface's origin to each location point.
+    This function can also be used to retrieve the time from an origin to many destinations.
+
 
 # otpr 0.4.2
 
