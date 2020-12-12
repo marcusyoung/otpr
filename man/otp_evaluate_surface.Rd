@@ -2,11 +2,7 @@
 % Please edit documentation in R/otp_evaluate_surface.R
 \name{otp_evaluate_surface}
 \alias{otp_evaluate_surface}
-\title{Evaluates an existing surface. Using a pointset from the specified CSV file,
-the travel time to each point is obtained from the specified surface. Accessibility
-indicators are then generated for one or more 'opportunity' columns in the pointset
-file. For example, you may have the number of jobs available at each location, or
-the number of hospital beds.}
+\title{Evaluates an existing travel time surface (OTPv1 only).}
 \usage{
 otp_evaluate_surface(otpcon, surfaceId, pointset, detail = FALSE)
 }
@@ -23,12 +19,36 @@ The name of the pointset is the name of the file.}
 \item{detail}{logical, whether the travel time to each location in the pointset
 should be returned. Default is FALSE.}
 }
+\value{
+Returns a list containing 4 or more items:
+\itemize{
+\item \code{errorId} - character, should be "OK" if no error condition.
+\item \code{query} - this is a character string containing the URL
+that was submitted to the OTP API.
+\item \code{surfaceId} - integer, the id of the surface that was evaluated.
+\item One or more dataframes for each of the 'opportunity' columns in the pointset CSV file.
+Each dataframe contains four columns: minutes (the time from the surface origin in one-minute increments); 
+counts (the number of the opportunity locations reached within each minute interval); 
+sum (the sum of the opportunities at each of the locations reached within each minute interval);
+and cumsums (a cumulative sum of the opportunities reached).
+\item If \code{detail} was set to TRUE then an additional dataframe containing 
+the time taken (in seconds) to reach each point in the pointset CSV file. If a
+point was not reachable the time will be recorded as NA.  
+}
+}
 \description{
-Requires OTP to have been started with the --analyst switch and the --pointset
-parameter set to the path of a directory containing the pointset file(s).
+Evaluates an existing travel time surface. Using a pointset from a specified CSV file,
+the travel time to each point is obtained from the specified surface. Accessibility
+indicators are then generated for one or more 'opportunity' columns in the pointset.
+For example, you might have the number of jobs available at each location, or
+the number of hospital beds.
+}
+\details{
+This function requires OTP to have been started with the --analyst switch and
+the --pointset parameter set to the path of a directory containing the pointset file(s).
 }
 \examples{
 \dontrun{
-
+otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "jobs", detail = TRUE)
 }
 }

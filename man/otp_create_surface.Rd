@@ -2,18 +2,16 @@
 % Please edit documentation in R/otpr_create_surface.R
 \name{otp_create_surface}
 \alias{otp_create_surface}
-\title{Creates a travel time surface for an origin point. A surface has the travel time
-to every geographic coordinate that can be reached from that origin. (OTPv1 only)}
+\title{Creates a travel time surface (OTPv1 only).}
 \usage{
 otp_create_surface(
   otpcon,
   getRaster = FALSE,
   rasterPath = tempdir(),
-  location,
+  origin,
   mode = "TRANSIT",
   date,
   time,
-  arriveBy = FALSE,
   maxWalkDistance = 800,
   walkReluctance = 2,
   transferPenalty = 0,
@@ -23,14 +21,14 @@ otp_create_surface(
 \arguments{
 \item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}
 
-\item{getRaster}{Logical. Whether to download a raster (tiff) of the generated
+\item{getRaster}{Logical. Whether or not to download a raster (geoTIFF) of the generated
 surface. Default FALSE.}
 
-\item{rasterPath}{Character. Path of a directory to save the surface raster.
-Default is \code{tempdir()}. File will be named surface_{id}.tiff, with {id}
-replaced with the id of the surface.}
+\item{rasterPath}{Character. Path of a directory where the the surface raster
+should be saved. Default is \code{tempdir()}. The file will be named 
+surface_{id}.tiff, with {id} replaced by the OTP id assigned to the surface.}
 
-\item{location}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
+\item{origin}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
 
 \item{mode}{Character, mode of travel. Valid values are: WALK, TRANSIT, BUS,
 or RAIL.
@@ -41,12 +39,8 @@ TRANSIT will use all available transit modes. Default is TRANSIT.}
 date of travel. Only relevant if \code{mode} includes public transport.
 Default is current system date.}
 
-\item{time}{Character, must be in the format hh:mm:ss. If \code{arriveBy} is
-FALSE (the default) this is the desired departure time, otherwise the desired
-arrival time. Default is current system time.}
-
-\item{arriveBy}{Logical. Whether the specified date and time is for
-departure (FALSE) or arrival (TRUE). Default is FALSE.}
+\item{time}{Character, must be in the format hh:mm:ss. This is the desired 
+departure time. Default is current system time.}
 
 \item{maxWalkDistance}{Numeric. The maximum distance (in meters) the user is
 willing to walk. Default = 800.}
@@ -64,13 +58,28 @@ adherence. This is a minimum; transfers over longer distances might use a longer
 Default is 0.}
 }
 \value{
-Returns ...
+A list of 5 items:
+\itemize{
+\item \code{errorId} - character, should be "OK" if no error condition.
+\item \code{query} - this is a character string containing the URL.
+that was submitted to the OTP API.
+\item \code{surfaceId} - integer, the id of the surface that was evaluated.
+\item \code{surfaceRecord} - details of the parameters used to create the surface.
+\item \code{rasterDownload} - the path to the saved raster file (if \code{getRaster} was 
+set to TRUE and a valid path was provided via \code{rasterPath}.)
+}
 }
 \description{
-Returns information about the created surface.
+Creates a travel time surface for an origin point. A surface contains the travel time
+to every geographic coordinate that can be reached from that origin. Optionally, the surface
+can be saved as a raster file (GeoTIFF) to the designated directory.
 }
 \examples{
 \dontrun{
+otp_create_surface(otpcon, origin = c(53.43329,-2.13357), mode = "TRANSIT", 
+maxWalkDistance = 1600, getRaster = TRUE)
 
+otp_create_surface(otpcon, origin = c(53.43329,-2.13357), date = "03-26-2019",
+time = "08:00:00", mode = "BUS", maxWalkDistance = 1600, getRaster = TRUE)
 }
 }
