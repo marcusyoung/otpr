@@ -75,12 +75,13 @@ otp_get_distance <-
     # parse text to json
     asjson <- jsonlite::fromJSON(text)
     
+    
     # Check for errors
     if (!is.null(asjson$error$id)) {
       response <-
         list(
           "errorId" = asjson$error$id,
-          "errorMessage" = asjson$error$msg,
+          "errorMessage" = ifelse(otpcon$version == 1, asjson$error$msg, asjson$error$message),
           "query" = url
         )
       return (response)

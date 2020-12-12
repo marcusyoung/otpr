@@ -16,6 +16,7 @@ otp_get_times(
   arriveBy = FALSE,
   transferPenalty = 0,
   minTransferTime = 0,
+  maxItineraries = 1,
   detail = FALSE,
   includeLegs = FALSE
 )
@@ -40,7 +41,10 @@ desired arrival time. Only relevant if \code{mode} includes public transport.
 Default is current system time.}
 
 \item{maxWalkDistance}{Numeric. The maximum distance (in meters) the user is
-willing to walk. Default = 800.}
+willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
+soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
+this parameter imposes a hard limit for all modes - including WALK only (see:
+\url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
 \item{walkReluctance}{Integer. A multiplier for how bad walking is, compared
 to being in transit for equal lengths of time. Default = 2.}
@@ -49,15 +53,21 @@ to being in transit for equal lengths of time. Default = 2.}
 date and time. Default is FALSE.}
 
 \item{transferPenalty}{Integer. An additional penalty added to boardings after
-the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high
-value to discourage transfers. Default is 0.}
+the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds.
+Set this to a high value to discourage transfers. Default is 0.}
 
 \item{minTransferTime}{Integer. The minimum time, in seconds, between successive
 trips on different vehicles. This is designed to allow for imperfect schedule
 adherence. This is a minimum; transfers over longer distances might use a longer time.
 Default is 0.}
 
-\item{detail}{Logical. Default is FALSE.}
+\item{maxItineraries}{Integer. Controls the number of trip itineraries that
+are returned. This is not an OTP parameter. All suggested itineraries are allowed to be
+returned by the OTP server. otpr will then return them to the user in the order
+they were provided by OTP up to the maximum specified by this parameter. Default is 1.}
+
+\item{detail}{Logical. This parameter only has an effect when \code{detail} is set
+to true. When \code{detail} is set to FALSE only a single trip time is returned. Default is FALSE.}
 
 \item{includeLegs}{Logical. Default is FALSE. Determines whether or not details of each
 journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but

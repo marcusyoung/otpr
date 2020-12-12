@@ -18,17 +18,25 @@
 #' @param arriveBy Logical. Whether trip should depart (FALSE) or arrive (TRUE) at the specified
 #' date and time. Default is FALSE.
 #' @param maxWalkDistance Numeric. The maximum distance (in meters) the user is
-#' willing to walk. Default = 800.
+#' willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
+#' soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
+#' this parameter imposes a hard limit for all modes - including WALK only (see:
+#' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
 #' @param walkReluctance Integer. A multiplier for how bad walking is, compared
 #' to being in transit for equal lengths of time. Default = 2.
 #' @param transferPenalty Integer. An additional penalty added to boardings after
-#' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds. Set this to a high
-#' value to discourage transfers. Default is 0.
+#' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds.
+#' Set this to a high value to discourage transfers. Default is 0.
 #' @param minTransferTime Integer. The minimum time, in seconds, between successive
 #' trips on different vehicles. This is designed to allow for imperfect schedule
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
-#' @param detail Logical. Default is FALSE.
+#' @param maxItineraries Integer. Controls the number of trip itineraries that
+#' are returned. This is not an OTP parameter. All suggested itineraries are allowed to be
+#' returned by the OTP server. otpr will then return them to the user in the order
+#' they were provided by OTP up to the maximum specified by this parameter. Default is 1. 
+#' @param detail Logical. This parameter only has an effect when \code{detail} is set
+#' to true. When \code{detail} is set to FALSE only a single trip time is returned. Default is FALSE.
 #' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each
 #' journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but
 #' only when \code{detail} is also TRUE.
@@ -70,6 +78,7 @@ otp_get_times <-
            arriveBy = FALSE,
            transferPenalty = 0,
            minTransferTime = 0,
+           maxItineraries = 1,
            detail = FALSE,
            includeLegs = FALSE)
   {
@@ -160,26 +169,24 @@ otp_get_times <-
     # Construct URL
     routerUrl <- paste0(make_url(otpcon)$router, "/plan")
     
+    # Construct query list
+    query <- list(
+      fromPlace = fromPlace,
+      toPlace = toPlace,
+      mode = mode,
+      date = date,
+      time = time,
+      maxWalkDistance = maxWalkDistance,
+      walkReluctance = walkReluctance,
+      arriveBy = arriveBy,
+      transferPenalty = transferPenalty,
+      minTransferTime = minTransferTime)
+    
+    
     # Use GET from the httr package to make API call and place in req - returns json by default.
-    # Not using numItineraries due to odd OTP behaviour - if request only 1 itinerary don't
-    # necessarily get the top/best itinerary, sometimes a suboptimal itinerary is returned.
-    # OTP will return default number of itineraries depending on mode. This function returns
-    # the first of those itineraries.
-    # See: https://groups.google.com/forum/#!topic/opentripplanner-users/xz6LD9Y13Vo
     req <- httr::GET(
       routerUrl,
-      query = list(
-        fromPlace = fromPlace,
-        toPlace = toPlace,
-        mode = mode,
-        date = date,
-        time = time,
-        maxWalkDistance = maxWalkDistance,
-        walkReluctance = walkReluctance,
-        arriveBy = arriveBy,
-        transferPenalty = transferPenalty,
-        minTransferTime = minTransferTime
-      )
+      query = query
     )
     
     # decode URL for return
@@ -191,11 +198,12 @@ otp_get_times <-
     asjson <- jsonlite::fromJSON(text, flatten = TRUE)
     
     # Check for errors
+    # Note that OTPv1 and OTPv2 use a different node name for the error message.
     if (!is.null(asjson$error$id)) {
       response <-
         list(
           "errorId" = asjson$error$id,
-          "errorMessage" = asjson$error$msg,
+          "errorMessage" = ifelse(otpcon$version == 1, asjson$error$msg, asjson$error$message),
           "query" = url
         )
       return (response)
@@ -211,7 +219,7 @@ otp_get_times <-
       response <-
         list(
           "errorId" = -9999,
-          "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules or the maxWalkDistance parameter (default 800m) might be too restrictive.",
+          "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules.",
           "query" = url
         )
       return (response)
