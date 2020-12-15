@@ -2,7 +2,7 @@
 % Please edit documentation in R/otp_get_times.R
 \name{otp_get_times}
 \alias{otp_get_times}
-\title{Finds the time in minutes between supplied origin and destination}
+\title{Queries OTP for trip time between an origin and destination or detailed itineraries}
 \usage{
 otp_get_times(
   otpcon,
@@ -79,21 +79,33 @@ This is "OK" if OTP has not returned an error. Otherwise it is the OTP error cod
 varies:
 \itemize{
 \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
-\item If there is no error and \code{detail} is FALSE then \code{duration} in minutes is returned as integer.
+\item If there is no error and \code{detail} is FALSE then the \code{duration} in minutes is
+returned as an integer. This is the duration of the top itinerary returned by the OTP server.
+
 \item If there is no error and \code{detail} is TRUE then \code{itineraries} as a dataframe.
 }
 The third element of the list is \code{query}. This is a character string containing the URL
 that was submitted to the OTP API.
-
-If requested, there will be a fourth element, \code{legs}.
-This is a dataframe and will contain core columns that are consistent across all queries.
-However, as the OTP API does not consistently return the same attributes for legs, there will
-be some variation in columns returned. You should bare this in mind if your post processing
-uses these columns (e.g. by checking for column existence).
 }
 \description{
-Finds the time in minutes between supplied origin and destination by specified mode(s).
-If \code{detail} is set to TRUE returns time for each mode, waiting time and number of transfers.
+In the simplest use case, returns the time in minutes between supplied origin
+and destination by specified mode(s) for the top itinerary returned by OTP. If
+\code{detail} is set to TRUE one or more detailed trip itineraries are returned,
+including the time for each mode (if a multimodal trip), waiting time and the
+number of transfers. Optionally, the details of each journey leg for each itinerary
+can be returned.
+}
+\details{
+If you plan to use the function in simple-mode - where just the duration of the top itinerary is returned -
+it is advisable to first review several detailed itineraries to ensure that the parameters
+you have set are producing sensible results.
+
+If requested, the itineraries dataframe will include a column called legs which
+contains a nested dataframe for each itinerary. Each legs dataframe will contain
+a set of core columns that are consistent across all queries. However, as the OTP
+API does not consistently return the same attributes for legs, there will be some variation
+in columns returned. You should bare this in mind if your post processing
+uses these columns (e.g. by checking for column existence).
 }
 \examples{
 \dontrun{
