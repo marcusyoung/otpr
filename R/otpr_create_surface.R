@@ -8,25 +8,29 @@
 #' @param getRaster Logical. Whether or not to download a raster (geoTIFF) of the generated
 #' surface. Default FALSE.
 #' @param rasterPath Character. Path of a directory where the the surface raster
-#' should be saved. Default is \code{tempdir()}. The file will be named 
-#' surface_{id}.tiff, with {id} replaced by the OTP id assigned to the surface.
+#' should be saved. Default is \code{tempdir()}. Use forward slashes on Windows.
+#' The file will be named surface_{id}.tiff, with {id} replaced by the OTP id assigned
+#' to the surface.
 #' @param origin Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
-#' @param mode Character, mode of travel. Valid values are: WALK, TRANSIT, BUS,
-#' or RAIL.
-#' Note that WALK mode is automatically included for TRANSIT, BUS and RAIL.
-#' TRANSIT will use all available transit modes. Default is TRANSIT.
-#' @param date Character, must be in the format mm-dd-yyyy. This is the desired
-#' date of travel. Only relevant if \code{mode} includes public transport.
-#' Default is current system date.
-#' @param time Character, must be in the format hh:mm:ss. This is the desired 
-#' departure time. Default is current system time.
+#' @param mode Character vector, mode(s) of travel. Valid values are: TRANSIT, WALK, BICYCLE,
+#' CAR, BUS, RAIL, OR 'c("TRANSIT", "BICYCLE")'. Note that WALK mode is automatically
+#' included for TRANSIT, BUS, and RAIL. TRANSIT will use all available transit modes. Default is CAR.
+#' @param date Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
+#' Only relevant if \code{mode} includes public transport. Default is current system date.
+#' @param time Character, must be in the format hh:mm:ss.
+#' If \code{arriveBy} is FALSE (the default) this is the desired departure time, otherwise the
+#' desired arrival time. Only relevant if \code{mode} includes public transport.
+#' Default is current system time.
 #' @param maxWalkDistance Numeric. The maximum distance (in meters) the user is
-#' willing to walk. Default = 800.
+#' willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
+#' soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
+#' this parameter imposes a hard limit for all modes - including WALK only (see:
+#' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
 #' @param walkReluctance Integer. A multiplier for how bad walking is, compared
 #' to being in transit for equal lengths of time. Default = 2.
 #' @param transferPenalty Integer. An additional penalty added to boardings after
-#' the first. The value is in OTP's internal weight units, which are roughly equivalent
-#' to seconds. Set this to a high value to discourage transfers. Default is 0.
+#' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds.
+#' Set this to a high value to discourage transfers. Default is 0.
 #' @param minTransferTime Integer. The minimum time, in seconds, between successive
 #' trips on different vehicles. This is designed to allow for imperfect schedule
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
@@ -46,7 +50,8 @@
 #' maxWalkDistance = 1600, getRaster = TRUE)
 #' 
 #' otp_create_surface(otpcon, origin = c(53.43329,-2.13357), date = "03-26-2019",
-#' time = "08:00:00", mode = "BUS", maxWalkDistance = 1600, getRaster = TRUE)
+#' time = "08:00:00", mode = "BUS", maxWalkDistance = 1600, getRaster = TRUE,
+#' rasterPath = "C:/temp")
 #'}
 #' @export
 otp_create_surface <-
@@ -103,6 +108,8 @@ otp_create_surface <-
     
     coll <- checkmate::makeAssertCollection()
     checkmate::assert_class(otpcon, "otpconnect", add = coll)
+    checkmate::assert_logical(getRaster)
+    checkmate::assert_character(rasterPath)
     checkmate::assert_numeric(
       origin,
       lower =  -180,
@@ -114,20 +121,37 @@ otp_create_surface <-
     checkmate::assert_int(walkReluctance, lower = 0, add = coll)
     checkmate::assert_int(transferPenalty, lower = 0, add = coll)
     checkmate::assert_int(minTransferTime, lower = 0, add = coll)
-    checkmate::assert_choice(
-      mode,
-      choices = c("WALK", "BUS", "RAIL", "TRANSIT", "BICYCLE", "CAR"),
-      null.ok = F,
-      add = coll
-    )
-    checkmate::assert_path_for_output(file.path(rasterPath, paste0("surface_", surfaceId, ".tiff"), fsep = .Platform$file.sep), overwrite = TRUE, add = coll)
+    checkmate::assert_path_for_output(file.path(rasterPath, paste0("test.tiff"), fsep = .Platform$file.sep), overwrite = TRUE, add = coll)
     checkmate::reportAssertions(coll)
     
+    # check for valid modes
+    valid_mode <-
+      list("TRANSIT",
+           "WALK",
+           "BICYCLE",
+           "CAR",
+           "BUS",
+           "RAIL",
+           c("TRANSIT", "BICYCLE"))
     
-    # add WALK to relevant modes
+    if (!(Position(function(x)
+      identical(x, mode), valid_mode, nomatch = 0) > 0)) {
+      stop(
+        paste0(
+          "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL', or 'c('TRANSIT', 'BICYCLE')', but is '",
+          mode,
+          "'."
+        )
+      )
+    }
+    
+    # add WALK to relevant modes - as mode may be a vector of length > 1 use identical
+    # otpr_vectorMatch is TRUE if mode is c("TRANSIT", "BICYCLE") or c("BICYCLE", "TRANSIT")
+    
     if (identical(mode, "TRANSIT") |
         identical(mode, "BUS") |
-        identical(mode, "RAIL")) {
+        identical(mode, "RAIL") |
+        otp_vector_match(mode, c("TRANSIT", "BICYCLE"))) {
       mode <- append(mode, "WALK")
     }
     
