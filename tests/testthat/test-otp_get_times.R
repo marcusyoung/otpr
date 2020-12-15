@@ -90,12 +90,12 @@ test_that("query with legs", {
       detail = TRUE,
       includeLegs = TRUE
     )
-  expect_equal(length(response), 4)
+  expect_equal(length(response), 3)
   expect_equal(response$errorId, "OK")
-  expect_s3_class(response$legs, "data.frame")
-  expect_equal(nrow(response$legs), legs_number)
+  expect_s3_class(response$itineraries$legs[[1]], "data.frame")
+  expect_equal(nrow(response$itineraries$legs[[1]]), legs_number)
   expect_named(
-    response$itineraries,
+    response$itineraries[1, ],
     c(
       "start",
       "end",
@@ -104,10 +104,11 @@ test_that("query with legs", {
       "walkTime",
       "transitTime",
       "waitingTime",
-      "transfers"
+      "transfers",
+      "legs"
     )
   )
-  expect_equal(round(response$itineraries$duration, 2), transit_duration)
+  expect_equal(round(response$itineraries[1, "duration"], 2), transit_duration)
 })
 
 test_that("query with arriveby", {
@@ -124,7 +125,7 @@ test_that("query with arriveby", {
       includeLegs = TRUE,
       arriveBy =  TRUE
     )
-  expect_equal(response$itineraries$end, arriveBy_time)
+  expect_equal(response$itineraries[1, "end"], arriveBy_time)
 })
 
 test_that("all parameters are passed in query", {

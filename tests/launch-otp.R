@@ -2,6 +2,12 @@
 # Requires: Sys.setenv("OTP_ON_LOCALHOST" = TRUE)
 
 if(identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE")) {
-system("java -Xmx2G -jar /otp/otp.jar --router otpr-test --graphs /otp/graphs --server", intern = FALSE, wait = FALSE)
+
+# OTP server in analyst mode for surface testing
+system(paste0("java -Xmx2G -jar ", getwd(), "/tests/otp/otp.jar --router otpr-test --graphs ", getwd(), "/tests/otp/graphs --server --port 9090 --securePort 9091 --analyst --pointSets ", getwd(), "/tests/otp/pointsets"), intern = FALSE, wait = FALSE)
+
+# standard OTP server
+system(paste0("java -Xmx2G -jar ", getwd(), "/tests/otp/otp.jar --router otpr-test --graphs ", getwd(), "/tests/otp/graphs --server"), intern = FALSE, wait = FALSE)
+
 Sys.sleep(5)
 }
