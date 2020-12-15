@@ -19,7 +19,10 @@ Imports:
     janitor,
     jsonlite,
     sf,
-    urltools
+    urltools,
+    dplyr,
+    rrapply,
+    rlang
 RoxygenNote: 7.1.1
 Suggests: 
     testthat,
