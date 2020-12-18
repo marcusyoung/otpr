@@ -27,7 +27,7 @@ otp_is_time <- function(time) {
 }
 
 #' Checks if two vectors are the same but where order doesn't matter
-#' 
+#'
 #' @param a vector, to be matched
 #' @param b vector, to be matched
 #' @keywords internal
@@ -36,7 +36,7 @@ otp_vector_match <- function(a, b)  {
 }
 
 #' Convert time from EPOCH format
-#' 
+#'
 #' @param epoch, time since EPOCH (milliseconds)
 #' @param tz, timezone (string)
 #' @keywords internal
@@ -45,31 +45,35 @@ otp_from_epoch <- function(epoch, tz) {
 }
 
 #' Check and process transport mode
-#' 
+#'
 #' @param mode, character vector
 #' @keywords internal
 otp_check_mode <- function(mode) {
   mode <- toupper(mode)
   valid_mode <-
-    list("TRANSIT",
-         "WALK",
-         "BICYCLE",
-         "CAR",
-         "BUS",
-         "RAIL",
-         c("TRANSIT", "BICYCLE"))
+    list(
+      "TRANSIT",
+      "WALK",
+      "BICYCLE",
+      "CAR",
+      "BUS",
+      "RAIL",
+      "TRAM",
+      "SUBWAY",
+      c("TRANSIT", "BICYCLE")
+    )
   
   if (!(Position(function(x)
     identical(x, mode), valid_mode, nomatch = 0) > 0)) {
     stop(
       paste0(
-        "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL', or 'c('TRANSIT', 'BICYCLE')', but is '",
+        "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'TRAM', 'SUBWAY, 'RAIL', or 'c('TRANSIT', 'BICYCLE')', but is '",
         paste(mode, collapse = ', '),
         "'."
       )
     )
   } else {
-    # add WALK to relevant modes - as mode may be a vector of length > 1 use identical
+    # Need to add WALK to relevant modes - as mode may be a vector of length > 1 use identical
     # otpr_vectorMatch is TRUE if mode is c("TRANSIT", "BICYCLE") or c("BICYCLE", "TRANSIT")
     if (identical(mode, "TRANSIT") |
         identical(mode, "BUS") |
@@ -77,14 +81,15 @@ otp_check_mode <- function(mode) {
         otp_vector_match(mode, c("TRANSIT", "BICYCLE"))) {
       mode <- append(mode, "WALK")
     }
-    
     return(paste(mode, collapse = ","))
   }
 }
 
+
 #' Check OTP parameters
-#' 
+#'
 #' @param otpcon Object of otpcon class
+#' @param ... Other optional parameters
 #' @keywords internal
 #' @importFrom utils hasName
 otp_check_params <- function (otpcon, ...)
@@ -92,7 +97,6 @@ otp_check_params <- function (otpcon, ...)
   call <- sys.call()
   call[[1]] <- as.name('list')
   args <- eval.parent(call)
-  print(args)
   
   coll <- checkmate::makeAssertCollection()
   
