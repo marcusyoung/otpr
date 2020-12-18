@@ -21,7 +21,17 @@ within, say, 30 minutes. There are two new functions to support surfaces:
     columns. A list is returned containing a dataframe for each 'opportunity' and, optionally,
     a dataframe of the time taken to travel from the surface's origin to each location point.
     This function can also be used to retrieve the time from an origin to many destinations.
+* The `waitReluctance` parameter was added to `otp_get_times()`, `otp_get_isochrone()` and
+`otp_get_surface()`.
+* For advanced users: the ability to pass any *additional* parameter not specified
+in the **otpr** functions to the OTP API. Available in `otp_get_times()`, `otp_get_isochrone()` and
+`otp_get_surface()`. Note that no validation of these additional parameters will be carried out
+by **otpr**. They will be passed directly to the OTP API.
 
+## Bug fixes
+
+* A single numeric value is now accepted for the \code{walkReluctance} parameter - this was incorrectly
+restricted to an integer.
 
 # otpr 0.4.2
 
