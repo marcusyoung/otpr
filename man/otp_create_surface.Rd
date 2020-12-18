@@ -8,14 +8,18 @@ otp_create_surface(
   otpcon,
   getRaster = FALSE,
   rasterPath = tempdir(),
-  origin,
+  fromPlace,
   mode = "TRANSIT",
-  date,
-  time,
+  date = format(Sys.Date(), "\%m-\%d-\%Y"),
+  time = format(Sys.time(), "\%H:\%M:\%S"),
   maxWalkDistance = 800,
   walkReluctance = 2,
+  waitReluctance = 1,
   transferPenalty = 0,
-  minTransferTime = 0
+  minTransferTime = 0,
+  batch = TRUE,
+  arriveBy = TRUE,
+  ...
 )
 }
 \arguments{
@@ -29,7 +33,7 @@ should be saved. Default is \code{tempdir()}. Use forward slashes on Windows.
 The file will be named surface_{id}.tiff, with {id} replaced by the OTP id assigned
 to the surface.}
 
-\item{origin}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
+\item{fromPlace}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`}
 
 \item{mode}{Character vector, mode(s) of travel. Valid values are: TRANSIT, WALK, BICYCLE,
 CAR, BUS, RAIL, OR 'c("TRANSIT", "BICYCLE")'. Note that WALK mode is automatically
@@ -43,14 +47,18 @@ If \code{arriveBy} is FALSE (the default) this is the desired departure time, ot
 desired arrival time. Only relevant if \code{mode} includes public transport.
 Default is current system time.}
 
-\item{maxWalkDistance}{Numeric. The maximum distance (in meters) the user is
+\item{maxWalkDistance}{A single numeric value. The maximum distance (in meters) the user is
 willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
 soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
 this parameter imposes a hard limit for all modes - including WALK only (see:
 \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
-\item{walkReluctance}{Integer. A multiplier for how bad walking is, compared
+\item{walkReluctance}{A single numeric value. A multiplier for how bad walking is, compared
 to being in transit for equal lengths of time. Default = 2.}
+
+\item{waitReluctance}{A single numeric value. A multiplier for how bad waiting for a
+transit vehicle is compared to being on a transit vehicle. This should be greater
+than 1 and less than \code{walkReluctance} (see API docs). Default = 1.}
 
 \item{transferPenalty}{Integer. An additional penalty added to boardings after
 the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds.
@@ -60,6 +68,15 @@ Set this to a high value to discourage transfers. Default is 0.}
 trips on different vehicles. This is designed to allow for imperfect schedule
 adherence. This is a minimum; transfers over longer distances might use a longer time.
 Default is 0.}
+
+\item{batch}{Logical. Set to TRUE by default. This is required to tell OTP
+to allow a query with no toPlace parameter. This is necessary as we want to build 
+paths to all destinations from one origin.}
+
+\item{arriveBy}{Logical. Set to FALSE by default.}
+
+\item{...}{Any other parameter:value pair accepted by the OTP API SurfaceResource entry point. Be aware
+that otpr will carry out no validation of these additional parameters. They will be passed directly to the API.}
 }
 \value{
 A list of 5 items:
@@ -69,7 +86,7 @@ A list of 5 items:
 that was submitted to the OTP API.
 \item \code{surfaceId} - integer, the id of the surface that was evaluated.
 \item \code{surfaceRecord} - details of the parameters used to create the surface.
-\item \code{rasterDownload} - the path to the saved raster file (if \code{getRaster} was 
+\item \code{rasterDownload} - the path to the saved raster file (if \code{getRaster} was
 set to TRUE and a valid path was provided via \code{rasterPath}.)
 }
 }
@@ -80,10 +97,10 @@ can be saved as a raster file (GeoTIFF) to the designated directory.
 }
 \examples{
 \dontrun{
-otp_create_surface(otpcon, origin = c(53.43329,-2.13357), mode = "TRANSIT", 
+otp_create_surface(otpcon, fromPlace = c(53.43329,-2.13357), mode = "TRANSIT",
 maxWalkDistance = 1600, getRaster = TRUE)
 
-otp_create_surface(otpcon, origin = c(53.43329,-2.13357), date = "03-26-2019",
+otp_create_surface(otpcon, fromPlace = c(53.43329,-2.13357), date = "03-26-2019",
 time = "08:00:00", mode = "BUS", maxWalkDistance = 1600, getRaster = TRUE,
 rasterPath = "C:/temp")
 }

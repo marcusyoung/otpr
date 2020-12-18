@@ -12,7 +12,7 @@
 #' @param format Character, required format of returned isochrone(s). Either JSON
 #' (returns GeoJSON) or SF (returns simple feature collection). Default is JSON.
 #' @param mode Character, mode of travel. Valid values are: WALK, TRANSIT, BUS,
-#' or RAIL.
+#' or RAIL. 
 #' Note that WALK mode is automatically included for TRANSIT, BUS and RAIL.
 #' TRANSIT will use all available transit modes. Default is TRANSIT.
 #' @param date Character, must be in the format mm-dd-yyyy. This is the desired
@@ -28,9 +28,15 @@
 #' @param arriveBy Logical. Whether the specified date and time is for
 #' departure (FALSE) or arrival (TRUE). Default is FALSE.
 #' @param maxWalkDistance Numeric. The maximum distance (in meters) the user is
-#' willing to walk. Default = 800.
-#' @param walkReluctance Integer. A multiplier for how bad walking is, compared
+#' willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
+#' soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
+#' this parameter imposes a hard limit for all modes - including WALK only (see:
+#' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
+#' @param walkReluctance A single numeric value. A multiplier for how bad walking is, compared
 #' to being in transit for equal lengths of time. Default = 2.
+#' @param waitReluctance A single numeric value. A multiplier for how bad waiting for a
+#' transit vehicle is compared to being on a transit vehicle. This should be greater
+#' than 1 and less than \code{walkReluctance} (see API docs). Default = 1.
 #' @param transferPenalty Integer. An additional penalty added to boardings after
 #' the first. The value is in OTP's internal weight units, which are roughly equivalent
 #' to seconds. Set this to a high value to discourage transfers. Default is 0.
@@ -38,6 +44,9 @@
 #' trips on different vehicles. This is designed to allow for imperfect schedule
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
+#' @param ... Any other parameter:value pair accepted by the OTP API LIsochrone entry point. Be aware
+#' that otpr will carry out no validation of these additional parameters. They will be passed directly
+#' to the API. 
 #' @return Returns a list. First element in the list is \code{errorId}. This is "OK" if
 #' OTP successfully returned the isochrone(s), otherwise it is "ERROR". The second
 #' element of list varies:
@@ -62,17 +71,27 @@ otp_get_isochrone <-
            fromLocation = TRUE,
            format = "JSON",
            mode = "TRANSIT",
-           date,
-           time,
+           date = format(Sys.Date(), "%m-%d-%Y"),
+           time = format(Sys.time(), "%H:%M:%S"),
            cutoffs,
            batch = TRUE,
            arriveBy = FALSE,
            maxWalkDistance = 800,
            walkReluctance = 2,
+           waitReluctance = 1,
            transferPenalty = 0,
-           minTransferTime = 0)
+           minTransferTime = 0,
+           ...)
   {
-    if (otpcon$version != 1) {
+    # get the OTP parameters ready to pass to check function
+    
+    call <- sys.call()
+    call[[1]] <- as.name('list')
+    params <- eval.parent(call)
+    params <-
+      params[names(params) %in% c("mode", "location", "fromLocation", "format") == FALSE]
+    
+        if (otpcon$version != 1) {
       stop(
         "OTP server is running OTPv",
         otpcon$version,
@@ -80,51 +99,35 @@ otp_get_isochrone <-
       )
     }
     
-    if (missing(date)) {
-      date <- format(Sys.Date(), "%m-%d-%Y")
-    }
-    
-    if (missing(time)) {
-      time <- format(Sys.time(), "%H:%M:%S")
-    }
-    
     # allow lowercase
     format <- toupper(format)
     mode <- toupper(mode)
     
-    #argument checks
-    
-    coll <- checkmate::makeAssertCollection()
-    checkmate::assert_logical(fromLocation, add = coll)
-    checkmate::assert_integerish(cutoffs, lower = 0, add = coll)
-    checkmate::assert_logical(batch, add = coll)
-    checkmate::assert_class(otpcon, "otpconnect", add = coll)
+    # function specific argument checks
+    args.coll <- checkmate::makeAssertCollection()
+    checkmate::assert_logical(fromLocation, add = args.coll)
+    checkmate::assert_logical(batch, add = args.coll)
     checkmate::assert_numeric(
       location,
       lower =  -180,
       upper = 180,
       len = 2,
-      add = coll
+      add = args.coll
     )
-    checkmate::assert_int(maxWalkDistance, lower = 0, add = coll)
-    checkmate::assert_int(walkReluctance, lower = 0, add = coll)
-    checkmate::assert_int(transferPenalty, lower = 0, add = coll)
-    checkmate::assert_int(minTransferTime, lower = 0, add = coll)
-    checkmate::assert_logical(arriveBy, add = coll)
+    # Mode is restricted for the isochrone function
     checkmate::assert_choice(
       mode,
       choices = c("WALK", "BUS", "RAIL", "TRANSIT"),
       null.ok = F,
-      add = coll
+      add = args.coll
     )
     checkmate::assert_choice(
       format,
       choices = c("JSON", "SF"),
       null.ok = FALSE,
-      add = coll
+      add = args.coll
     )
-    checkmate::reportAssertions(coll)
-    
+    checkmate::reportAssertions(args.coll)
     
     # add WALK to relevant modes
     if (identical(mode, "TRANSIT") |
@@ -135,16 +138,9 @@ otp_get_isochrone <-
     
     mode <- paste(mode, collapse = ",")
     
-    # check date and time are valid
-    
-    if (otp_is_date(date) == FALSE) {
-      stop("date must be in the format mm-dd-yyyy")
-    }
-    
-    if (otp_is_time(time) == FALSE) {
-      stop("time must be in the format hh:mm:ss")
-    }
-    
+    # OTP API parameter checks
+    do.call(otp_check_params,
+            params)
     
     # Construct URL
     routerUrl <- paste0(make_url(otpcon)$router, "/isochrone")
@@ -169,7 +165,8 @@ otp_get_isochrone <-
                              transferPenalty = transferPenalty,
                              minTransferTime = minTransferTime
                            ),
-                           cutoffs
+                           cutoffs,
+                           list(...)
                          ))
     } else {
       # due to OTP bug when we require an isochrone to the location we must provide the
@@ -192,7 +189,8 @@ otp_get_isochrone <-
                              transferPenalty = transferPenalty,
                              minTransferTime = minTransferTime
                            ),
-                           cutoffs
+                           cutoffs,
+                           list(...)
                          ))
     }
     

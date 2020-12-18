@@ -9,16 +9,18 @@ otp_get_times(
   fromPlace,
   toPlace,
   mode = "CAR",
-  date,
-  time,
+  date = format(Sys.Date(), "\%m-\%d-\%Y"),
+  time = format(Sys.time(), "\%H:\%M:\%S"),
   maxWalkDistance = 800,
   walkReluctance = 2,
+  waitReluctance = 1,
   arriveBy = FALSE,
   transferPenalty = 0,
   minTransferTime = 0,
   maxItineraries = 1,
   detail = FALSE,
-  includeLegs = FALSE
+  includeLegs = FALSE,
+  ...
 )
 }
 \arguments{
@@ -46,8 +48,12 @@ soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv
 this parameter imposes a hard limit for all modes - including WALK only (see:
 \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
-\item{walkReluctance}{Integer. A multiplier for how bad walking is, compared
+\item{walkReluctance}{A single numeric value. A multiplier for how bad walking is, compared
 to being in transit for equal lengths of time. Default = 2.}
+
+\item{waitReluctance}{A single numeric value. A multiplier for how bad waiting for a
+transit vehicle is compared to being on a transit vehicle. This should be greater
+than 1 and less than \code{walkReluctance} (see API docs). Default = 1.}
 
 \item{arriveBy}{Logical. Whether trip should depart (FALSE) or arrive (TRUE) at the specified
 date and time. Default is FALSE.}
@@ -69,9 +75,12 @@ they were provided by OTP up to the maximum specified by this parameter. Default
 \item{detail}{Logical. This parameter only has an effect when \code{detail} is set
 to true. When \code{detail} is set to FALSE only a single trip time is returned. Default is FALSE.}
 
-\item{includeLegs}{Logical. Default is FALSE. Determines whether or not details of each
+\item{includeLegs}{Logical. Determines whether or not details of each
 journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but
-only when \code{detail} is also TRUE.}
+only when \code{detail} is also TRUE. Default is FALSE.}
+
+\item{...}{Any other parameter:value pair accepted by the OTP API PlannerResource entry point. Be aware
+that otpr will carry out no validation of these additional parameters. They will be passed directly to the API.}
 }
 \value{
 Returns a list of three or four elements. First element in the list is \code{errorId}.

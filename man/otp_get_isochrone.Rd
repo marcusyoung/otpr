@@ -10,15 +10,17 @@ otp_get_isochrone(
   fromLocation = TRUE,
   format = "JSON",
   mode = "TRANSIT",
-  date,
-  time,
+  date = format(Sys.Date(), "\%m-\%d-\%Y"),
+  time = format(Sys.time(), "\%H:\%M:\%S"),
   cutoffs,
   batch = TRUE,
   arriveBy = FALSE,
   maxWalkDistance = 800,
   walkReluctance = 2,
+  waitReluctance = 1,
   transferPenalty = 0,
-  minTransferTime = 0
+  minTransferTime = 0,
+  ...
 )
 }
 \arguments{
@@ -34,7 +36,7 @@ be generated \emph{to} the \code{location}.}
 (returns GeoJSON) or SF (returns simple feature collection). Default is JSON.}
 
 \item{mode}{Character, mode of travel. Valid values are: WALK, TRANSIT, BUS,
-or RAIL.
+or RAIL. 
 Note that WALK mode is automatically included for TRANSIT, BUS and RAIL.
 TRANSIT will use all available transit modes. Default is TRANSIT.}
 
@@ -56,10 +58,17 @@ would request 15, 30 and 60 minute isochrones. Can be a single value.}
 departure (FALSE) or arrival (TRUE). Default is FALSE.}
 
 \item{maxWalkDistance}{Numeric. The maximum distance (in meters) the user is
-willing to walk. Default = 800.}
+willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
+soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
+this parameter imposes a hard limit for all modes - including WALK only (see:
+\url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
-\item{walkReluctance}{Integer. A multiplier for how bad walking is, compared
+\item{walkReluctance}{A single numeric value. A multiplier for how bad walking is, compared
 to being in transit for equal lengths of time. Default = 2.}
+
+\item{waitReluctance}{A single numeric value. A multiplier for how bad waiting for a
+transit vehicle is compared to being on a transit vehicle. This should be greater
+than 1 and less than \code{walkReluctance} (see API docs). Default = 1.}
 
 \item{transferPenalty}{Integer. An additional penalty added to boardings after
 the first. The value is in OTP's internal weight units, which are roughly equivalent
@@ -69,6 +78,10 @@ to seconds. Set this to a high value to discourage transfers. Default is 0.}
 trips on different vehicles. This is designed to allow for imperfect schedule
 adherence. This is a minimum; transfers over longer distances might use a longer time.
 Default is 0.}
+
+\item{...}{Any other parameter:value pair accepted by the OTP API LIsochrone entry point. Be aware
+that otpr will carry out no validation of these additional parameters. They will be passed directly
+to the API.}
 }
 \value{
 Returns a list. First element in the list is \code{errorId}. This is "OK" if

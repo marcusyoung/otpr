@@ -26,8 +26,11 @@
 #' soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
 #' this parameter imposes a hard limit for all modes - including WALK only (see:
 #' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
-#' @param walkReluctance Integer. A multiplier for how bad walking is, compared
+#' @param walkReluctance A single numeric value. A multiplier for how bad walking is, compared
 #' to being in transit for equal lengths of time. Default = 2.
+#' @param waitReluctance A single numeric value. A multiplier for how bad waiting for a
+#' transit vehicle is compared to being on a transit vehicle. This should be greater
+#' than 1 and less than \code{walkReluctance} (see API docs). Default = 1.
 #' @param transferPenalty Integer. An additional penalty added to boardings after
 #' the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds.
 #' Set this to a high value to discourage transfers. Default is 0.
@@ -41,9 +44,11 @@
 #' they were provided by OTP up to the maximum specified by this parameter. Default is 1.
 #' @param detail Logical. This parameter only has an effect when \code{detail} is set
 #' to true. When \code{detail} is set to FALSE only a single trip time is returned. Default is FALSE.
-#' @param includeLegs Logical. Default is FALSE. Determines whether or not details of each
+#' @param includeLegs Logical. Determines whether or not details of each
 #' journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but
-#' only when \code{detail} is also TRUE.
+#' only when \code{detail} is also TRUE. Default is FALSE.
+#' @param ... Any other parameter:value pair accepted by the OTP API PlannerResource entry point. Be aware
+#' that otpr will carry out no validation of these additional parameters. They will be passed directly to the API.  
 #' @return Returns a list of three or four elements. First element in the list is \code{errorId}.
 #' This is "OK" if OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
 #' varies:
@@ -84,106 +89,61 @@ otp_get_times <-
            fromPlace,
            toPlace,
            mode = "CAR",
-           date,
-           time,
+           date = format(Sys.Date(), "%m-%d-%Y"),
+           time = format(Sys.time(), "%H:%M:%S"),
            maxWalkDistance = 800,
            walkReluctance = 2,
+           waitReluctance = 1,
            arriveBy = FALSE,
            transferPenalty = 0,
            minTransferTime = 0,
            maxItineraries = 1,
            detail = FALSE,
-           includeLegs = FALSE)
+           includeLegs = FALSE,
+           ...)
   {
-    mode <- toupper(mode)
+    # get the OTP parameters ready to pass to check function
     
+    call <- sys.call()
+    call[[1]] <- as.name('list')
+    params <- eval.parent(call)
+    params <-
+      params[names(params) %in% c("mode", "detail", "includeLegs") == FALSE]
     
-    if (missing(date)) {
-      date <- format(Sys.Date(), "%m-%d-%Y")
+    # Check for required arguments
+    
+    if (missing(otpcon)) {
+      stop("otpcon argument is required")
+    } else if (missing(fromPlace)) {
+      stop("fromPlace argument is required")
+    } else if (missing(toPlace)) {
+      stop("toPlace argument is required")
     }
     
-    if (missing(time)) {
-      time <- format(Sys.time(), "%H:%M:%S")
-    }
+    # function specific argument checks
     
-    
-    #argument checks
-    
-    coll <- checkmate::makeAssertCollection()
-    checkmate::assert_class(otpcon, "otpconnect", add = coll)
-    checkmate::assert_numeric(
-      fromPlace,
-      lower =  -180,
-      upper = 180,
-      len = 2,
-      add = coll
-    )
-    checkmate::assert_numeric(
-      toPlace,
-      lower =  -180,
-      upper = 180,
-      len = 2,
-      add = coll
-    )
+    args.coll <- checkmate::makeAssertCollection()
+    checkmate::assert_logical(detail, add = args.coll)
     checkmate::assert_integerish(maxItineraries,
                                  lower = 1,
-                                 add = coll)
-    checkmate::assert_int(maxWalkDistance, lower = 0, add = coll)
-    checkmate::assert_int(walkReluctance, lower = 0, add = coll)
-    checkmate::assert_int(transferPenalty, lower = 0, add = coll)
-    checkmate::assert_int(minTransferTime, lower = 0, add = coll)
-    checkmate::assert_logical(detail, add = coll)
-    checkmate::reportAssertions(coll)
+                                 add = args.coll)
+    checkmate::reportAssertions(args.coll)
     
-    fromPlace <- paste(fromPlace, collapse = ",")
-    toPlace <- paste(toPlace, collapse = ",")
+    # process mode
     
-    # check for valid modes
-    valid_mode <-
-      list("TRANSIT",
-           "WALK",
-           "BICYCLE",
-           "CAR",
-           "BUS",
-           "RAIL",
-           c("TRANSIT", "BICYCLE"))
+    mode <- otp_check_mode(mode)
     
-    if (!(Position(function(x)
-      identical(x, mode), valid_mode, nomatch = 0) > 0)) {
-      stop(
-        paste0(
-          "Mode must be one of: 'TRANSIT', 'WALK', 'BICYCLE', 'CAR', 'BUS', 'RAIL', or 'c('TRANSIT', 'BICYCLE')', but is '",
-          mode,
-          "'."
-        )
-      )
-    }
+    # OTP API parameter checks
     
-    # add WALK to relevant modes - as mode may be a vector of length > 1 use identical
-    # otpr_vectorMatch is TRUE if mode is c("TRANSIT", "BICYCLE") or c("BICYCLE", "TRANSIT")
-    
-    if (identical(mode, "TRANSIT") |
-        identical(mode, "BUS") |
-        identical(mode, "RAIL") |
-        otp_vector_match(mode, c("TRANSIT", "BICYCLE"))) {
-      mode <- append(mode, "WALK")
-    }
-    
-    mode <- paste(mode, collapse = ",")
-    
-    # check date and time are valid
-    
-    if (otp_is_date(date) == FALSE) {
-      stop("date must be in the format mm-dd-yyyy")
-    }
-    
-    if (otp_is_time(time) == FALSE) {
-      stop("time must be in the format hh:mm:ss")
-    }
-    
+    do.call(otp_check_params,
+            params)
     
     # Construct URL
     routerUrl <- paste0(make_url(otpcon)$router, "/plan")
+    
+    # Collapse fromPlace and toPlace
+    fromPlace <- paste(fromPlace, collapse = ",")
+    toPlace <- paste(toPlace, collapse = ",")
     
     # Construct query list
     query <- list(
@@ -194,12 +154,14 @@ otp_get_times <-
       time = time,
       maxWalkDistance = maxWalkDistance,
       walkReluctance = walkReluctance,
+      waitReluctance = waitReluctance,
       arriveBy = arriveBy,
       transferPenalty = transferPenalty,
       minTransferTime = minTransferTime
     )
     
-    
+    query <- c(query, list(...))
+
     # Use GET from the httr package to make API call and place in req - returns json by default.
     req <- httr::GET(routerUrl,
                      query = query)
@@ -244,13 +206,12 @@ otp_get_times <-
       return (response)
     }
     
-    
     # check if need to return detailed response
     if (detail == TRUE) {
       # Return up to maxItineraries
       num_itin <-
         pmin(maxItineraries, nrow(asjson$plan[["itineraries"]]))
-      df <- asjson$plan$itineraries[c(1:num_itin),]
+      df <- asjson$plan$itineraries[c(1:num_itin), ]
       # need to convert times from epoch format
       df$start <-
         otp_from_epoch(df$startTime, otpcon$tz)
@@ -327,7 +288,6 @@ otp_get_times <-
               dplyr::mutate(x, timeZone = attributes(x$startTime)$tzone[1]),
             classes = "data.frame"
           )
-        
         
         # select required columns in legs using %in% as sometimes columns are missing
         # for example routeShortName. Also there are fewer columns when just a WALK,
