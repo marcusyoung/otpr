@@ -35,53 +35,55 @@ be generated \emph{to} the \code{location}.}
 \item{format}{Character, required format of returned isochrone(s). Either JSON
 (returns GeoJSON) or SF (returns simple feature collection). Default is JSON.}
 
-\item{mode}{Character, mode of travel. Valid values are: WALK, TRANSIT, BUS,
-or RAIL. 
-Note that WALK mode is automatically included for TRANSIT, BUS and RAIL.
-TRANSIT will use all available transit modes. Default is TRANSIT.}
+\item{mode}{Character vector, mode(s) of travel. Valid values are: WALK,
+TRANSIT, BUS, RAIL, TRAM, SUBWAY. TRANSIT will use all available transit modes.
+Default is TRANSIT. WALK mode is automatically added to
+TRANSIT, BUS, RAIL, TRAM, and SUBWAY. Due to an OTP limitation this
+function is \emph{not} suitable for CAR or BICYCLE modes.}
 
-\item{date}{Character, must be in the format mm-dd-yyyy. This is the desired
-date of travel. Only relevant if \code{mode} includes public transport.
-Default is current system date.}
+\item{date}{Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
+Only relevant for transit modes. Default is the current system date.}
 
-\item{time}{Character, must be in the format hh:mm:ss. If \code{arriveBy} is
-FALSE (the default) this is the desired departure time, otherwise the desired
-arrival time. Default is current system time.}
+\item{time}{Character, must be in the format hh:mm:ss.
+If \code{arriveBy} is FALSE (the default) this is the desired departure time, otherwise the
+desired arrival time. Only relevant for transit modes. Default is the current system time.}
 
-\item{cutoffs}{Numeric vector, containing the cutoff times in seconds, for
-example: 'c(900, 1800, 2700)'
-would request 15, 30 and 60 minute isochrones. Can be a single value.}
+\item{cutoffs}{Numeric vector, containing the cutoff times in seconds. for
+example: 'c(900, 1800, 2700)' would request 15, 30 and 60 minute isochrones.
+Can be a single value.}
 
 \item{batch}{Logical. If true, goal direction is turned off and a full path tree is built}
 
-\item{arriveBy}{Logical. Whether the specified date and time is for
-departure (FALSE) or arrival (TRUE). Default is FALSE.}
+\item{arriveBy}{Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
+date and time. Default is FALSE.}
 
-\item{maxWalkDistance}{Numeric. The maximum distance (in meters) the user is
-willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
-soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
-this parameter imposes a hard limit for all modes - including WALK only (see:
+\item{maxWalkDistance}{Numeric. The maximum distance (in meters) that the user is
+willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
+soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+this parameter imposes a hard limit on WALK (see:
 \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
-\item{walkReluctance}{A single numeric value. A multiplier for how bad walking is, compared
-to being in transit for equal lengths of time. Default = 2.}
+\item{walkReluctance}{A single numeric value. A multiplier for how bad walking is
+compared to being in transit for equal lengths of time. Default = 2.}
 
 \item{waitReluctance}{A single numeric value. A multiplier for how bad waiting for a
 transit vehicle is compared to being on a transit vehicle. This should be greater
 than 1 and less than \code{walkReluctance} (see API docs). Default = 1.}
 
 \item{transferPenalty}{Integer. An additional penalty added to boardings after
-the first. The value is in OTP's internal weight units, which are roughly equivalent
-to seconds. Set this to a high value to discourage transfers. Default is 0.}
+the first. The value is in OTP's internal weight units, which are roughly equivalent to seconds.
+Set this to a high value to discourage transfers. Default is 0.}
 
 \item{minTransferTime}{Integer. The minimum time, in seconds, between successive
 trips on different vehicles. This is designed to allow for imperfect schedule
 adherence. This is a minimum; transfers over longer distances might use a longer time.
 Default is 0.}
 
-\item{...}{Any other parameter:value pair accepted by the OTP API LIsochrone entry point. Be aware
-that otpr will carry out no validation of these additional parameters. They will be passed directly
-to the API.}
+\item{...}{Any other parameter accepted by the OTP API LIsochrone entry point. For
+advanced users. Be aware that otpr will carry out no validation of these additional
+parameters. They will be passed directly to the API. Do not pass 'fromPlace' or 'toPlace'
+to this function. These parameters are handled internally based on the values of \code{location}
+and \code{fromLocation}.}
 }
 \value{
 Returns a list. First element in the list is \code{errorId}. This is "OK" if
@@ -97,7 +99,7 @@ The third element of the list is \code{query} which is a character string contai
 that was submitted to the OTP API.
 }
 \description{
-Returns one or more travel time isochrone in either GeoJSON format or as an
+Returns one or more travel time isochrones in either GeoJSON format or as an
 \strong{sf} object. Only works correctly for walk and/or transit modes - a limitation
 of OTP. Isochrones can be generated either \emph{from} a location or \emph{to}
 a location.

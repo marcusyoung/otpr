@@ -8,6 +8,8 @@ otp_check_params(otpcon, ...)
 }
 \arguments{
 \item{otpcon}{Object of otpcon class}
+
+\item{...}{Other optional parameters}
 }
 \description{
 Check OTP parameters

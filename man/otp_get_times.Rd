@@ -2,7 +2,8 @@
 % Please edit documentation in R/otp_get_times.R
 \name{otp_get_times}
 \alias{otp_get_times}
-\title{Queries OTP for trip time between an origin and destination or detailed itineraries}
+\title{Queries OTP for the time or detailed itinerary for a trip between an origin
+and destination}
 \usage{
 otp_get_times(
   otpcon,
@@ -30,32 +31,32 @@ otp_get_times(
 
 \item{toPlace}{Numeric vector, Latitude/Longitude pair, e.g. `c(53.36484, -2.27108)`}
 
-\item{mode}{Character vector, mode(s) of travel. Valid values are: TRANSIT, WALK, BICYCLE,
-CAR, BUS, RAIL, OR 'c("TRANSIT", "BICYCLE")'. Note that WALK mode is automatically
-included for TRANSIT, BUS, and RAIL. TRANSIT will use all available transit modes. Default is CAR.}
+\item{mode}{Character vector, mode(s) of travel. Valid values are: WALK, BICYCLE,
+CAR, TRANSIT, BUS, RAIL, TRAM, SUBWAY OR 'c("TRANSIT", "BICYCLE")'. TRANSIT will use all
+available transit modes. Default is CAR. WALK mode is automatically
+added for TRANSIT, BUS, RAIL, TRAM, and SUBWAY.}
 
 \item{date}{Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
-Only relevant if \code{mode} includes public transport. Default is current system date.}
+Only relevant for transit modes. Default is the current system date.}
 
 \item{time}{Character, must be in the format hh:mm:ss.
 If \code{arriveBy} is FALSE (the default) this is the desired departure time, otherwise the
-desired arrival time. Only relevant if \code{mode} includes public transport.
-Default is current system time.}
+desired arrival time. Only relevant for transit modes. Default is the current system time.}
 
-\item{maxWalkDistance}{Numeric. The maximum distance (in meters) the user is
-willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
-soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
-this parameter imposes a hard limit for all modes - including WALK only (see:
+\item{maxWalkDistance}{Numeric. The maximum distance (in meters) that the user is
+willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
+soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+this parameter imposes a hard limit on WALK (see:
 \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
-\item{walkReluctance}{A single numeric value. A multiplier for how bad walking is, compared
-to being in transit for equal lengths of time. Default = 2.}
+\item{walkReluctance}{A single numeric value. A multiplier for how bad walking is
+compared to being in transit for equal lengths of time. Default = 2.}
 
 \item{waitReluctance}{A single numeric value. A multiplier for how bad waiting for a
 transit vehicle is compared to being on a transit vehicle. This should be greater
 than 1 and less than \code{walkReluctance} (see API docs). Default = 1.}
 
-\item{arriveBy}{Logical. Whether trip should depart (FALSE) or arrive (TRUE) at the specified
+\item{arriveBy}{Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
 date and time. Default is FALSE.}
 
 \item{transferPenalty}{Integer. An additional penalty added to boardings after
@@ -68,23 +69,27 @@ adherence. This is a minimum; transfers over longer distances might use a longer
 Default is 0.}
 
 \item{maxItineraries}{Integer. Controls the number of trip itineraries that
-are returned. This is not an OTP parameter. All suggested itineraries are allowed to be
-returned by the OTP server. otpr will then return them to the user in the order
-they were provided by OTP up to the maximum specified by this parameter. Default is 1.}
+are returned when \code{detail} is set to TRUE. This is not an OTP parameter.
+All suggested itineraries are allowed to be returned by the OTP server. The function
+will return them to the user in the order they were provided by OTP up to the maximum
+specified by this parameter. Default is 1. This is an alternative to using the
+OTP \code{maxNumItineraries} parameter which has problematic behaviour.}
 
-\item{detail}{Logical. This parameter only has an effect when \code{detail} is set
-to true. When \code{detail} is set to FALSE only a single trip time is returned. Default is FALSE.}
+\item{detail}{Logical. When set to FALSE a single trip time is returned.
+When set to TRUE one or more detailed trip itineraries are returned (dependent on \code{maxItineraries}).
+Default is FALSE.}
 
 \item{includeLegs}{Logical. Determines whether or not details of each
-journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but
-only when \code{detail} is also TRUE. Default is FALSE.}
+journey leg are returned. If TRUE then a nested dataframe of journeys legs will be returned
+for each itinerary if \code{detail} is also TRUE. Default is FALSE.}
 
-\item{...}{Any other parameter:value pair accepted by the OTP API PlannerResource entry point. Be aware
-that otpr will carry out no validation of these additional parameters. They will be passed directly to the API.}
+\item{...}{Any other parameter accepted by the OTP API PlannerResource entry point. For
+advanced users. Be aware that otpr will carry out no validation of these additional
+parameters. They will be passed directly to the API.}
 }
 \value{
-Returns a list of three or four elements. First element in the list is \code{errorId}.
-This is "OK" if OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
+Returns a list of three or four elements. The first element in the list is \code{errorId}.
+This is "OK" if OTP has not returned an error. Otherwise it is the OTP error code. The second element of list
 varies:
 \itemize{
 \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
@@ -97,20 +102,20 @@ The third element of the list is \code{query}. This is a character string contai
 that was submitted to the OTP API.
 }
 \description{
-In the simplest use case, returns the time in minutes between supplied origin
-and destination by specified mode(s) for the top itinerary returned by OTP. If
+In its simplest use case the function returns the time in minutes between an origin
+and destination by the specified mode(s) for the top itinerary returned by OTP. If
 \code{detail} is set to TRUE one or more detailed trip itineraries are returned,
-including the time for each mode (if a multimodal trip), waiting time and the
+including the time by each mode (if a multimodal trip), waiting time and the
 number of transfers. Optionally, the details of each journey leg for each itinerary
-can be returned.
+can also be returned.
 }
 \details{
 If you plan to use the function in simple-mode - where just the duration of the top itinerary is returned -
 it is advisable to first review several detailed itineraries to ensure that the parameters
 you have set are producing sensible results.
 
-If requested, the itineraries dataframe will include a column called legs which
-contains a nested dataframe for each itinerary. Each legs dataframe will contain
+If requested using \code{includeLegs}, the itineraries dataframe will contain a column called 'legs'
+which has a nested legs dataframe for each itinerary. Each legs dataframe will contain
 a set of core columns that are consistent across all queries. However, as the OTP
 API does not consistently return the same attributes for legs, there will be some variation
 in columns returned. You should bare this in mind if your post processing

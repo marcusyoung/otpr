@@ -1,33 +1,34 @@
-#' Queries OTP for trip time between an origin and destination or detailed itineraries
+#' Queries OTP for the time or detailed itinerary for a trip between an origin
+#' and destination
 #'
-#' In the simplest use case, returns the time in minutes between supplied origin
-#' and destination by specified mode(s) for the top itinerary returned by OTP. If
+#' In its simplest use case the function returns the time in minutes between an origin
+#' and destination by the specified mode(s) for the top itinerary returned by OTP. If
 #' \code{detail} is set to TRUE one or more detailed trip itineraries are returned,
-#' including the time for each mode (if a multimodal trip), waiting time and the
+#' including the time by each mode (if a multimodal trip), waiting time and the
 #' number of transfers. Optionally, the details of each journey leg for each itinerary
-#' can be returned.
+#' can also be returned.
 #'
 #' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
 #' @param fromPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
 #' @param toPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.36484, -2.27108)`
-#' @param mode Character vector, mode(s) of travel. Valid values are: TRANSIT, WALK, BICYCLE,
-#' CAR, BUS, RAIL, OR 'c("TRANSIT", "BICYCLE")'. Note that WALK mode is automatically
-#' included for TRANSIT, BUS, and RAIL. TRANSIT will use all available transit modes. Default is CAR.
+#' @param mode Character vector, mode(s) of travel. Valid values are: WALK, BICYCLE,
+#' CAR, TRANSIT, BUS, RAIL, TRAM, SUBWAY OR 'c("TRANSIT", "BICYCLE")'. TRANSIT will use all
+#' available transit modes. Default is CAR. WALK mode is automatically
+#' added for TRANSIT, BUS, RAIL, TRAM, and SUBWAY.
 #' @param date Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
-#' Only relevant if \code{mode} includes public transport. Default is current system date.
+#' Only relevant for transit modes. Default is the current system date.
 #' @param time Character, must be in the format hh:mm:ss.
 #' If \code{arriveBy} is FALSE (the default) this is the desired departure time, otherwise the
-#' desired arrival time. Only relevant if \code{mode} includes public transport.
-#' Default is current system time.
-#' @param arriveBy Logical. Whether trip should depart (FALSE) or arrive (TRUE) at the specified
+#' desired arrival time. Only relevant for transit modes. Default is the current system time.
+#' @param arriveBy Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
 #' date and time. Default is FALSE.
-#' @param maxWalkDistance Numeric. The maximum distance (in meters) the user is
-#' willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
-#' soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
-#' this parameter imposes a hard limit for all modes - including WALK only (see:
+#' @param maxWalkDistance Numeric. The maximum distance (in meters) that the user is
+#' willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
+#' soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+#' this parameter imposes a hard limit on WALK (see:
 #' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
-#' @param walkReluctance A single numeric value. A multiplier for how bad walking is, compared
-#' to being in transit for equal lengths of time. Default = 2.
+#' @param walkReluctance A single numeric value. A multiplier for how bad walking is
+#' compared to being in transit for equal lengths of time. Default = 2.
 #' @param waitReluctance A single numeric value. A multiplier for how bad waiting for a
 #' transit vehicle is compared to being on a transit vehicle. This should be greater
 #' than 1 and less than \code{walkReluctance} (see API docs). Default = 1.
@@ -38,19 +39,23 @@
 #' trips on different vehicles. This is designed to allow for imperfect schedule
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
-#' @param maxItineraries Integer. Controls the number of trip itineraries that
-#' are returned. This is not an OTP parameter. All suggested itineraries are allowed to be
-#' returned by the OTP server. otpr will then return them to the user in the order
-#' they were provided by OTP up to the maximum specified by this parameter. Default is 1.
-#' @param detail Logical. This parameter only has an effect when \code{detail} is set
-#' to true. When \code{detail} is set to FALSE only a single trip time is returned. Default is FALSE.
+#' @param detail Logical. When set to FALSE a single trip time is returned.
+#' When set to TRUE one or more detailed trip itineraries are returned (dependent on \code{maxItineraries}).
+#' Default is FALSE.
 #' @param includeLegs Logical. Determines whether or not details of each
-#' journey leg are returned. If TRUE then a dataframe of journeys legs will be returned but
-#' only when \code{detail} is also TRUE. Default is FALSE.
-#' @param ... Any other parameter:value pair accepted by the OTP API PlannerResource entry point. Be aware
-#' that otpr will carry out no validation of these additional parameters. They will be passed directly to the API.  
-#' @return Returns a list of three or four elements. First element in the list is \code{errorId}.
-#' This is "OK" if OTP has not returned an error. Otherwise it is the OTP error code. Second element of list
+#' journey leg are returned. If TRUE then a nested dataframe of journeys legs will be returned
+#' for each itinerary if \code{detail} is also TRUE. Default is FALSE.
+#' @param maxItineraries Integer. Controls the number of trip itineraries that
+#' are returned when \code{detail} is set to TRUE. This is not an OTP parameter.
+#' All suggested itineraries are allowed to be returned by the OTP server. The function
+#' will return them to the user in the order they were provided by OTP up to the maximum
+#' specified by this parameter. Default is 1. This is an alternative to using the
+#' OTP \code{maxNumItineraries} parameter which has problematic behaviour.
+#' @param ... Any other parameter accepted by the OTP API PlannerResource entry point. For
+#' advanced users. Be aware that otpr will carry out no validation of these additional
+#' parameters. They will be passed directly to the API.
+#' @return Returns a list of three or four elements. The first element in the list is \code{errorId}.
+#' This is "OK" if OTP has not returned an error. Otherwise it is the OTP error code. The second element of list
 #' varies:
 #' \itemize{
 #' \item If OTP has returned an error then \code{errorMessage} contains the OTP error message.
@@ -66,8 +71,8 @@
 #' it is advisable to first review several detailed itineraries to ensure that the parameters
 #' you have set are producing sensible results.
 #'
-#' If requested, the itineraries dataframe will include a column called legs which
-#' contains a nested dataframe for each itinerary. Each legs dataframe will contain
+#' If requested using \code{includeLegs}, the itineraries dataframe will contain a column called 'legs'
+#' which has a nested legs dataframe for each itinerary. Each legs dataframe will contain
 #' a set of core columns that are consistent across all queries. However, as the OTP
 #' API does not consistently return the same attributes for legs, there will be some variation
 #' in columns returned. You should bare this in mind if your post processing
@@ -103,15 +108,13 @@ otp_get_times <-
            ...)
   {
     # get the OTP parameters ready to pass to check function
-    
     call <- sys.call()
     call[[1]] <- as.name('list')
     params <- eval.parent(call)
     params <-
-      params[names(params) %in% c("mode", "detail", "includeLegs") == FALSE]
+      params[names(params) %in% c("mode", "detail", "includeLegs", "maxItineraries") == FALSE]
     
     # Check for required arguments
-    
     if (missing(otpcon)) {
       stop("otpcon argument is required")
     } else if (missing(fromPlace)) {
@@ -121,7 +124,6 @@ otp_get_times <-
     }
     
     # function specific argument checks
-    
     args.coll <- checkmate::makeAssertCollection()
     checkmate::assert_logical(detail, add = args.coll)
     checkmate::assert_integerish(maxItineraries,
@@ -130,11 +132,9 @@ otp_get_times <-
     checkmate::reportAssertions(args.coll)
     
     # process mode
-    
     mode <- otp_check_mode(mode)
     
     # OTP API parameter checks
-    
     do.call(otp_check_params,
             params)
     
@@ -159,9 +159,12 @@ otp_get_times <-
       transferPenalty = transferPenalty,
       minTransferTime = minTransferTime
     )
-    
-    query <- c(query, list(...))
 
+    # append ... arguments if present
+    if (length(list(...)) > 0) {
+      query <- append(query, list(...))
+    }
+    
     # Use GET from the httr package to make API call and place in req - returns json by default.
     req <- httr::GET(routerUrl,
                      query = query)
@@ -192,33 +195,18 @@ otp_get_times <-
       error.id <- "OK"
     }
     
-    # Is this still the case v v2.0.0?
-    # OTPv2 does not return an error when there is no itinerary - for
-    # example if date is out of range of the GTFS schedules. So now also check that
-    # there is at least 1 itinerary present.
-    if (length(asjson$plan$itineraries) == 0) {
-      response <-
-        list(
-          "errorId" = -9999,
-          "errorMessage" = "No itinerary returned. If using OTPv2 you might be trying to plan a trip on a date not covered by the transit schedules.",
-          "query" = url
-        )
-      return (response)
-    }
-    
-    # check if need to return detailed response
+    # check if we need to return detailed response
     if (detail == TRUE) {
       # Return up to maxItineraries
       num_itin <-
         pmin(maxItineraries, nrow(asjson$plan[["itineraries"]]))
-      df <- asjson$plan$itineraries[c(1:num_itin), ]
-      # need to convert times from epoch format
+      df <- asjson$plan$itineraries[c(1:num_itin),]
+      # convert times from epoch format
       df$start <-
         otp_from_epoch(df$startTime, otpcon$tz)
       df$end <-
         otp_from_epoch(df$endTime, otpcon$tz)
       df$timeZone <- attributes(df$start)$tzone[1]
-      
       # If legs are required we process the nested legs dataframes preserving
       # structure using rrapply
       if (isTRUE(includeLegs)) {
@@ -234,16 +222,14 @@ otp_get_times <-
         legs <-
           rrapply::rrapply(
             legs,
-            f = function(x, .xname)
-              if (.xname == "startTime" |
-                  .xname == "endTime" |
-                  .xname == "fromDeparture" |
-                  .xname == "fromArrival")
+            condition = function(x, .xname)
+              .xname %in% c("startTime", "endTime", "fromDeparture", "fromArrival"),
+              f = function(x)
                 otp_from_epoch(x, otpcon$tz)
-            else
-              x
           )
-        # calculate departureWait - not relevant for one leg itineraries
+  
+        
+         # calculate departureWait - not relevant for one leg itineraries
         # (e.g. WALK only trip) where there won't be a fromArrival
         # However, for ease of processing of returned data we set departureWait
         # to zero for these.
@@ -264,21 +250,19 @@ otp_get_times <-
         legs <-
           rrapply::rrapply(
             legs,
-            f = function(x, .xname)
-              if (.xname == "departureWait")
-                replace(x, is.na(x), 0)
-            else
-              x
+            condition = function(x, .xname)
+              .xname == "departureWait",
+            f = function(x)    
+            replace(x, is.na(x), 0)
           )
         # Update duration column to minutes
         legs <-
           rrapply::rrapply(
             legs,
-            f = function(x, .xname)
-              if (.xname == "duration")
-                round(x / 60, 2)
-            else
-              x
+            condition = function(x, .xname)
+              .xname == "duration",
+            f = function(x)  
+              round(x / 60, 2)
           )
         # Add timezone column
         legs <-
@@ -288,11 +272,9 @@ otp_get_times <-
               dplyr::mutate(x, timeZone = attributes(x$startTime)$tzone[1]),
             classes = "data.frame"
           )
-        
         # select required columns in legs using %in% as sometimes columns are missing
         # for example routeShortName. Also there are fewer columns when just a WALK,
-        #BICYCLE or CAR leg # is returned.
-        
+        # BICYCLE or CAR leg is returned.
         leg_columns <- c(
           'startTime',
           'endTime',
@@ -320,7 +302,6 @@ otp_get_times <-
           'toStopId',
           'toStopCode'
         )
-        
         # Select columns
         legs <-
           rrapply::rrapply(
@@ -330,7 +311,6 @@ otp_get_times <-
                                        leg_columns)),
             classes = "data.frame"
           )
-        
         # change column order using relocate
         legs <- rrapply::rrapply(
           legs,
@@ -338,9 +318,7 @@ otp_get_times <-
             dplyr::relocate(x, any_of(leg_columns)),
           classes = "data.frame"
         )
-        
       } # end legs processing
-      
       # subset the dataframe ready to return
       ret.df <-
         dplyr::select(
@@ -356,12 +334,10 @@ otp_get_times <-
             'transfers'
           )
         )
-      
       # Insert processed legs if required
       if (isTRUE(includeLegs)) {
         ret.df$legs <- legs
       }
-      
       # convert seconds into minutes where applicable
       ret.df[, 4:7] <- round(ret.df[, 4:7] / 60, digits = 2)
       # rename walkTime column as appropriate - this a mistake in OTP
@@ -374,7 +350,6 @@ otp_get_times <-
         list("errorId" = error.id,
              "itineraries" = ret.df,
              "query" = url)
-      
       return (response)
     } else {
       # detail not needed - just return travel time in minutes from the first itinerary
