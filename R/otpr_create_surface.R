@@ -2,32 +2,35 @@
 #'
 #' Creates a travel time surface for an origin point. A surface contains the travel time
 #' to every geographic coordinate that can be reached from that origin. Optionally, the surface
-#' can be saved as a raster file (GeoTIFF) to the designated directory.
+#' can be saved as a raster file (GeoTIFF) to a designated directory.
 #'
 #' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
 #' @param getRaster Logical. Whether or not to download a raster (geoTIFF) of the generated
 #' surface. Default FALSE.
 #' @param rasterPath Character. Path of a directory where the the surface raster
-#' should be saved. Default is \code{tempdir()}. Use forward slashes on Windows.
+#' should be saved if \code{getRaster} is TRUE. Default is \code{tempdir()}. Use forward slashes on Windows.
 #' The file will be named surface_{id}.tiff, with {id} replaced by the OTP id assigned
 #' to the surface.
-#' @param fromPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`
-#' @param mode Character vector, mode(s) of travel. Valid values are: TRANSIT, WALK, BICYCLE,
-#' CAR, BUS, RAIL, OR 'c("TRANSIT", "BICYCLE")'. Note that WALK mode is automatically
-#' included for TRANSIT, BUS, and RAIL. TRANSIT will use all available transit modes. Default is CAR.
+#' @param fromPlace Numeric vector, Latitude/Longitude pair, e.g. `c(53.48805, -2.24258)`. This is
+#' the origin of the surface to be created.
+#' @param mode Character vector, mode(s) of travel. Valid values are: WALK, BICYCLE,
+#' CAR, TRANSIT, BUS, RAIL, TRAM, SUBWAY OR 'c("TRANSIT", "BICYCLE")'. TRANSIT will use all
+#' available transit modes. Default is CAR. WALK mode is automatically
+#' added for TRANSIT, BUS, RAIL, TRAM, and SUBWAY.
 #' @param date Character, must be in the format mm-dd-yyyy. This is the desired date of travel.
-#' Only relevant if \code{mode} includes public transport. Default is current system date.
+#' Only relevant for transit modes. Default is the current system date.
 #' @param time Character, must be in the format hh:mm:ss.
 #' If \code{arriveBy} is FALSE (the default) this is the desired departure time, otherwise the
-#' desired arrival time. Only relevant if \code{mode} includes public transport.
-#' Default is current system time.
-#' @param maxWalkDistance A single numeric value. The maximum distance (in meters) the user is
-#' willing to walk. Default = 800 (approximately 10-minutes at 3 mph). This is a
-#' soft limit in OTPv1 and is effectively ignored if the mode is WALK only. In OTPv2
-#' this parameter imposes a hard limit for all modes - including WALK only (see:
+#' desired arrival time. Only relevant for transit modes. Default is the current system time.
+#' @param arriveBy Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
+#' date and time. Default is FALSE.
+#' @param maxWalkDistance Numeric. The maximum distance (in meters) that the user is
+#' willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
+#' soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+#' this parameter imposes a hard limit on WALK (see:
 #' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
-#' @param walkReluctance A single numeric value. A multiplier for how bad walking is, compared
-#' to being in transit for equal lengths of time. Default = 2.
+#' @param walkReluctance A single numeric value. A multiplier for how bad walking is
+#' compared to being in transit for equal lengths of time. Default = 2.
 #' @param waitReluctance A single numeric value. A multiplier for how bad waiting for a
 #' transit vehicle is compared to being on a transit vehicle. This should be greater
 #' than 1 and less than \code{walkReluctance} (see API docs). Default = 1.
@@ -38,21 +41,26 @@
 #' trips on different vehicles. This is designed to allow for imperfect schedule
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
-#' @param arriveBy Logical. Set to FALSE by default.
 #' @param batch Logical. Set to TRUE by default. This is required to tell OTP
-#' to allow a query with no toPlace parameter. This is necessary as we want to build 
+#' to allow a query without the  \code{toPlace} parameter. This is necessary as we want to build
 #' paths to all destinations from one origin.
-#' @param ... Any other parameter:value pair accepted by the OTP API SurfaceResource entry point. Be aware
-#' that otpr will carry out no validation of these additional parameters. They will be passed directly to the API. 
-#' @return A list of 5 items:
+#' @param ... Any other parameter accepted by the OTP API SurfaceResource entry point. For
+#' advanced users. Be aware that otpr will carry out no validation of these additional
+#' parameters. They will be passed directly to the API.
+#' @return Assuming no error, returns a list of 5 elements:
 #' \itemize{
-#' \item \code{errorId} - character, should be "OK" if no error condition.
-#' \item \code{query} - this is a character string containing the URL.
-#' that was submitted to the OTP API.
-#' \item \code{surfaceId} - integer, the id of the surface that was evaluated.
-#' \item \code{surfaceRecord} - details of the parameters used to create the surface.
-#' \item \code{rasterDownload} - the path to the saved raster file (if \code{getRaster} was
+#' \item \code{errorId} Will be "OK" if no error condition.
+#' \item \code{query} The URL that was submitted to the OTP API.
+#' \item \code{surfaceId} The id of the surface that was evaluated.
+#' \item \code{surfaceRecord} Details of the parameters used to create the surface.
+#' \item \code{rasterDownload} The path to the saved raster file (if \code{getRaster} was
 #' set to TRUE and a valid path was provided via \code{rasterPath}.)
+#' }
+#' If there is an error, a list containing 3 elements is returned:
+#' \itemize{
+#' \item \code{errorId} The id code of the error.
+#' \item \code{query} The URL that was submitted to the OTP API.
+#' \item \code{errorMessage} The error message.
 #' }
 #' @examples \dontrun{
 #' otp_create_surface(otpcon, fromPlace = c(53.43329,-2.13357), mode = "TRANSIT",
@@ -92,6 +100,13 @@ otp_create_surface <-
         otpcon$version,
         ". otp_create_surface() is only supported in OTPv1"
       )
+    }
+    
+    # Check for required arguments
+    if (missing(otpcon)) {
+      stop("otpcon argument is required")
+    } else if (missing(fromPlace)) {
+      stop("fromPlace argument is required")
     }
     
     # /otp/surface API endpoint must be enabled on the OTP instance (requires --analyst on launch)
@@ -145,13 +160,13 @@ otp_create_surface <-
       batch = TRUE
     )
     
-    # add any ...
-    query <- c(query, list(...))
+    # append ... arguments if present
+    if (length(list(...)) > 0) {
+      query <- append(query, list(...))
+    }
     
-    req <- httr::POST(
-      surfaceUrl,
-      query = query
-    )
+    req <- httr::POST(surfaceUrl,
+                      query = query)
     
     # decode URL for return
     url <- urltools::url_decode(req$url)
@@ -187,8 +202,8 @@ otp_create_surface <-
       response <-
         list(
           "errorId" = "ERROR",
-          "errorMessage" = "A surface was not successfully created",
-          "query" = url
+          "query" = url,
+          "errorMessage" = "A surface was not successfully created"
         )
       return (response)
     }

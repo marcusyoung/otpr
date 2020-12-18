@@ -9,31 +9,41 @@ otp_evaluate_surface(otpcon, surfaceId, pointset, detail = FALSE)
 \arguments{
 \item{otpcon}{An OTP connection object produced by \code{\link{otp_connect}}.}
 
-\item{surfaceId}{Integer, The id number of an existing surface for an origin
-created using \code{otp_create_surface()}.}
+\item{surfaceId}{Integer, the id number of an existing surface created using
+\code{otp_create_surface()}.}
 
 \item{pointset}{Character string, the name of a pointset known to OTP. A pointset
-is contained in a CSV file located in the pointset directory passed to OTP at startup.
-The name of the pointset is the name of the file.}
+is contained in a CSV file present in the pointset directory location passed to
+OTP at startup. The name of the pointset is the name of the file (without extension).}
 
-\item{detail}{logical, whether the travel time to each location in the pointset
-should be returned. Default is FALSE.}
+\item{detail}{logical, whether the travel time from the surface origin to each
+location in the pointset should be returned. Default is FALSE.}
 }
 \value{
-Returns a list containing 4 or more items:
+Assuming no error, returns a list containing 4 or more elements:
 \itemize{
-\item \code{errorId} - character, should be "OK" if no error condition.
-\item \code{query} - this is a character string containing the URL
-that was submitted to the OTP API.
-\item \code{surfaceId} - integer, the id of the surface that was evaluated.
-\item One or more dataframes for each of the 'opportunity' columns in the pointset CSV file.
-Each dataframe contains four columns: minutes (the time from the surface origin in one-minute increments); 
-counts (the number of the opportunity locations reached within each minute interval); 
-sum (the sum of the opportunities at each of the locations reached within each minute interval);
-and cumsums (a cumulative sum of the opportunities reached).
-\item If \code{detail} was set to TRUE then an additional dataframe containing 
+\item \code{errorId} Will be "OK" if no error condition.
+\item \code{query} The URL that was submitted to the OTP API.
+\item \code{surfaceId} The id of the surface that was evaluated.
+\item One or more dataframes for each of the 'opportunity' columns in the pointset
+CSV file. Each dataframe contains four columns:
+\itemize{
+\item minutes. The time from the surface origin in one-minute increments.
+\item counts. The number of the opportunity locations
+reached within each minute interval.
+\item sum. The sum of the opportunities at each of
+the locations reached within each minute interval.
+\item cumsums. A cumulative sum of the opportunities reached.
+}
+\item If \code{detail} was set to TRUE then an additional dataframe containing
 the time taken (in seconds) to reach each point in the pointset CSV file. If a
-point was not reachable the time will be recorded as NA.  
+point was not reachable the time will be recorded as NA.
+}
+If there is an error, a list containing 3 elements is returned:
+\itemize{
+\item \code{errorId} The id code of the error.
+\item \code{query} The URL that was submitted to the OTP API.
+\item \code{errorMessage} The error message.
 }
 }
 \description{
@@ -44,8 +54,8 @@ For example, you might have the number of jobs available at each location, or
 the number of hospital beds.
 }
 \details{
-This function requires OTP to have been started with the --analyst switch and
-the --pointset parameter set to the path of a directory containing the pointset file(s).
+This function requires OTP to have been started with the \code{--analyst} switch and
+the \code{--pointset} parameter set to the path of a directory containing the pointset file(s).
 }
 \examples{
 \dontrun{

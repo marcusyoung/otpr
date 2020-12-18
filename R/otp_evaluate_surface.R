@@ -1,36 +1,46 @@
 #' Evaluates an existing travel time surface (OTPv1 only).
-#' 
+#'
 #' Evaluates an existing travel time surface. Using a pointset from a specified CSV file,
 #' the travel time to each point is obtained from the specified surface. Accessibility
 #' indicators are then generated for one or more 'opportunity' columns in the pointset.
 #' For example, you might have the number of jobs available at each location, or
 #' the number of hospital beds.
 #'
-#' This function requires OTP to have been started with the --analyst switch and
-#' the --pointset parameter set to the path of a directory containing the pointset file(s).
+#' This function requires OTP to have been started with the \code{--analyst} switch and
+#' the \code{--pointset} parameter set to the path of a directory containing the pointset file(s).
 #'
 #' @param otpcon An OTP connection object produced by \code{\link{otp_connect}}.
-#' @param surfaceId Integer, The id number of an existing surface for an origin
-#' created using \code{otp_create_surface()}.
+#' @param surfaceId Integer, the id number of an existing surface created using
+#' \code{otp_create_surface()}.
 #' @param pointset Character string, the name of a pointset known to OTP. A pointset
-#' is contained in a CSV file located in the pointset directory passed to OTP at startup.
-#' The name of the pointset is the name of the file.
-#' @param detail logical, whether the travel time to each location in the pointset
-#' should be returned. Default is FALSE.
-#' @return Returns a list containing 4 or more items:
+#' is contained in a CSV file present in the pointset directory location passed to
+#' OTP at startup. The name of the pointset is the name of the file (without extension).
+#' @param detail logical, whether the travel time from the surface origin to each
+#' location in the pointset should be returned. Default is FALSE.
+#' @return Assuming no error, returns a list containing 4 or more elements:
 #' \itemize{
-#' \item \code{errorId} - character, should be "OK" if no error condition.
-#' \item \code{query} - this is a character string containing the URL
-#' that was submitted to the OTP API.
-#' \item \code{surfaceId} - integer, the id of the surface that was evaluated.
-#' \item One or more dataframes for each of the 'opportunity' columns in the pointset CSV file.
-#' Each dataframe contains four columns: minutes (the time from the surface origin in one-minute increments); 
-#' counts (the number of the opportunity locations reached within each minute interval); 
-#' sum (the sum of the opportunities at each of the locations reached within each minute interval);
-#' and cumsums (a cumulative sum of the opportunities reached).
-#' \item If \code{detail} was set to TRUE then an additional dataframe containing 
+#' \item \code{errorId} Will be "OK" if no error condition.
+#' \item \code{query} The URL that was submitted to the OTP API.
+#' \item \code{surfaceId} The id of the surface that was evaluated.
+#' \item One or more dataframes for each of the 'opportunity' columns in the pointset
+#' CSV file. Each dataframe contains four columns:
+#' \itemize{
+#' \item minutes. The time from the surface origin in one-minute increments.
+#' \item counts. The number of the opportunity locations
+#' reached within each minute interval.
+#' \item sum. The sum of the opportunities at each of
+#' the locations reached within each minute interval.
+#' \item cumsums. A cumulative sum of the opportunities reached.
+#' }
+#' \item If \code{detail} was set to TRUE then an additional dataframe containing
 #' the time taken (in seconds) to reach each point in the pointset CSV file. If a
-#' point was not reachable the time will be recorded as NA.  
+#' point was not reachable the time will be recorded as NA.
+#' }
+#' If there is an error, a list containing 3 elements is returned:
+#' \itemize{
+#' \item \code{errorId} The id code of the error.
+#' \item \code{query} The URL that was submitted to the OTP API.
+#' \item \code{errorMessage} The error message.
 #' }
 #' @examples \dontrun{
 #' otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "jobs", detail = TRUE)
@@ -42,13 +52,21 @@ otp_evaluate_surface <-
            pointset,
            detail = FALSE)
   {
-    
     if (otpcon$version != 1) {
       stop(
         "OTP server is running OTPv",
         otpcon$version,
         ". otp_evaluate_surface() is only supported in OTPv1"
       )
+    }
+    
+    # Check for required arguments
+    if (missing(otpcon)) {
+      stop("otpcon argument is required")
+    } else if (missing(surfaceId)) {
+      stop("surfaceId argument is required")
+    } else if (missing(pointset)) {
+      stop("pointset argument is required")
     }
     
     coll <- checkmate::makeAssertCollection()
@@ -64,10 +82,16 @@ otp_evaluate_surface <-
     req <-
       try(httr::GET(paste0(make_url(otpcon)$otp, "/surfaces/", surfaceId)), silent = T)
     if (class(req) == "try-error") {
-      stop("Unable to connect to the OTP surfaces API endpoint. Was ", make_url(otpcon)$otp, " started with the --analysis switch?")
+      stop(
+        "Unable to connect to the OTP surfaces API endpoint. Was ",
+        make_url(otpcon)$otp,
+        " started with the --analysis switch?"
+      )
     } else if (req$status_code != 200) {
       stop(
-        "Unable to find surface id: ", surfaceId, ". Is the id correct? Has a surface been created first using otp_create_surface()?"
+        "Unable to find surface id: ",
+        surfaceId,
+        ". Is the id correct? Has a surface been created first using otp_create_surface()?"
       )
     }
     
@@ -76,10 +100,16 @@ otp_evaluate_surface <-
     req <-
       try(httr::GET(paste0(make_url(otpcon)$otp, "/pointsets/", pointset)), silent = T)
     if (class(req) == "try-error") {
-      stop("Unable to connect to the OTP pointsets API endpoint. Was ", make_url(otpcon)$otp, "started with the --analysis switch?")
+      stop(
+        "Unable to connect to the OTP pointsets API endpoint. Was ",
+        make_url(otpcon)$otp,
+        "started with the --analysis switch?"
+      )
     } else if (req$status_code != 200) {
       stop(
-        "Unable to find pointset: ", pointset, ". Is the name correct? Was OTP started with the --pointset switch and was a CSV file with this name located in the pointset directory when OTP was started?"
+        "Unable to find pointset: ",
+        pointset,
+        ". Is the name correct? Was OTP started with the --pointset switch and was a CSV file with this name located in the pointset directory when OTP was started?"
       )
     }
     
@@ -112,8 +142,8 @@ otp_evaluate_surface <-
       response <-
         list(
           "errorId" = asjson$error$id,
-          "errorMessage" = asjson$error$msg,
-          "query" = url
+          "query" = url,
+          "errorMessage" = asjson$error$msg
         )
       return (response)
     } else {
