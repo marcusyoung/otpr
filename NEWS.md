@@ -2,7 +2,7 @@
 
 ## New Features
 
-* Support for creating and evaluating surfaces. The OTP surfaces endpoint enables
+* Support for creating and evaluating surfaces in OTPv1. The OTP surfaces endpoint enables
 efficient running of one-to-many queries. Once a surface for an origin has been
 generated (a surface is specific to a transport mode, date, time etc), distances
 from that origin to a set of locations (or 'opportunities') can be generated very
@@ -21,12 +21,19 @@ within, say, 30 minutes. There are two new functions to support surfaces:
     columns. A list is returned containing a dataframe for each 'opportunity' and, optionally,
     a dataframe of the time taken to travel from the surface's origin to each location point.
     This function can also be used to retrieve the time from an origin to many destinations.
+* Support for OTPv2. Some issues to be aware of (due to OTPv2 implementation not otpr):
+    * currently, due to a bug in OTPv2, for TRANSIT modes a sub-optimal walk-only trip may be returned
+    as the top itinerary. See: [https://github.com/opentripplanner/OpenTripPlanner/issues/3289](https://github.com/opentripplanner/OpenTripPlanner/issues/3289) for a discussion of this issue. This can be mitigated by using the 
+    `maxWalkDistance` parameter (but see below).
+    * maxWalkDistance is a hard limit. This is a soft limit in OTPv1 and is effectively ignored
+    if the mode is WALK only. In OTPv2 this parameter imposes a hard limit for all modes (including WALK only). see: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config).
 * The `waitReluctance` parameter was added to `otp_get_times()`, `otp_get_isochrone()` and
 `otp_get_surface()`.
 * For advanced users: the ability to pass any *additional* parameter not specified
 in the **otpr** functions to the OTP API. Available in `otp_get_times()`, `otp_get_isochrone()` and
 `otp_get_surface()`. Note that no validation of these additional parameters will be carried out
 by **otpr**. They will be passed directly to the OTP API.
+* Now additionally imports **dplyr** and **rrapply**.
 
 ## Bug fixes
 
