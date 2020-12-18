@@ -11,16 +11,15 @@ if (identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE")) {
   cutoffs <- c(300, 600, 900, 1200)
   response_query <-
     paste(
-      "http://localhost:8080/otp/routers/default/isochrone?toPlace=",
-      paste(toPlace, collapse = ","),
-      "&fromPlace=",
+      "http://localhost:8080/otp/routers/default/isochrone?fromPlace=",
       paste(location, collapse = ","),
       "&mode=TRANSIT,WALK&batch=TRUE&date=",
       date,
       "&time=",
       time,
-      "&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=600&cutoffSec=",
-      paste(cutoffs, collapse = "&cutoffSec="),
+      "&maxWalkDistance=800&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=600&cutoffSec=",
+      paste(cutoffs, collapse = "&cutoffSec="), "&toPlace=",
+      paste(toPlace, collapse = ","),
       sep = ""
     )
 }
@@ -105,6 +104,7 @@ test_that("all parameters are passed in query", {
       cutoffs = cutoffs,
       maxWalkDistance = 800,
       walkReluctance = 2,
+      waitReluctance = 1,
       arriveBy = FALSE,
       transferPenalty = 0,
       minTransferTime = 600,

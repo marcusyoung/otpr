@@ -5,12 +5,12 @@ if (identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE")) {
   otpcon_analyst <- otp_connect(port = 9090)
   
   # setup test query results - amend for a new graph build
-  origin <- c(50.75840, -1.30291)
+  fromPlace <- c(50.75840, -1.30291)
   date <- "06-01-2020"
   time <- "12:00:00"
   mode <- "TRANSIT"
   rasterPath <- "C:/temp"
-  response_query <- paste("http://localhost:9090/otp/surfaces?batch=TRUE&fromPlace=", paste(origin, collapse = ","), "&mode=TRANSIT,WALK&date=", date, "&time=", time, "&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=600", sep="")
+  response_query <- paste("http://localhost:9090/otp/surfaces?fromPlace=", paste(fromPlace, collapse = ","), "&mode=TRANSIT,WALK&date=", date, "&time=", time, "&maxWalkDistance=800&walkReluctance=2&waitReluctance=1&transferPenalty=0&minTransferTime=600&arriveBy=FALSE&batch=TRUE", sep="")
 }
 
 skip_if_no_otp <- function() {
@@ -22,7 +22,7 @@ test_that("Check for invalid mode", {
   skip_if_no_otp()
   error <-
     try(otp_create_surface(otpcon_analyst,
-                           origin = origin,
+                           fromPlace = fromPlace,
                            mode = "FOO"),
         silent = TRUE)
   expect_equal(grepl("Mode must be one of:", error, fixed = TRUE), TRUE)
@@ -34,7 +34,7 @@ test_that("create surface - no raster download", {
   response <-
     otp_create_surface(
       otpcon_analyst,
-      origin = origin,
+      fromPlace = fromPlace,
       date = date,
       time = time,
       mode = "TRANSIT"
@@ -61,7 +61,7 @@ test_that("create surface - with raster download", {
   response <-
     otp_create_surface(
       otpcon_analyst,
-      origin = origin,
+      fromPlace = fromPlace,
       date = date,
       time = time,
       mode = "TRANSIT",
@@ -91,7 +91,7 @@ test_that("Check all parameters are passed", {
 response <-
   otp_create_surface(
     otpcon_analyst,
-    origin = origin,
+    fromPlace = fromPlace,
     date = date,
     time = time,
     mode = "TRANSIT",

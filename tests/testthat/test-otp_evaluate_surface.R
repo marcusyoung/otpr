@@ -36,6 +36,80 @@ test_that("Check for invalid pointset", {
   expect_equal(grepl("Unable to find pointset: FOO.", error, fixed = TRUE), TRUE)
 })
 
+test_that("Check for valid response", {
+  skip_if_no_otp()
+  response <- otp_evaluate_surface(otpcon_analyst, surfaceId = surfaceId, pointset = pointset, detail = TRUE)
+  expect_equal(length(response), 5)
+  expect_equal(response$errorId, "OK")
+  expect_equal(response$surfaceId, 0)
+  expect_s3_class(response$population, "data.frame")
+  expect_s3_class(response$times, "data.frame")
+  expect_named(
+    response$population,
+    c(
+      "minutes",
+      "counts",
+      "sums",
+      "cumsums"
+    )
+  )
+  expect_named(
+    response$times,
+    c(
+      "point",
+      "time"
+    )
+  )
+  expect_equal(all(tail(response$population, n=1) == c(102, 1, 437, 52945)), TRUE)
+  expect_equal(nrow(response$population), 102)
+  expect_equal(nrow(response$times), 135)
+  expect_equal(all(head(response$times, n=1) == c(1, 3158)), TRUE)
+  expect_equal(mean(response$times$time, na.rm = TRUE), 3273.252)
+})
+
+test_that("Check when multiple indicators in pointset file", {
+  skip_if_no_otp()
+  response <- otp_evaluate_surface(otpcon_analyst, surfaceId = surfaceId, pointset = "test", detail = TRUE)
+  expect_equal(length(response), 6)
+  expect_equal(response$errorId, "OK")
+  expect_equal(response$surfaceId, 0)
+  expect_s3_class(response$indicator, "data.frame")
+  expect_s3_class(response$population, "data.frame")
+  expect_s3_class(response$times, "data.frame")
+  expect_named(
+    response$indicator,
+    c(
+      "minutes",
+      "counts",
+      "sums",
+      "cumsums"
+    )
+  )
+  expect_named(
+    response$population,
+    c(
+      "minutes",
+      "counts",
+      "sums",
+      "cumsums"
+    )
+  )
+  expect_named(
+    response$times,
+    c(
+      "point",
+      "time"
+    )
+  )
+  expect_equal(all(tail(response$population, n=1) == c(102, 1, 437, 52945)), TRUE)
+  expect_equal(all(tail(response$indicator, n=1) == c(102, 1, 218, 26438)), TRUE)
+  expect_equal(nrow(response$population), 102)
+  expect_equal(nrow(response$indicator), 102)
+  expect_equal(nrow(response$times), 135)
+  expect_equal(all(head(response$times, n=1) == c(1, 3158)), TRUE)
+  expect_equal(mean(response$times$time, na.rm = TRUE), 3273.252)
+})
+
 
 
 

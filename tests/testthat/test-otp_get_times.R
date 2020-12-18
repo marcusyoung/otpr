@@ -11,7 +11,7 @@ if (identical(Sys.getenv("OTP_ON_LOCALHOST"), "TRUE")) {
   time <- "12:00:00"
   legs_number <- 5
   arriveBy_time <- as.POSIXct("2020-06-01 11:52:50 BST")
-  response_query <- paste("http://localhost:8080/otp/routers/default/plan?fromPlace=", paste(fromPlace, collapse = ","), "&toPlace=", paste(toPlace, collapse = ","), "&mode=TRANSIT,WALK&date=", date, "&time=", time, "&maxWalkDistance=800&walkReluctance=2&arriveBy=FALSE&transferPenalty=0&minTransferTime=600", sep="")
+  response_query <- paste("http://localhost:8080/otp/routers/default/plan?fromPlace=", paste(fromPlace, collapse = ","), "&toPlace=", paste(toPlace, collapse = ","), "&mode=TRANSIT,WALK&date=", date, "&time=", time, "&maxWalkDistance=800&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=600", sep="")
 }
 
 skip_if_no_otp <- function() {
@@ -140,6 +140,7 @@ test_that("all parameters are passed in query", {
       mode = "TRANSIT",
       maxWalkDistance = 800,
       walkReluctance = 2,
+      waitReluctance = 1,
       arriveBy = FALSE,
       transferPenalty = 0,
       minTransferTime = 600,
