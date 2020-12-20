@@ -21,7 +21,7 @@ otp_get_times(
   maxItineraries = 1,
   detail = FALSE,
   includeLegs = FALSE,
-  ...
+  extra.params
 )
 }
 \arguments{
@@ -83,7 +83,7 @@ Default is FALSE.}
 journey leg are returned. If TRUE then a nested dataframe of journeys legs will be returned
 for each itinerary if \code{detail} is also TRUE. Default is FALSE.}
 
-\item{...}{Any other parameter accepted by the OTP API PlannerResource entry point. For
+\item{extra.params}{A list of any other parameter accepted by the OTP API PlannerResource entry point. For
 advanced users. Be aware that otpr will carry out no validation of these additional
 parameters. They will be passed directly to the API.}
 }

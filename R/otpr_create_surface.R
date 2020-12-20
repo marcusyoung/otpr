@@ -44,7 +44,7 @@
 #' @param batch Logical. Set to TRUE by default. This is required to tell OTP
 #' to allow a query without the  \code{toPlace} parameter. This is necessary as we want to build
 #' paths to all destinations from one origin.
-#' @param ... Any other parameter accepted by the OTP API SurfaceResource entry point. For
+#' @param extra.params A list of any other parameters accepted by the OTP API SurfaceResource entry point. For
 #' advanced users. Be aware that otpr will carry out no validation of these additional
 #' parameters. They will be passed directly to the API.
 #' @return Assuming no error, returns a list of 5 elements:
@@ -86,13 +86,13 @@ otp_create_surface <-
            minTransferTime = 0,
            batch = TRUE,
            arriveBy = TRUE,
-           ...)
+           extra.params = list())
   {
     call <- sys.call()
     call[[1]] <- as.name('list')
     params <- eval.parent(call)
     params <-
-      params[names(params) %in% c("getRaster", "rasterPath") == FALSE]
+      params[names(params) %in% c("getRaster", "rasterPath", "extra.params") == FALSE]
     
     if (otpcon$version != 1) {
       stop(
@@ -124,9 +124,11 @@ otp_create_surface <-
       )
     }
     
+    
     # function specific argument checks
     
     args.coll <- checkmate::makeAssertCollection()
+    checkmate::assert_list(extra.params)
     checkmate::assert_logical(getRaster, add = args.coll)
     checkmate::assert_character(rasterPath, add = args.coll)
     checkmate::assert_path_for_output(
@@ -160,9 +162,11 @@ otp_create_surface <-
       batch = TRUE
     )
     
-    # append ... arguments if present
-    if (length(list(...)) > 0) {
-      query <- append(query, list(...))
+    # append extra.params to query if present
+    if (length(extra.params) > 0) {
+      msg <- paste("Unknown parameters were passed to the OTP API without checks:", paste(sapply(names(extra.params), paste), collapse=", "))
+      warning(paste(msg), call. = FALSE)
+      query <- append(query, extra.params)
     }
     
     req <- httr::POST(surfaceUrl,

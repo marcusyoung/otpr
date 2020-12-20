@@ -51,7 +51,7 @@
 #' will return them to the user in the order they were provided by OTP up to the maximum
 #' specified by this parameter. Default is 1. This is an alternative to using the
 #' OTP \code{maxNumItineraries} parameter which has problematic behaviour.
-#' @param ... Any other parameter accepted by the OTP API PlannerResource entry point. For
+#' @param extra.params A list of any other parameters accepted by the OTP API PlannerResource entry point. For
 #' advanced users. Be aware that otpr will carry out no validation of these additional
 #' parameters. They will be passed directly to the API.
 #' @return Returns a list of three or four elements. The first element in the list is \code{errorId}.
@@ -105,14 +105,14 @@ otp_get_times <-
            maxItineraries = 1,
            detail = FALSE,
            includeLegs = FALSE,
-           ...)
+           extra.params = list())
   {
     # get the OTP parameters ready to pass to check function
     call <- sys.call()
     call[[1]] <- as.name('list')
     params <- eval.parent(call)
     params <-
-      params[names(params) %in% c("mode", "detail", "includeLegs", "maxItineraries") == FALSE]
+      params[names(params) %in% c("mode", "detail", "includeLegs", "maxItineraries", "extra.params") == FALSE]
     
     # Check for required arguments
     if (missing(otpcon)) {
@@ -125,6 +125,7 @@ otp_get_times <-
     
     # function specific argument checks
     args.coll <- checkmate::makeAssertCollection()
+    checkmate::assert_list(extra.params)
     checkmate::assert_logical(detail, add = args.coll)
     checkmate::assert_integerish(maxItineraries,
                                  lower = 1,
@@ -160,9 +161,11 @@ otp_get_times <-
       minTransferTime = minTransferTime
     )
 
-    # append ... arguments if present
-    if (length(list(...)) > 0) {
-      query <- append(query, list(...))
+    # append extra.params to query if present
+    if (length(extra.params) > 0) {
+      msg <- paste("Unknown parameters were passed to the OTP API without checks:", paste(sapply(names(extra.params), paste), collapse=", "))
+      warning(paste(msg), call. = FALSE)
+      query <- append(query, extra.params)
     }
     
     # Use GET from the httr package to make API call and place in req - returns json by default.

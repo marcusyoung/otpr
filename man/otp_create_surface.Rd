@@ -19,7 +19,7 @@ otp_create_surface(
   minTransferTime = 0,
   batch = TRUE,
   arriveBy = TRUE,
-  ...
+  extra.params
 )
 }
 \arguments{
@@ -77,7 +77,7 @@ paths to all destinations from one origin.}
 \item{arriveBy}{Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
 date and time. Default is FALSE.}
 
-\item{...}{Any other parameter accepted by the OTP API SurfaceResource entry point. For
+\item{extra.params}{A list of any other parameter accepted by the OTP API SurfaceResource entry point. For
 advanced users. Be aware that otpr will carry out no validation of these additional
 parameters. They will be passed directly to the API.}
 }

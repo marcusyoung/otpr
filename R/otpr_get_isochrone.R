@@ -44,7 +44,7 @@
 #' adherence. This is a minimum; transfers over longer distances might use a longer time.
 #' Default is 0.
 #' @param batch Logical. If true, goal direction is turned off and a full path tree is built
-#' @param ... Any other parameter accepted by the OTP API LIsochrone entry point. For
+#' @param extra.params A list of any other parameters accepted by the OTP API LIsochrone entry point. For
 #' advanced users. Be aware that otpr will carry out no validation of these additional
 #' parameters. They will be passed directly to the API. Do not pass 'fromPlace' or 'toPlace'
 #' to this function. These parameters are handled internally based on the values of \code{location}
@@ -83,14 +83,14 @@ otp_get_isochrone <-
            waitReluctance = 1,
            transferPenalty = 0,
            minTransferTime = 0,
-           ...)
+           extra.params = list())
   {
     # get the OTP parameters ready to pass to check function
     call <- sys.call()
     call[[1]] <- as.name('list')
     params <- eval.parent(call)
     params <-
-      params[names(params) %in% c("mode", "location", "fromLocation", "format") == FALSE]
+      params[names(params) %in% c("mode", "location", "fromLocation", "format", "extra.params") == FALSE]
     
     if (otpcon$version != 1) {
       stop(
@@ -115,6 +115,7 @@ otp_get_isochrone <-
     
     # function specific argument checks
     args.coll <- checkmate::makeAssertCollection()
+    checkmate::assert_list(extra.params)
     checkmate::assert_logical(fromLocation, add = args.coll)
     checkmate::assert_logical(batch, add = args.coll)
     checkmate::assert_numeric(
@@ -173,9 +174,11 @@ otp_get_isochrone <-
         minTransferTime = minTransferTime
       )
     
-    # append ... arguments if present
-    if (length(list(...)) > 0) {
-      query <- append(query, list(...))
+    # append extra.params to query if present
+    if (length(extra.params) > 0) {
+      msg <- paste("Unknown parameters were passed to the OTP API without checks:", paste(sapply(names(extra.params), paste), collapse=", "))
+      warning(paste(msg), call. = FALSE)
+      query <- append(query, extra.params)
     }
     
     # make and append cutoffs into list

@@ -20,7 +20,7 @@ otp_get_isochrone(
   waitReluctance = 1,
   transferPenalty = 0,
   minTransferTime = 0,
-  ...
+  extra.params
 )
 }
 \arguments{
@@ -79,7 +79,7 @@ trips on different vehicles. This is designed to allow for imperfect schedule
 adherence. This is a minimum; transfers over longer distances might use a longer time.
 Default is 0.}
 
-\item{...}{Any other parameter accepted by the OTP API LIsochrone entry point. For
+\item{extra.params}{A list of any other parameter accepted by the OTP API LIsochrone entry point. For
 advanced users. Be aware that otpr will carry out no validation of these additional
 parameters. They will be passed directly to the API. Do not pass 'fromPlace' or 'toPlace'
 to this function. These parameters are handled internally based on the values of \code{location}
