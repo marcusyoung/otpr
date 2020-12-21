@@ -30,20 +30,24 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-**otpr** is an R package that provides a simple wrapper for the [OpenTripPlanner](https://www.opentripplanner.org/) (OTP) API.
-To use **otpr** you will need a running instance of OTP. The purpose of the package is
-to submit a query to the relevant OTP API resource, parse the OTP response and return
-useful R objects.
+**otpr** is an R package that provides a wrapper for the [OpenTripPlanner](https://www.opentripplanner.org/) (OTP) API.
+To use **otpr** you will need a running instance of OTP. The purpose of the package is to submit a query to the relevant
+OTP API resource, parse the OTP response and return useful R objects. The package is aimed at both new and expert users of OTP. The key parameters needed to query each supported API resource are provided as (or via) **otpr** function arguments. The argument values submitted by the user are comprehensively checked prior to submission to OTP to ensure that they are valid and make sense in combination, with feedback provided as appropriate. This makes the package ideal for new users of OTP (especially when used with the [accompanying tutorial](https://github.com/marcusyoung/otp-tutorial)). Advanced users can provide any additional API parameters they wish via the `extra.params` argument. These parameters are passed directly to the OTP API without checks.
+
+**otpr** currently supports the following OTP API resources:
+
+* PlannerResource - retrieve one or more trip itineraries between supplied origin and destination by the designated mode(s).
+* LIsochrone Resource (OTPv1 only) - generate isochrone maps (the area accessible from or to a point within specified time thresholds).
+* SurfaceResource (OTPv1 only) - create and evaluate travel time surfaces (extremely efficient one-to-many analysis and generation of accessibility measures)
 
 This package will be useful to researchers and transport planners who want to use OTP to generate trip data for accessibility analysis or to derive variables for use in transportation models.
 
 ## Version support
 
-**otpr** supports OTP versions 1 and 2. However, as OTPv2 has not yet been released and changes to its codebase could cause errors in otpr or unexpected behaviour, OTPv2 support is currently considered experimental. Known issues with OTPv2 include:
+**otpr** fully supports OTP versions 1 and 2. Please note the following :
 
-* `otp_get_isochrone()` is only supported in OTPv1 as this feature has been removed from OTPv2.
-* The maxWalkDistance parameter used in the `otp_get_times()` function is treated as a hard limit when the mode is either WALK or BICYCLE. This could result in no itinerary being returned as the default is 800m. This is different from the behaviour of OTPv1 where this parameter is effectively ignored when the mode is WALK and not applied at all to BICYCLE trips. Workaround: provide a large value to this parameter for these modes.
-* The 'routeType' and 'agencyUrl' columns do not appear in the data frame of journey legs as these are not returned by OTPv2.
+* There is a bug in OTPv2 which means that the first returned itinerary for TRANSIT trips is a (usually) sub-optimal WALK-only option. See: [https://github.com/opentripplanner/OpenTripPlanner/issues/3289](https://github.com/opentripplanner/OpenTripPlanner/issues/3289). Workaround: set an appropriate maxWalkDistance (but see below).  
+* In OTPv2 the `maxWalkDistance` parameter is treated as a hard limit when the mode is either WALK or (strangely) BICYCLE. This could result in no itinerary being returned as the default is 800m. This is different from the behaviour of OTPv1 where this parameter is effectively ignored when the mode is WALK and not applied at all to BICYCLE trips. Workaround: provide a large value to this parameter for these modes. See: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#rest-api](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#rest-api) for more information.
 
 
 ## Installation
@@ -90,7 +94,7 @@ in the local system's time zone and not the time zone of the graph. This is beca
 the OTP API returns EPOCH values and the conversion to date and time format occurs
 on the local system. A 'timeZone' column is included in returned dataframes
 that contain start and end times to make this explicit. If you wish to have start
-and end times expressed in the time zone of the graph, the 'tz' argument can be
+and end times expressed in the time zone of the graph, the `tz` argument can be
 specified when calling the `otp_connect()` function. This must be a valid time zone
 (checked against the vector returned by `OlsonNames()`); for example: "Europe/Berlin".
 
@@ -99,17 +103,19 @@ specified when calling the `otp_connect()` function. This must be a valid time z
 
 ### Function behaviour
 
-The functions that query the OTP API generally return a list of three elements. The first
+The functions that query the OTP API return a list of three or more elements. The first
 element is an errorId - with the value "OK" or the error code returned by OTP. If
 errorId is "OK", the second element will contain the query response; otherwise it
-will contain the OTP error message, the third element is the query URL that was sent to
-the OTP API (for information and useful for troubleshooting).
+will contain the OTP error message. There may be further list elements forming the
+query response. The last element will be the query URL that was submitted to the OTP API
+(for information and useful for troubleshooting).
 
 ### Distance between two points
 
 To get the trip distance in metres between an origin and destination on the street
 and/or path network use `otp_get_distance()`. You can specify the required mode: 
-CAR (default), BICYCLE or WALK are valid.
+CAR (default), BICYCLE or WALK are valid. The trip information will relate to the
+*first* itinerary that was returned by the OTP server.
 
 ```{r}
 # Distance between Manchester city centre and Manchester airport by CAR
@@ -132,7 +138,7 @@ otp_get_distance(
 ### Time between two points
 
 To get the trip duration in minutes between an origin and destination use `otp_get_times()`. 
-You can specify the required mode: TRANSIT (all available transit modes), BUS, RAIL, CAR, 
+You can specify the required mode: TRANSIT (all available transit modes), BUS, RAIL, SUBWAY, TRAM, CAR, 
 BICYCLE, and WALK are valid. All the public transit modes automatically allow WALK.
 There is also the option to combine TRANSIT with BICYCLE.
 
@@ -162,9 +168,12 @@ otp_get_times(
 ### Breakdown of time by mode, waiting time and transfers
 
 To get more information about the trip when using transit modes, `otp_get_times()` 
-can be called with the 'detail' argument set to TRUE. The trip duration (minutes) is then further
+can be called with the `detail` argument set to TRUE. The trip duration (minutes) is then further
 broken down by time on transit, walking time (from/to and between stops), waiting time
-(when changing transit vehicle or mode), and number of transfers (when changing transit vehicle or mode).
+(when changing transit vehicle or mode), and number of transfers (when changing transit vehicle or mode). By default
+the function returns trip information for the first itinerary suggested by the OTP server. However, additional itineraries
+can be requested by specifying the `maxItineraries` argument. The function will
+return every available itinerary suggested by the OTP server, in order, *up to* the value of `maxItineraries` (the default is 1).
 
 ```{r}
 # Time between Manchester city centre and Manchester airport by TRANSIT with detail
@@ -175,7 +184,8 @@ otp_get_times(
   mode = "TRANSIT",
   date = "04-29-2020",
   time = "07:15:00",
-  detail = TRUE
+  detail = TRUE,
+  maxItineraries = 1
 )
 
 ```
@@ -183,8 +193,9 @@ otp_get_times(
 #### Details of each leg for transit-based trips
 
 To get information about each leg of transit-based trips, `otp_get_times()` can be called
-with both the 'detail' and 'includeLegs' arguments set to TRUE. A third element, called 'legs',
-will then be returned. The 'legs' element is a dataframe containing a row for each leg of the trip.
+with both the `detail` and `includeLegs` arguments set to TRUE. A column called 'legs'
+will then be included in the itineraries dataframe. This column contains a nested 'legs' dataframe
+for each itinerary. The 'legs' dataframe contains a row for each leg of the trip.
 The information provided for each leg includes start and end times, duration, distance, mode,
 route details, agency details, and stop names. There is also a column called 'departureWait'
 which is the length of time in minutes required to wait before the start of a leg. The sum
@@ -200,15 +211,16 @@ trip <- otp_get_times(
   date = "04-29-2020",
   time = "07:15:00",
   detail = TRUE,
-  includeLegs = TRUE
+  includeLegs = TRUE,
+  maxItineraries = 2
 )
 
-# View legs (first 9 columns)
-trip$legs[1:9]
+# Legs for the first itinerary returned by OTP (first 9 columns)
+trip$itineraries$legs[[1]][1:9]
 
 ```
 
-### Travel time isochrones
+### Travel time isochrones (OTPv1 only)
 
 The `otp_get_isochrone()` function can be used to get one or more travel time isochrones
 in either GeoJSON or SF format. These are only available for transit or walking modes (OTP limitation).
@@ -282,9 +294,62 @@ tm_shape(osm_man) +
 
 ```
 
+### One-to-many Travel Time Analysis (OTPv1 only)
+
+If you wish to calculate the travel time from one or more origins to many destinations, querying the OTP journey planning API (using `otp_get_times()`) may not be the best option as it requires multiple requests to the API which can be very inefficient. An alternative is to use the OTP surface analysis feature, which enables you to calculate the travel time from an origin to thousands of destinations in about the same time it takes to perform a single origin:destination lookup. This is achieved by generating a surface for an origin which contains the travel time to every geographic coordinate that can be reached from that origin by the specified transport mode.
+
+Once the surface has been generated, it can be evaluated to rapidly retrieve the travel times from the origin to each 'destination' point provided in a supplied CSV file. This file, known as a pointset, can also contain the quantities of one or more 'opportunities' that are associated with each point. During evaluation, OTP will sum the opportunities available at each additional minute of travel time, and **otpr** generates a cumulative sum of the opportunities. For example, you might have a poinset of workplace zones and a column with the number of jobs within each zone. The output will be a cumulative sum of jobs reachable for each minute of travel time by the mode specified when the surface was generated.
+
+Before a surface analysis can be performed, OTP must be started with the `--analyst` switch. To evaluate one or more pointsets against a surface, the location of the pointset CSV file(s) must be specified using the `--pointSets` switch followed by the file path. For more information about the required file format for a pointset CSV file and the switches to start OTP with, see: [http://docs.opentripplanner.org/en/dev-1.x/Surface/](http://docs.opentripplanner.org/en/dev-1.x/Surface/).
+
+#### Create a surface
+
+Once an OTP instance has been started in analysis mode, a surface can be generated by calling the `otp-create-surface()` function. The arguments that can be passed to this function are very similar to `otp_get_times()`. The main differences are the exclusion of the `toPlace` argument and two new function-specific arguments - `getRaster` and `rasterPath`. These are used to request a raster image (a geoTIFF file) of the generated surface which is saved to the local file system. If the surface is successfully generated, the function will return the OTP ID number of the surface - this will be needed for any subsequent evaluation against the surface.
+
+There are a few things to note regarding the raster image that OTP creates:
+
+* The travel time cutoff for a surface appears to be 120 minutes. Every grid cell within the extent of the graph that is 120 minutes travel time or beyond, *or not accessible at all*, is given the value of 120.
+* Any grid cell outside of the extent of the network (i.e. no-data cells) is given given the value 128.
+* It is advisable to interpret the raster of a surface in conjunction with results from evaluating the surface (see below).
+* OTP can take a while the first time a raster of a surface is generated after starting up. Subsequent rasters (even for different origins) are much faster to generate.
+
+```{r}
+# create surface with origin as Manchester city centre
+otp_create_surface(otpcon, fromPlace = c(53.479167,-2.244167), date = "03-26-2020",
+time = "08:00:00", mode = "TRANSIT", maxWalkDistance = 1600, getRaster = TRUE,
+rasterPath = "C:/temp")
+```
+
+![Example of surface raster visualised in QGIS](man/figures/surface0.jpg)
+
+#### Evaluate a surface
+
+Once a surface has been generated, it can be evaluated using the `otp_evaluate_surface()` function. The ID of the surface (returned by the `otp_create_surface()` function) and the name of a pointset (which is the pointset file name excluding the extension) must be provided as arguments. The function will return one or more dataframes for each of the 'opportunity' columns in the pointset CSV file. Each of these dataframes contains four columns:
+
+* minutes: the time from the surface origin in one-minute increments.
+* counts: the number of opportunity locations reached within each minute interval.
+* sum: the sum of the opportunities at each of the locations reached within each minute interval.
+* cumsums: a cumulative sum of the opportunities reached.
+
+As noted above, there is a cutoff of 120 minutes for the surface and only data for minutes *up to* 120 are returned by OTP. Further investigation into how and where this is controlled is ongoing.
+
+If the optional `detail` argument is set to TRUE, then a dataframe called 'times' containing the time taken (in seconds) to reach each point in the pointset file will also be returned. If a point is not reachable the time will be recorded as NA. This could mean that the point is genuinely unreachable by the mode (e.g. if it is CAR mode and the location is only accessible by walking or cycling) or that point falls outside of the surface (which might be due to the extent of the network or the 120 minute limit to the surface extent). The 'times' table can be joined with the data from the original pointset file to get the travel time from the origin to each destination.
+
+```{r}
+response <- otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "jobs", detail = TRUE)
+# Look at first few rows of the job opportunity data
+head(response$jobs)
+# And the last few rows
+tail(response$jobs)
+# Number of job opportunities accesible with 60 minutes from origin by TRANSIT
+response$jobs$cumsums[60]
+# And a peak at the times dataframe
+head(response$times)
+```
+
 ## Learning more
 
-The example function calls shown above can be extended by passing additional parameters to the OTP API. Further information is available in the documentation for each function: 
+The example function calls shown above can be extended by passing additional parameters to the OTP API. This includes the advanced option to pass any parameter that is not an **otpr** argument directly to the OTP API via the `extra.params` argument. Further information is available in the documentation for each function: 
 
 ```{r eval=FALSE}
 # get help on using the otp_get_times() function
@@ -292,13 +357,11 @@ The example function calls shown above can be extended by passing additional par
 ```
 
 If you are new to OTP, then the best place to start is to work through the tutorial, [OpenTripPlanner Tutorial - creating and querying your own multi-modal route planner](https://github.com/marcusyoung/otp-tutorial). This includes
-everything you need, including example data. The tutorial also has examples
+everything you need, including example data, to get started with OTPv1. The tutorial also has examples
 of using **otpr** functions, and helps you get the most from the package, for example using it to populate
 an origin-destination matrix.
 
-If you are already experienced with OTPv1 and want to try v2, you will need to build it from source. See this [guide](http://docs.opentripplanner.org/en/dev-2.x/Developers-Guide/) and this [basic tutorial](http://docs.opentripplanner.org/en/dev-2.x/Basic-Tutorial/#get-otp) from the OTP project team.
-
-For more guidance on how **otpr**, in conjunction with OTP, can be used to generate data for input into models, read [An automated framework to derive model variables from open transport data using R, PostgreSQL and OpenTripPlanner](https://eprints.soton.ac.uk/389728/).
+For more guidance on how **otpr**, in conjunction with OTP, can be used to generate data for input into models, you may be interested in: [An automated framework to derive model variables from open transport data using R, PostgreSQL and OpenTripPlanner](https://eprints.soton.ac.uk/389728/).
 
 ## Getting help
 
