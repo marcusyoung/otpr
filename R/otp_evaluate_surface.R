@@ -20,7 +20,6 @@
 #' @return Assuming no error, returns a list containing 4 or more elements:
 #' \itemize{
 #' \item \code{errorId} Will be "OK" if no error condition.
-#' \item \code{query} The URL that was submitted to the OTP API.
 #' \item \code{surfaceId} The id of the surface that was evaluated.
 #' \item One or more dataframes for each of the 'opportunity' columns in the pointset
 #' CSV file. Each dataframe contains four columns:
@@ -36,11 +35,12 @@
 #' the time taken (in seconds) to reach each point in the pointset CSV file. If a
 #' point was not reachable the time will be recorded as NA.
 #' }
+#' \item \code{query} The URL that was submitted to the OTP API.
 #' If there is an error, a list containing 3 elements is returned:
 #' \itemize{
 #' \item \code{errorId} The id code of the error.
-#' \item \code{query} The URL that was submitted to the OTP API.
 #' \item \code{errorMessage} The error message.
+#' \item \code{query} The URL that was submitted to the OTP API.
 #' }
 #' @examples \dontrun{
 #' otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "jobs", detail = TRUE)
@@ -142,8 +142,8 @@ otp_evaluate_surface <-
       response <-
         list(
           "errorId" = asjson$error$id,
-          "query" = url,
-          "errorMessage" = asjson$error$msg
+          "errorMessage" = asjson$error$msg,
+          "query" = url
         )
       return (response)
     } else {
@@ -152,7 +152,6 @@ otp_evaluate_surface <-
     
     response <- list()
     response["errorId"] <- error.id
-    response["query"] <- url
     response["surfaceId"] <- as.integer(surfaceId)
     
     for (i in 1:length(asjson[["data"]])) {
@@ -176,6 +175,8 @@ otp_evaluate_surface <-
       df <- df[, c("point", "time")]
       response[["times"]] <- df
     }
+    
+    response["query"] <- url
     
     return(response)
     

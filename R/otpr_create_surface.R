@@ -50,17 +50,17 @@
 #' @return Assuming no error, returns a list of 5 elements:
 #' \itemize{
 #' \item \code{errorId} Will be "OK" if no error condition.
-#' \item \code{query} The URL that was submitted to the OTP API.
 #' \item \code{surfaceId} The id of the surface that was evaluated.
 #' \item \code{surfaceRecord} Details of the parameters used to create the surface.
 #' \item \code{rasterDownload} The path to the saved raster file (if \code{getRaster} was
 #' set to TRUE and a valid path was provided via \code{rasterPath}.)
 #' }
+#' \item \code{query} The URL that was submitted to the OTP API.
 #' If there is an error, a list containing 3 elements is returned:
 #' \itemize{
 #' \item \code{errorId} The id code of the error.
-#' \item \code{query} The URL that was submitted to the OTP API.
 #' \item \code{errorMessage} The error message.
+#' \item \code{query} The URL that was submitted to the OTP API.
 #' }
 #' @examples \dontrun{
 #' otp_create_surface(otpcon, fromPlace = c(53.43329,-2.13357), mode = "TRANSIT",
@@ -206,8 +206,8 @@ otp_create_surface <-
       response <-
         list(
           "errorId" = "ERROR",
-          "query" = url,
-          "errorMessage" = "A surface was not successfully created"
+          "errorMessage" = "A surface was not successfully created",
+          "query" = url
         )
       return (response)
     }
@@ -215,10 +215,10 @@ otp_create_surface <-
     response <-
       list(
         "errorId" = errorId,
-        "query" = url,
         "surfaceId" = surfaceId,
         "surfaceRecord" = surfaceRecord,
-        "rasterDownload" = rasterDownload
+        "rasterDownload" = rasterDownload,
+        "query" = url
       )
     return (response)
     
