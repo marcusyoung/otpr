@@ -493,7 +493,7 @@ called ‘times’ containing the time taken (in seconds) to reach each
 point in the pointset file will also be returned. If a point is not
 reachable the time will be recorded as NA. This could mean that the
 point is genuinely unreachable by the mode (e.g. if it is CAR mode and
-the location is only accessible by walking or cycling) or that point
+the location is only accessible by walking or cycling) or that the point
 falls outside of the surface (which might be due to the extent of the
 network or the 120 minute limit to the surface extent). The ‘times’
 table can be joined with the data from the original pointset file to get
