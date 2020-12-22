@@ -23,7 +23,6 @@ location in the pointset should be returned. Default is FALSE.}
 Assuming no error, returns a list containing 4 or more elements:
 \itemize{
 \item \code{errorId} Will be "OK" if no error condition.
-\item \code{query} The URL that was submitted to the OTP API.
 \item \code{surfaceId} The id of the surface that was evaluated.
 \item One or more dataframes for each of the 'opportunity' columns in the pointset
 CSV file. Each dataframe contains four columns:
@@ -38,12 +37,13 @@ the locations reached within each minute interval.
 \item If \code{detail} was set to TRUE then an additional dataframe containing
 the time taken (in seconds) to reach each point in the pointset CSV file. If a
 point was not reachable the time will be recorded as NA.
+\item \code{query} The URL that was submitted to the OTP API.
 }
 If there is an error, a list containing 3 elements is returned:
 \itemize{
 \item \code{errorId} The id code of the error.
-\item \code{query} The URL that was submitted to the OTP API.
 \item \code{errorMessage} The error message.
+\item \code{query} The URL that was submitted to the OTP API.
 }
 }
 \description{
