@@ -23,9 +23,10 @@
 #' @param arriveBy Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
 #' date and time. Default is FALSE.
 #' @param maxWalkDistance Numeric. The maximum distance (in meters) that the user is
-#' willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
-#' soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
-#' this parameter imposes a hard limit on WALK (see:
+#' willing to walk. Default is NULL (the parameter is not passed to the API and the OTP
+#' default of unlimited takes effect).
+#' This is a soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+#' this parameter imposes a hard limit on WALK, CAR and BICYCLE modes (see:
 #' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
 #' @param walkReluctance A single numeric value. A multiplier for how bad walking is
 #' compared to being in transit for equal lengths of time. Default = 2.
@@ -96,7 +97,7 @@ otp_get_times <-
            mode = "CAR",
            date = format(Sys.Date(), "%m-%d-%Y"),
            time = format(Sys.time(), "%H:%M:%S"),
-           maxWalkDistance = 800,
+           maxWalkDistance = NULL,
            walkReluctance = 2,
            waitReluctance = 1,
            arriveBy = FALSE,
@@ -196,6 +197,20 @@ otp_get_times <-
       return (response)
     } else {
       error.id <- "OK"
+    }
+    
+    # OTPv2 does not return an error when there is no itinerary - for
+    # example if WALK mode and maxWalkDistance is too low. So now also check that
+    # there is at least 1 itinerary present.
+    if (length(asjson$plan$itineraries) == 0) {
+      response <-
+        list(
+          "errorId" = -9999,
+          "errorMessage" = "No itinerary returned. If using OTPv2 the maxWalkDistance parameter (default 800m) might be too restrictive. It 
+          is applied by OTPv2 to BICYCLE and CAR modes in addition to WALK",
+          "query" = url
+        )
+      return (response)
     }
     
     # check if we need to return detailed response

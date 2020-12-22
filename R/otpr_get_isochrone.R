@@ -27,9 +27,10 @@
 #' @param arriveBy Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
 #' date and time. Default is FALSE.
 #' @param maxWalkDistance Numeric. The maximum distance (in meters) that the user is
-#' willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
-#' soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
-#' this parameter imposes a hard limit on WALK (see:
+#' willing to walk. Default is NULL (the parameter is not passed to the API and the OTP
+#' default of unlimited takes effect).
+#' This is a soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+#' this parameter imposes a hard limit on WALK, CAR and BICYCLE modes (see:
 #' \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).
 #' @param walkReluctance A single numeric value. A multiplier for how bad walking is
 #' compared to being in transit for equal lengths of time. Default = 2.
@@ -78,7 +79,7 @@ otp_get_isochrone <-
            cutoffs,
            batch = TRUE,
            arriveBy = FALSE,
-           maxWalkDistance = 800,
+           maxWalkDistance = NULL,
            walkReluctance = 2,
            waitReluctance = 1,
            transferPenalty = 0,

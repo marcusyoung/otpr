@@ -12,14 +12,14 @@ otp_create_surface(
   mode = "TRANSIT",
   date = format(Sys.Date(), "\%m-\%d-\%Y"),
   time = format(Sys.time(), "\%H:\%M:\%S"),
-  maxWalkDistance = 800,
+  maxWalkDistance = NULL,
   walkReluctance = 2,
   waitReluctance = 1,
   transferPenalty = 0,
   minTransferTime = 0,
   batch = TRUE,
   arriveBy = TRUE,
-  extra.params
+  extra.params = list()
 )
 }
 \arguments{
@@ -49,9 +49,10 @@ If \code{arriveBy} is FALSE (the default) this is the desired departure time, ot
 desired arrival time. Only relevant for transit modes. Default is the current system time.}
 
 \item{maxWalkDistance}{Numeric. The maximum distance (in meters) that the user is
-willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
-soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
-this parameter imposes a hard limit on WALK (see:
+willing to walk. Default is NULL (the parameter is not passed to the API and the OTP
+default of unlimited takes effect).
+This is a soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+this parameter imposes a hard limit on WALK, CAR and BICYCLE modes (see:
 \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
 \item{walkReluctance}{A single numeric value. A multiplier for how bad walking is
@@ -77,7 +78,7 @@ paths to all destinations from one origin.}
 \item{arriveBy}{Logical. Whether a trip should depart (FALSE) or arrive (TRUE) at the specified
 date and time. Default is FALSE.}
 
-\item{extra.params}{A list of any other parameter accepted by the OTP API SurfaceResource entry point. For
+\item{extra.params}{A list of any other parameters accepted by the OTP API SurfaceResource entry point. For
 advanced users. Be aware that otpr will carry out no validation of these additional
 parameters. They will be passed directly to the API.}
 }
@@ -85,17 +86,17 @@ parameters. They will be passed directly to the API.}
 Assuming no error, returns a list of 5 elements:
 \itemize{
 \item \code{errorId} Will be "OK" if no error condition.
-\item \code{query} The URL that was submitted to the OTP API.
 \item \code{surfaceId} The id of the surface that was evaluated.
 \item \code{surfaceRecord} Details of the parameters used to create the surface.
 \item \code{rasterDownload} The path to the saved raster file (if \code{getRaster} was
 set to TRUE and a valid path was provided via \code{rasterPath}.)
+\item \code{query} The URL that was submitted to the OTP API.
 }
 If there is an error, a list containing 3 elements is returned:
 \itemize{
 \item \code{errorId} The id code of the error.
-\item \code{query} The URL that was submitted to the OTP API.
 \item \code{errorMessage} The error message.
+\item \code{query} The URL that was submitted to the OTP API.
 }
 }
 \description{

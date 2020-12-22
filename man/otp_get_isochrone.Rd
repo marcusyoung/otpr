@@ -15,12 +15,12 @@ otp_get_isochrone(
   cutoffs,
   batch = TRUE,
   arriveBy = FALSE,
-  maxWalkDistance = 800,
+  maxWalkDistance = NULL,
   walkReluctance = 2,
   waitReluctance = 1,
   transferPenalty = 0,
   minTransferTime = 0,
-  extra.params
+  extra.params = list()
 )
 }
 \arguments{
@@ -58,9 +58,10 @@ Can be a single value.}
 date and time. Default is FALSE.}
 
 \item{maxWalkDistance}{Numeric. The maximum distance (in meters) that the user is
-willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
-soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
-this parameter imposes a hard limit on WALK (see:
+willing to walk. Default is NULL (the parameter is not passed to the API and the OTP
+default of unlimited takes effect).
+This is a soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+this parameter imposes a hard limit on WALK, CAR and BICYCLE modes (see:
 \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
 \item{walkReluctance}{A single numeric value. A multiplier for how bad walking is
@@ -79,7 +80,7 @@ trips on different vehicles. This is designed to allow for imperfect schedule
 adherence. This is a minimum; transfers over longer distances might use a longer time.
 Default is 0.}
 
-\item{extra.params}{A list of any other parameter accepted by the OTP API LIsochrone entry point. For
+\item{extra.params}{A list of any other parameters accepted by the OTP API LIsochrone entry point. For
 advanced users. Be aware that otpr will carry out no validation of these additional
 parameters. They will be passed directly to the API. Do not pass 'fromPlace' or 'toPlace'
 to this function. These parameters are handled internally based on the values of \code{location}

@@ -12,7 +12,7 @@ otp_get_times(
   mode = "CAR",
   date = format(Sys.Date(), "\%m-\%d-\%Y"),
   time = format(Sys.time(), "\%H:\%M:\%S"),
-  maxWalkDistance = 800,
+  maxWalkDistance = NULL,
   walkReluctance = 2,
   waitReluctance = 1,
   arriveBy = FALSE,
@@ -21,7 +21,7 @@ otp_get_times(
   maxItineraries = 1,
   detail = FALSE,
   includeLegs = FALSE,
-  extra.params
+  extra.params = list()
 )
 }
 \arguments{
@@ -44,9 +44,10 @@ If \code{arriveBy} is FALSE (the default) this is the desired departure time, ot
 desired arrival time. Only relevant for transit modes. Default is the current system time.}
 
 \item{maxWalkDistance}{Numeric. The maximum distance (in meters) that the user is
-willing to walk. Default = 800 (approximately 10 minutes at 3 mph). This is a
-soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
-this parameter imposes a hard limit on WALK (see:
+willing to walk. Default is NULL (the parameter is not passed to the API and the OTP
+default of unlimited takes effect).
+This is a soft limit in OTPv1 and is ignored if the mode is WALK only. In OTPv2
+this parameter imposes a hard limit on WALK, CAR and BICYCLE modes (see:
 \url{http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config}).}
 
 \item{walkReluctance}{A single numeric value. A multiplier for how bad walking is
@@ -83,7 +84,7 @@ Default is FALSE.}
 journey leg are returned. If TRUE then a nested dataframe of journeys legs will be returned
 for each itinerary if \code{detail} is also TRUE. Default is FALSE.}
 
-\item{extra.params}{A list of any other parameter accepted by the OTP API PlannerResource entry point. For
+\item{extra.params}{A list of any other parameters accepted by the OTP API PlannerResource entry point. For
 advanced users. Be aware that otpr will carry out no validation of these additional
 parameters. They will be passed directly to the API.}
 }
