@@ -46,8 +46,8 @@ This package will be useful to researchers and transport planners who want to us
 
 **otpr** fully supports OTP versions 1 and 2. Please note the following :
 
-* There is a bug in OTPv2 which means that the first returned itinerary for TRANSIT trips is a (usually) sub-optimal WALK-only option. See: [https://github.com/opentripplanner/OpenTripPlanner/issues/3289](https://github.com/opentripplanner/OpenTripPlanner/issues/3289). Workaround: set an appropriate maxWalkDistance (but see below).  
-* In OTPv2 the `maxWalkDistance` parameter is treated as a hard limit when the mode is either WALK or (strangely) BICYCLE. This could result in no itinerary being returned as the default is 800m. This is different from the behaviour of OTPv1 where this parameter is effectively ignored when the mode is WALK and not applied at all to BICYCLE trips. Workaround: provide a large value to this parameter for these modes. See: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#rest-api](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#rest-api) for more information.
+* There is a bug in OTPv2 which means that the first returned itinerary for TRANSIT trips is a (usually) sub-optimal WALK-only option. See: [https://github.com/opentripplanner/OpenTripPlanner/issues/3289](https://github.com/opentripplanner/OpenTripPlanner/issues/3289). Workaround: set an appropriate maxWalkDistance, perhaps 800 (metres), but see below.  
+* In OTPv2 the `maxWalkDistance` parameter is treated as a hard limit when the mode is either WALK or (strangely) CAR or BICYCLE. This could result in no itinerary being returned if the parameter is change from its default (the default is NULL, which means that the OTP internal default of unlimited takes effect). This is different from the behaviour of OTPv1 where this parameter is effectively ignored when the mode is WALK and not applied at all to BICYCLE or CAR trips. See: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#rest-api](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#rest-api) for more information.
 
 
 ## Installation
