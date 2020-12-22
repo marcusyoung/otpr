@@ -64,7 +64,7 @@ test_that("Check for valid response", {
   expect_equal(nrow(response$population), 102)
   expect_equal(nrow(response$times), 135)
   expect_equal(all(head(response$times, n=1) == c(1, 3158)), TRUE)
-  expect_equal(mean(response$times$time, na.rm = TRUE), 3273.252)
+  expect_equal(mean(response$times$time, na.rm = TRUE), 3273.252, tolerance = .01)
 })
 
 test_that("Check when multiple indicators in pointset file", {
@@ -107,7 +107,7 @@ test_that("Check when multiple indicators in pointset file", {
   expect_equal(nrow(response$indicator), 102)
   expect_equal(nrow(response$times), 135)
   expect_equal(all(head(response$times, n=1) == c(1, 3158)), TRUE)
-  expect_equal(mean(response$times$time, na.rm = TRUE), 3273.252)
+  expect_equal(mean(response$times$time, na.rm = TRUE), 3273.252, tolerance = 0.02)
 })
 
 
