@@ -16,12 +16,6 @@ skip_if_no_otp <- function() {
 }
 
 
-# Test that function not available for OTPv2
-
-
-# test for surfaces end point
-
-
 test_that("Check for invalid surfaceId", {
   skip_if_no_otp()
   error <-

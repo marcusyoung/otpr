@@ -43,10 +43,10 @@ test_that("create surface - no raster download", {
     response,
     c(
       "errorId",
+      "query",
       "surfaceId",
       "surfaceRecord",
-      "rasterDownload",
-      "query"
+      "rasterDownload"
     )
   )
   expect_equal(length(response), 5)
@@ -72,10 +72,10 @@ test_that("create surface - with raster download", {
     response,
     c(
       "errorId",
+      "query",
       "surfaceId",
       "surfaceRecord",
-      "rasterDownload",
-      "query"
+      "rasterDownload"
     )
   )
   expect_equal(length(response), 5)
