@@ -4,7 +4,7 @@
 
 * Support for creating and evaluating surfaces in OTPv1. The OTP surfaces endpoint enables
 efficient running of one-to-many queries. Once a surface for an origin has been
-generated (a surface is specific to a transport mode, date, time etc), distances
+generated (a surface is specific to a transport mode, date, time etc.), distances
 from that origin to a set of locations (or 'opportunities') can be generated very
 quickly - many thousands in a few seconds. In addition, one or more indicators of
 accessibility for those opportunities can be generated at the same time. For example,
@@ -13,7 +13,7 @@ number of jobs accessible from the origin at one-minute intervals are returned, 
 with a cumulative sum, enabling a rapid assessment of the number of job opportunities
 within, say, 30 minutes. There are two new functions to support surfaces:
     * `otp_create_surface()` creates a surface stored in memory on the OTP server and
-    returns its Id number. It can optionally also retrieve and save a raster (geo TIFF)
+    returns its Id number. It can optionally also retrieve and save a raster file (geoTIFF)
     of the surface for visualisation in R (or other GIS).
     * `otp_evaluate_surface()` uses an existing surface and a pointset (loaded from a CSV file
     provided to OTP at server startup) to calculate the travel time to each point location
@@ -21,23 +21,29 @@ within, say, 30 minutes. There are two new functions to support surfaces:
     columns. A list is returned containing a dataframe for each 'opportunity' and, optionally,
     a dataframe of the time taken to travel from the surface's origin to each location point.
     This function can also be used to retrieve the time from an origin to many destinations.
-* Support for OTPv2. Some issues to be aware of (due to OTPv2 implementation not otpr):
+* Support for OTPv2. Some issues to be aware of (due to OTPv2 implementation not **otpr**):
     * currently, due to a bug in OTPv2, for TRANSIT modes a sub-optimal walk-only trip may be returned
     as the top itinerary. See: [https://github.com/opentripplanner/OpenTripPlanner/issues/3289](https://github.com/opentripplanner/OpenTripPlanner/issues/3289) for a discussion of this issue. This can be mitigated by using the 
     `maxWalkDistance` parameter (but see below).
-    * maxWalkDistance is a hard limit. This is a soft limit in OTPv1 and is effectively ignored
-    if the mode is WALK only. In OTPv2 this parameter imposes a hard limit for all modes (including WALK only). see: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config).
-* The `waitReluctance` parameter was added to `otp_get_times()`, `otp_get_isochrone()` and
-`otp_get_surface()`.
-* For advanced users: the ability to pass any *additional* parameter not specified
-in the **otpr** functions to the OTP API. Available in `otp_get_times()`, `otp_get_isochrone()` and
-`otp_get_surface()`. Note that no validation of these additional parameters will be carried out
-by **otpr**. They will be passed directly to the OTP API.
+    * maxWalkDistance is a hard limit in OTPv2. This is a soft limit in OTPv1 and is effectively ignored
+    if the mode is WALK only. In OTPv2 this parameter imposes a hard limit for WALK and BICYCLE modes. see: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config).
+* Multiple trip itineraries are now supported by the `otp_get_times()` function and specified using the `MaxItineraries` argument.
+* The `waitReluctance` argument has been added to `otp_get_times()`, `otp_get_isochrone()` and
+`otp_get_surface()` functions.
+* For advanced users: the ability to pass any *additional* OTP API parameter not specified
+in the **otpr** functions to the OTP API via an `extra.params` argument. Available in
+`otp_get_times()`, `otp_get_isochrone()` and `otp_get_surface()`. Note that no validation of
+these additional parameters will be carried out by **otpr**. They will be passed directly to the OTP API.
 * Now additionally imports **dplyr** and **rrapply**.
+
+## Breaking change
+
+* As part of the support for multiple itineraries, trip legs are now returned by `otp_get_time()` as a nested dataframe within the
+itineraries dataframe, rather than as a separate list element.
 
 ## Bug fixes
 
-* A single numeric value is now accepted for the \code{walkReluctance} parameter - this was incorrectly
+* A single numeric value is now accepted for the `walkReluctance` parameter - this was incorrectly
 restricted to an integer.
 
 # otpr 0.4.2
