@@ -26,7 +26,7 @@ within, say, 30 minutes. There are two new functions to support surfaces:
     as the top itinerary. See: [https://github.com/opentripplanner/OpenTripPlanner/issues/3289](https://github.com/opentripplanner/OpenTripPlanner/issues/3289) for a discussion of this issue. This can be mitigated by using the 
     `maxWalkDistance` parameter (but see below).
     * maxWalkDistance is a hard limit in OTPv2. This is a soft limit in OTPv1 and is effectively ignored
-    if the mode is WALK only. In OTPv2 this parameter imposes a hard limit for WALK and BICYCLE modes. see: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config).
+    if the mode is WALK only. In OTPv2 this parameter imposes a hard limit for WALK, CAR and BICYCLE modes. see: [http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config](http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#router-config).
 * Multiple trip itineraries are now supported by the `otp_get_times()` function and specified using the `MaxItineraries` argument.
 * The `waitReluctance` argument has been added to `otp_get_times()`, `otp_get_isochrone()` and
 `otp_get_surface()` functions.
@@ -36,10 +36,11 @@ in the **otpr** functions to the OTP API via an `extra.params` argument. Availab
 these additional parameters will be carried out by **otpr**. They will be passed directly to the OTP API.
 * Now additionally imports **dplyr** and **rrapply**.
 
-## Breaking change
+## Breaking changes
 
 * As part of the support for multiple itineraries, trip legs are now returned by `otp_get_time()` as a nested dataframe within the
 itineraries dataframe, rather than as a separate list element.
+* The default value for maxWalkDistance (used in `otp_get_times()`, `otp_get_isochrone()` and `otp_create_surface()`) has been changed from 800 to NULL. This means that the internal OTP default of unlimited is applied. This has been implemented due to the impact of this parameter in OTPv2 (see above). It is now necessary to make a conscious decision on whether to set this parameter and to what value. The default value of 800 that was previously set by **otpr** was different from the OTP default (which is unlimited) and so this change corrects that anomaly.
 
 ## Bug fixes
 
