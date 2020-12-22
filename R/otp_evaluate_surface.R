@@ -34,8 +34,8 @@
 #' \item If \code{detail} was set to TRUE then an additional dataframe containing
 #' the time taken (in seconds) to reach each point in the pointset CSV file. If a
 #' point was not reachable the time will be recorded as NA.
-#' }
 #' \item \code{query} The URL that was submitted to the OTP API.
+#' }
 #' If there is an error, a list containing 3 elements is returned:
 #' \itemize{
 #' \item \code{errorId} The id code of the error.
