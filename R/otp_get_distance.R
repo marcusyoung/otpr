@@ -28,6 +28,15 @@ otp_get_distance <-
     mode <- toupper(mode)
     
     
+    # Check for required arguments
+    if (missing(otpcon)) {
+      stop("otpcon argument is required")
+    } else if (missing(fromPlace)) {
+      stop("fromPlace argument is required")
+    } else if (missing(toPlace)) {
+      stop("toPlace argument is required")
+    }
+    
     coll <- checkmate::makeAssertCollection()
     checkmate::assert_class(otpcon, "otpconnect", add = coll)
     checkmate::assert_numeric(
@@ -75,12 +84,17 @@ otp_get_distance <-
     # parse text to json
     asjson <- jsonlite::fromJSON(text)
     
+    
     # Check for errors
     if (!is.null(asjson$error$id)) {
       response <-
         list(
           "errorId" = asjson$error$id,
-          "errorMessage" = asjson$error$msg,
+          "errorMessage" = ifelse(
+            otpcon$version == 1,
+            asjson$error$msg,
+            asjson$error$message
+          ),
           "query" = url
         )
       return (response)
