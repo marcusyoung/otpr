@@ -436,7 +436,7 @@ creates:
     travel time or beyond, *or not accessible at all*, is given the
     value of 120.
 -   Any grid cell outside of the extent of the network (i.e. no-data
-    cells) is given given the value 128.
+    cells) is given the value 128.
 -   It is advisable to interpret the raster of a surface in conjunction
     with results from evaluating the surface (see below).
 -   OTP can take a while the first time a raster of a surface is
