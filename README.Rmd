@@ -296,7 +296,7 @@ tm_shape(osm_man) +
 
 ### One-to-many Travel Time Analysis (OTPv1 only)
 
-If you wish to calculate the travel time from one or more origins to many destinations, querying the OTP journey planning API (using `otp_get_times()`) may not be the best option as it requires multiple requests to the API which can be very inefficient. An alternative is to use the OTP surface analysis feature, which enables you to calculate the travel time from an origin to thousands of destinations in about the same time it takes to perform a single origin:destination lookup. This is achieved by generating a surface for an origin which contains the travel time to every geographic coordinate that can be reached from that origin by the specified transport mode.
+If you wish to calculate the travel time from one or more origins to many destinations, querying the OTP journey planning API (using `otp_get_times()`) may not be the best option as it requires multiple requests to the API which can be very inefficient. An alternative is to use the OTP surface analysis feature, which enables you to calculate the travel time from an origin to thousands of destinations in about the same time it takes to perform a single origin:destination lookup. This is achieved by generating a surface for an origin which contains the travel time to every geographic coordinate that can be reached from that origin by the specified transport mode (though note that there is a hard-coded surface cutoff of 120 minutes set in OTP).
 
 Once the surface has been generated, it can be evaluated to rapidly retrieve the travel times from the origin to each 'destination' point provided in a supplied CSV file. This file, known as a pointset, can also contain the quantities of one or more 'opportunities' that are associated with each point. During evaluation, OTP will sum the opportunities available at each additional minute of travel time, and **otpr** generates a cumulative sum of the opportunities. For example, you might have a poinset of workplace zones and a column with the number of jobs within each zone. The output will be a cumulative sum of jobs reachable for each minute of travel time by the mode specified when the surface was generated.
 
@@ -308,7 +308,7 @@ Once an OTP instance has been started in analysis mode, a surface can be generat
 
 There are a few things to note regarding the raster image that OTP creates:
 
-* The travel time cutoff for a surface is hard-coded iN OTP at 120 minutes. Every grid cell within the extent of the graph that is 120 minutes travel time or beyond, *or not accessible*, is given the value of 120.
+* The travel time cutoff for a surface is hard-coded within OTP at 120 minutes. Every grid cell within the extent of the graph that is 120 minutes travel time or beyond, *or not accessible*, is given the value of 120.
 * Any grid cell outside of the extent of the network (i.e. unreachable) is given the value 128.
 * It is advisable to interpret the raster of a surface in conjunction with results from evaluating the surface (see below).
 * OTP can take a while the first time a raster of a surface is generated after starting up. Subsequent rasters (even for different origins) are much faster to generate.

@@ -208,7 +208,7 @@ otp_get_times(
 #> [1] 60.12
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=12-23-2020&time=19:12:42&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=12-23-2020&time=19:18:43&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -395,7 +395,8 @@ travel time from an origin to thousands of destinations in about the
 same time it takes to perform a single origin:destination lookup. This
 is achieved by generating a surface for an origin which contains the
 travel time to every geographic coordinate that can be reached from that
-origin by the specified transport mode.
+origin by the specified transport mode (though note that there is a
+hard-coded surface cutoff of 120 minutes set in OTP).
 
 Once the surface has been generated, it can be evaluated to rapidly
 retrieve the travel times from the origin to each ‘destination’ point
@@ -433,7 +434,7 @@ evaluation against the surface.
 There are a few things to note regarding the raster image that OTP
 creates:
 
--   The travel time cutoff for a surface is hard-coded iN OTP at 120
+-   The travel time cutoff for a surface is hard-coded within OTP at 120
     minutes. Every grid cell within the extent of the graph that is 120
     minutes travel time or beyond, *or not accessible*, is given the
     value of 120.
