@@ -101,8 +101,22 @@ If there is an error, a list containing 3 elements is returned:
 }
 \description{
 Creates a travel time surface for an origin point. A surface contains the travel time
-to every geographic coordinate that can be reached from that origin. Optionally, the surface
-can be saved as a raster file (GeoTIFF) to a designated directory.
+to every geographic coordinate that can be reached from that origin (up to a hard coded
+limit in OTP of 120 minutes). Optionally, the surface can be saved as a raster file (GeoTIFF)
+to a designated directory.
+}
+\details{
+There are a few things to note regarding the raster image that OTP creates:
+\itemize{
+\item The travel time cutoff for a surface is hard-coded within OTP at 120 minutes. Every grid
+ cell within the extent of the graph that is 120 minutes travel time or beyond, or not accessible,
+ is given the value of 120.
+\item Any grid cell outside of the extent of the network (i.e. unreachable) is given the value 128.
+\item It is advisable to interpret the raster of a surface in conjunction with results from 
+evaluating the surface.
+\item OTP can take a while the first time a raster of a surface is generated after starting up. Subsequent
+rasters (even for different origins) are much faster to generate.
+}
 }
 \examples{
 \dontrun{
