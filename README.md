@@ -405,7 +405,7 @@ also contain the quantities of one or more ‘opportunities’ that are
 associated with each point. During evaluation, OTP will sum the
 opportunities available at each additional minute of travel time, and
 **otpr** generates a cumulative sum of the opportunities. For example,
-you might have a poinset of workplace zones and a column with the number
+you might have a pointset of workplace zones and a column with the number
 of jobs within each zone. The output will be a cumulative sum of jobs
 reachable for each minute of travel time by the mode specified when the
 surface was generated.

@@ -1,4 +1,4 @@
-# otpr 0.4.2.9000 (Development version)
+# otpr 0.5.0
 
 ## New Features
 
