@@ -38,7 +38,7 @@ these additional parameters will be carried out by **otpr**. They will be passed
 
 ## Breaking changes
 
-* As part of the support for multiple itineraries, trip legs are now returned by `otp_get_time()` as a nested dataframe within the
+* As part of the support for multiple itineraries, trip legs are now returned by `otp_get_times()` as a nested dataframe within the
 itineraries dataframe, rather than as a separate list element.
 * The default value for maxWalkDistance (used in `otp_get_times()`, `otp_get_isochrone()` and `otp_create_surface()`) has been changed from 800 to NULL. This means that the internal OTP default of unlimited is applied. This has been implemented due to the impact of this parameter in OTPv2 (see above). It is now necessary to make a conscious decision on whether to set this parameter and to what value. The default value of 800 that was previously set by **otpr** was different from the OTP default (which is unlimited) and so this change corrects that anomaly.
 
