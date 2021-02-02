@@ -1,6 +1,6 @@
 Package: otpr
 Title: An R Wrapper for the 'OpenTripPlanner' REST API
-Version: 0.5.0
+Version: 0.5.0.9000
 Authors@R: c(
     person("Marcus", "Young", email = "M.A.Young@soton.ac.uk", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-4627-1116"))
