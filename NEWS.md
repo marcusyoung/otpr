@@ -1,3 +1,9 @@
+# otpr 0.5.0.9000 (Development)
+
+## Bug fixes
+
+* Check that API call to evaluate surface actually returns some results. If not return error message - most likely cause is that the pointset coordinates are not within the area covered by the surface (e.g. could be the wrong pointset specified or latitude and longitude are the wrong way around).
+
 # otpr 0.5.0
 
 ## New Features
