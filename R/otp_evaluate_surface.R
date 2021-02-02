@@ -150,6 +150,17 @@ otp_evaluate_surface <-
       error.id <- "OK"
     }
     
+    # Check that there are some results
+    if (length(asjson$data[[1]]$sums) == 0) {
+      response <-
+        list(
+          "errorId" = 1001,
+          "errorMessage" = "No results - are the pointset destinations within the area covered by the surface?",
+          "query" = url
+        )
+      return (response)
+    }
+    
     response <- list()
     response["errorId"] <- error.id
     response["surfaceId"] <- as.integer(surfaceId)
