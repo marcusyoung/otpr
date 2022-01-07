@@ -9,3 +9,4 @@
 ^tests/otp$
 ^lucene$
 ^codecov\.yml$
+^CRAN-SUBMISSION$
