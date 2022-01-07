@@ -1,7 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-otpr <img src='man/figures/sticker.png' align="right" height=250/>
-==================================================================
+# otpr <img src='man/figures/sticker.png' align="right" height=250/>
 
 <!-- badges: start -->
 
@@ -19,8 +18,7 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 <!-- badges: end -->
 
-Overview
---------
+## Overview
 
 **otpr** is an R package that provides a wrapper for the
 [OpenTripPlanner](https://www.opentripplanner.org/) (OTP) API. To use
@@ -53,8 +51,7 @@ This package will be useful to researchers and transport planners who
 want to use OTP to generate trip data for accessibility analysis or to
 derive variables for use in transportation models.
 
-Version support
----------------
+## Version support
 
 **otpr** fully supports OTP versions 1 and 2. Please note the following
 :
@@ -76,12 +73,11 @@ Version support
     <http://docs.opentripplanner.org/en/latest/OTP2-MigrationGuide/#rest-api>
     for more information.
 
-Installation
-------------
+## Installation
 
 ``` r
 # Install from CRAN
-install.packages("otpr")
+# install.packages("otpr")
 ```
 
 ### Development version
@@ -92,12 +88,11 @@ install otpr from GitHub. See
 changes since last release.
 
 ``` r
-install.packages("devtools")
-devtools::install_github("marcusyoung/otpr")
+# install.packages("devtools")
+# devtools::install_github("marcusyoung/otpr")
 ```
 
-Getting started
----------------
+## Getting started
 
 ``` r
 library(otpr)
@@ -131,8 +126,7 @@ specified when calling the `otp_connect()` function. This must be a
 valid time zone (checked against the vector returned by `OlsonNames()`);
 for example: “Europe/Berlin”.
 
-Querying the OTP API
---------------------
+## Querying the OTP API
 
 ### Function behaviour
 
@@ -163,7 +157,7 @@ otp_get_distance(
 #> [1] "OK"
 #> 
 #> $distance
-#> [1] 29051.51
+#> [1] 29050.21
 #> 
 #> $query
 #> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=CAR"
@@ -179,7 +173,7 @@ otp_get_distance(
 #> [1] "OK"
 #> 
 #> $distance
-#> [1] 16065.04
+#> [1] 16028.57
 #> 
 #> $query
 #> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE"
@@ -205,10 +199,10 @@ otp_get_times(
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 60.12
+#> [1] 59.75
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=12-23-2020&time=19:18:43&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=BICYCLE&date=01-06-2022&time=19:07:48&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 
 
 # By default the date and time of travel is taken as the current system date and
@@ -218,17 +212,17 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00"
 )
 #> $errorId
 #> [1] "OK"
 #> 
 #> $duration
-#> [1] 42.2
+#> [1] 39.65
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=TRANSIT,WALK&date=04-29-2020&time=07:15:00&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=TRANSIT,WALK&date=01-19-2021&time=07:15:00&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 ```
 
 ### Breakdown of time by mode, waiting time and transfers
@@ -252,7 +246,7 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00",
   detail = TRUE,
   maxItineraries = 1
@@ -262,12 +256,12 @@ otp_get_times(
 #> 
 #> $itineraries
 #>                 start                 end      timeZone duration walkTime
-#> 1 2020-04-29 07:37:31 2020-04-29 08:19:43 Europe/London     42.2     5.17
+#> 1 2021-01-19 07:16:03 2021-01-19 07:55:42 Europe/London    39.65        8
 #>   transitTime waitingTime transfers
-#> 1          37        0.03         0
+#> 1          31        0.65         1
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=TRANSIT,WALK&date=04-29-2020&time=07:15:00&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
+#> [1] "http://localhost:8080/otp/routers/default/plan?fromPlace=53.48805,-2.24258&toPlace=53.36484,-2.27108&mode=TRANSIT,WALK&date=01-19-2021&time=07:15:00&walkReluctance=2&waitReluctance=1&arriveBy=FALSE&transferPenalty=0&minTransferTime=0"
 ```
 
 #### Details of each leg for transit-based trips
@@ -291,7 +285,7 @@ trip <- otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00",
   detail = TRUE,
   includeLegs = TRUE,
@@ -301,13 +295,17 @@ trip <- otp_get_times(
 # Legs for the first itinerary returned by OTP (first 9 columns)
 trip$itineraries$legs[[1]][1:9]
 #>             startTime             endTime      timeZone mode departureWait
-#> 1 2020-04-29 07:37:31 2020-04-29 07:38:59 Europe/London WALK          0.00
-#> 2 2020-04-29 07:39:00 2020-04-29 08:16:00 Europe/London RAIL          0.02
-#> 3 2020-04-29 08:16:01 2020-04-29 08:19:43 Europe/London WALK          0.02
-#>   duration  distance routeType routeId
-#> 1     1.47    98.057        NA    <NA>
-#> 2    37.00 17872.820         2 1:13081
-#> 3     3.70   245.949        NA    <NA>
+#> 1 2021-01-19 07:16:03 2021-01-19 07:18:59 Europe/London WALK          0.00
+#> 2 2021-01-19 07:19:00 2021-01-19 07:28:00 Europe/London TRAM          0.02
+#> 3 2021-01-19 07:28:00 2021-01-19 07:29:23 Europe/London WALK          0.00
+#> 4 2021-01-19 07:30:00 2021-01-19 07:52:00 Europe/London RAIL          0.62
+#> 5 2021-01-19 07:52:01 2021-01-19 07:55:42 Europe/London WALK          0.02
+#>   duration  distance routeType                 routeId
+#> 1     2.93   197.370        NA                    <NA>
+#> 2     9.00  1424.641         0 2:METLYELL:I:2021-01-02
+#> 3     1.38   106.629        NA                    <NA>
+#> 4    22.00 14921.306         2                  1:7285
+#> 5     3.68   246.086        NA                    <NA>
 ```
 
 ### Travel time isochrones (OTPv1 only)
@@ -327,7 +325,7 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00"
 )
 
@@ -350,7 +348,7 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700, 3600, 4500, 5400),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time= "07:15:00",
   maxWalkDistance = 1600,
   walkReluctance = 5,
@@ -405,10 +403,10 @@ also contain the quantities of one or more ‘opportunities’ that are
 associated with each point. During evaluation, OTP will sum the
 opportunities available at each additional minute of travel time, and
 **otpr** generates a cumulative sum of the opportunities. For example,
-you might have a pointset of workplace zones and a column with the number
-of jobs within each zone. The output will be a cumulative sum of jobs
-reachable for each minute of travel time by the mode specified when the
-surface was generated.
+you might have a pointset of workplace zones and a column with the
+number of jobs within each zone. The output will be a cumulative sum of
+jobs reachable for each minute of travel time by the mode specified when
+the surface was generated.
 
 Before a surface analysis can be performed, OTP must be started with the
 `--analyst` switch. To evaluate one or more pointsets against a surface,
@@ -448,7 +446,7 @@ creates:
 
 ``` r
 # create surface with origin as Manchester city centre
-otp_create_surface(otpcon, fromPlace = c(53.479167,-2.244167), date = "03-26-2020",
+otp_create_surface(otpcon, fromPlace = c(53.479167,-2.244167), date = "01-19-2021",
 time = "08:00:00", mode = "TRANSIT", maxWalkDistance = 1600, getRaster = TRUE,
 rasterPath = "C:/temp")
 #> $errorId
@@ -458,13 +456,13 @@ rasterPath = "C:/temp")
 #> [1] 0
 #> 
 #> $surfaceRecord
-#> [1] "{\"id\":0,\"params\":{\"mode\":\"TRANSIT,WALK\",\"date\":\"03-26-2020\",\"walkReluctance\":\"2\",\"arriveBy\":\"FALSE\",\"minTransferTime\":\"0\",\"fromPlace\":\"53.479167,-2.244167\",\"batch\":\"TRUE\",\"transferPenalty\":\"0\",\"time\":\"08:00:00\",\"maxWalkDistance\":\"1600\",\"waitReluctance\":\"1\"}}"
+#> [1] "{\"id\":0,\"params\":{\"mode\":\"TRANSIT,WALK\",\"date\":\"01-19-2021\",\"walkReluctance\":\"2\",\"arriveBy\":\"FALSE\",\"minTransferTime\":\"0\",\"fromPlace\":\"53.479167,-2.244167\",\"batch\":\"TRUE\",\"transferPenalty\":\"0\",\"time\":\"08:00:00\",\"maxWalkDistance\":\"1600\",\"waitReluctance\":\"1\"}}"
 #> 
 #> $rasterDownload
 #> [1] "C:/temp/surface_0.tiff"
 #> 
 #> $query
-#> [1] "http://localhost:8080/otp/surfaces?fromPlace=53.479167,-2.244167&mode=TRANSIT,WALK&date=03-26-2020&time=08:00:00&maxWalkDistance=1600&walkReluctance=2&waitReluctance=1&transferPenalty=0&minTransferTime=0&arriveBy=FALSE&batch=TRUE"
+#> [1] "http://localhost:8080/otp/surfaces?fromPlace=53.479167,-2.244167&mode=TRANSIT,WALK&date=01-19-2021&time=08:00:00&maxWalkDistance=1600&walkReluctance=2&waitReluctance=1&transferPenalty=0&minTransferTime=0&arriveBy=FALSE&batch=TRUE"
 ```
 
 ![Example of surface raster visualised in
@@ -503,41 +501,40 @@ table can be joined with the data from the original pointset file to get
 the travel time from the origin to each destination.
 
 ``` r
-response <- otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "jobs", detail = TRUE)
+response <- otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "gm-jobs", detail = TRUE)
 # Look at first few rows of the job opportunity data
 head(response$jobs)
 #>   minutes counts sums cumsums
-#> 1       1      0  230     230
-#> 2       2      0  442     672
-#> 3       3      1  636    1308
-#> 4       4      3 1689    2997
-#> 5       5      4 2872    5869
-#> 6       6      8 4300   10169
+#> 1       1      0  219     219
+#> 2       2      0  441     660
+#> 3       3      1  637    1297
+#> 4       4      3 1656    2953
+#> 5       5      4 2905    5858
+#> 6       6      9 4848   10706
 # And the last few rows
 tail(response$jobs)
 #>     minutes counts sums cumsums
-#> 115     115      3 2057 1154742
-#> 116     116      3 1349 1156091
-#> 117     117      2  974 1157065
-#> 118     118      2  793 1157858
-#> 119     119      0  284 1158142
-#> 120     120      1   92 1158234
+#> 101     101      1  401 1225495
+#> 102     102      1  329 1225824
+#> 103     103      1  560 1226384
+#> 104     104      2  817 1227201
+#> 105     105      0  458 1227659
+#> 106     106      1  198 1227857
 # Number of job opportunities accesible with 60 minutes from origin by TRANSIT
 response$jobs$cumsums[60]
-#> [1] 706590
+#> [1] 927699
 # And a peak at the times dataframe
 head(response$times)
 #>   point time
-#> 1     1 6736
-#> 2     2 2966
-#> 3     3  328
-#> 4     4 2894
-#> 5     5 4199
-#> 6     6   NA
+#> 1     1 3641
+#> 2     2 4351
+#> 3     3 4835
+#> 4     4 5058
+#> 5     5 4653
+#> 6     6 4244
 ```
 
-Learning more
--------------
+## Learning more
 
 The example function calls shown above can be extended by passing
 additional parameters to the OTP API. This includes the advanced option
@@ -564,14 +561,12 @@ automated framework to derive model variables from open transport data
 using R, PostgreSQL and
 OpenTripPlanner](https://eprints.soton.ac.uk/389728/).
 
-Getting help
-------------
+## Getting help
 
 -   Please [report any issues or
     bugs](https://github.com/marcusyoung/otpr/issues).
 
-How to cite
------------
+## How to cite
 
 Please cite **otpr** if you use it. Get citation information using:
 `citation(package = 'otpr')`:
@@ -584,7 +579,7 @@ citation(package = 'otpr')
 #> https://zenodo.org/record/4065250
 #> 
 #>   Marcus Young (2020). otpr: An API wrapper for OpenTripPlanner. R
-#>   package version 0.4.2. https://doi.org/10.5281/zenodo.4065250
+#>   package version 0.5.0. https://doi.org/10.5281/zenodo.4065250
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -592,13 +587,12 @@ citation(package = 'otpr')
 #>     author = {{Marcus Young}},
 #>     title = {{otpr: An API wrapper for OpenTripPlanner}},
 #>     year = {2020},
-#>     note = {{R package version 0.4.2}},
-#>     doi = {{10.5281/zenodo.4065250}},
+#>     note = {{R package version 0.5.0}},
+#>     doi = {10.5281/zenodo.4065250},
 #>   }
 ```
 
-Want to say thanks?
--------------------
+## Want to say thanks?
 
 <a href="https://ko-fi.com/marcusyoung"><img src='man/figures/BuyMeACoffee_blue@2x.png' align="left" width=200/></a>
 

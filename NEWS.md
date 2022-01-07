@@ -1,4 +1,6 @@
-# otpr 0.5.0.9000 (Development)
+# otpr 0.5.1.9000 (Development)
+
+# otpr 0.5.1
 
 ## Bug fixes
 

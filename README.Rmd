@@ -54,7 +54,7 @@ This package will be useful to researchers and transport planners who want to us
 
 ```{r install, eval=FALSE}
 # Install from CRAN
-install.packages("otpr")
+# install.packages("otpr")
 ```
 
 ### Development version
@@ -62,8 +62,8 @@ install.packages("otpr")
 To get a bug fix, or use a feature from the development version, you can install otpr from GitHub. See [NEWS](https://github.com/marcusyoung/otpr/blob/master/NEWS.md) for changes since last release.
 
 ```{r eval=FALSE}
-install.packages("devtools")
-devtools::install_github("marcusyoung/otpr")
+# install.packages("devtools")
+# devtools::install_github("marcusyoung/otpr")
 ```
 
 
@@ -159,7 +159,7 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00"
 )
 
@@ -182,7 +182,7 @@ otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00",
   detail = TRUE,
   maxItineraries = 1
@@ -208,7 +208,7 @@ trip <- otp_get_times(
   fromPlace = c(53.48805,-2.24258),
   toPlace = c(53.36484,-2.27108),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00",
   detail = TRUE,
   includeLegs = TRUE,
@@ -237,7 +237,7 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time = "07:15:00"
 )
 
@@ -261,7 +261,7 @@ my_isochrone <- otp_get_isochrone(
   fromLocation = FALSE,
   cutoffs = c(900, 1800, 2700, 3600, 4500, 5400),
   mode = "TRANSIT",
-  date = "04-29-2020",
+  date = "01-19-2021",
   time= "07:15:00",
   maxWalkDistance = 1600,
   walkReluctance = 5,
@@ -315,7 +315,7 @@ There are a few things to note regarding the raster image that OTP creates:
 
 ```{r}
 # create surface with origin as Manchester city centre
-otp_create_surface(otpcon, fromPlace = c(53.479167,-2.244167), date = "03-26-2020",
+otp_create_surface(otpcon, fromPlace = c(53.479167,-2.244167), date = "01-19-2021",
 time = "08:00:00", mode = "TRANSIT", maxWalkDistance = 1600, getRaster = TRUE,
 rasterPath = "C:/temp")
 ```
@@ -336,7 +336,7 @@ As noted above, there is a cutoff of 120 minutes for the surface and only data f
 If the optional `detail` argument is set to TRUE, then a dataframe called 'times' containing the time taken (in seconds) to reach each point in the pointset file will also be returned. If a point is not reachable the time will be recorded as NA. This could mean that the point is genuinely unreachable by the mode (e.g. if it is CAR mode and the location is only accessible by walking or cycling) or that the point falls outside of the surface (which might be due to the extent of the network or the 120 minute limit to the surface extent). The 'times' table can be joined with the data from the original pointset file to get the travel time from the origin to each destination.
 
 ```{r}
-response <- otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "jobs", detail = TRUE)
+response <- otp_evaluate_surface(otpcon, surfaceId = 0, pointset = "gm-jobs", detail = TRUE)
 # Look at first few rows of the job opportunity data
 head(response$jobs)
 # And the last few rows
