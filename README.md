@@ -9,7 +9,7 @@
 status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4065250.svg)](https://doi.org/10.5281/zenodo.4065250)
 [![Codecov test
-coverage](https://codecov.io/gh/marcusyoung/otpr/branch/master/graph/badge.svg)](https://codecov.io/gh/marcusyoung/otpr?branch=master)
+coverage](https://codecov.io/gh/marcusyoung/otpr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/marcusyoung/otpr?branch=master)
 [![CRAN
 downloads](https://cranlogs.r-pkg.org/badges/grand-total/otpr)](https://cran.r-project.org/package=otpr)
 [![Project Status: Active – The project has reached a stable, usable
