@@ -4,8 +4,7 @@
 
 <!-- badges: start -->
 
-[![Build
-Status](https://travis-ci.com/marcusyoung/otpr.svg?branch=master)](https://travis-ci.com/marcusyoung/otpr)
+[![Build Status](https://app.travis-ci.com/marcusyoung/otpr.svg?branch=master)](https://app.travis-ci.com/marcusyoung/otpr)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/otpr)](https://cran.r-project.org/package=otpr)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4065250.svg)](https://doi.org/10.5281/zenodo.4065250)
