@@ -10,3 +10,4 @@
 ^lucene$
 ^codecov\.yml$
 ^CRAN-SUBMISSION$
+^dev$
